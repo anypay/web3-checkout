@@ -26,3 +26,26 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
+
+# Styling guide
+
+Common conventions for styling guide
+
+### styled components
+
+Use [styled components](https://styled-components.com/docs/advanced#theming) for common theming and styling. Components used in should follow following naming convention `[ComponentName]Styled`.
+
+### compose and reuse
+
+Custom component styling should be minimized as much as possible. Styling should be created by composing and reusing smaller chunks defined at `theme.tsx`.\
+
+```
+const WrapperStyled = styled.div`
+  ${props => props.theme.padding.default}
+  ${props => props.theme.background.card}
+`
+...
+<WrapperStyled>
+  ${this.props.children}
+</WrapperStyled>
+```
