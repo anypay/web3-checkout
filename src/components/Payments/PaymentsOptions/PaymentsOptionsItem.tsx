@@ -18,10 +18,11 @@ const ComponentStyled = styled.div`
 
   ${props => props.theme.flex.one}
   ${props => props.theme.flex.directionRow}
+  ${props => props.theme.flex.alignItemsCenter}
 `
 
 const TitleStyled = styled.div`
-  ${props => props.theme.font.sizeH4}
+  ${props => props.theme.font.sizeH2}
   ${props => props.theme.font.weight600}
 `
 

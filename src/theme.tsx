@@ -2,18 +2,21 @@ import { css } from 'styled-components'
 
 export const colors = {
   white: '#ffffff',
-  card: '#333333',
+  card: '#f4f4f4',
   primary: '#357edd',
   border: '#eeeeee',
   grey: '#777777',
+  dark: '#333333',
 }
 
 export const units = {
+  radiusDefault: '0.5rem',
+
   paddingDefault: '1rem',
   paddingSmall: '0.5rem',
 
   fontSizeH1: '1.5rem',
-  fontSizeH4: '1.125rem',
+  fontSizeH2: '1.125rem',
   fontSizeH3: '1rem',
   fontSizeP: '.75rem',
   fontSizeCaption: '0.5rem',
@@ -40,6 +43,10 @@ const font = {
     font-size: ${units.fontSizeH1};
     line-height: 1.25;
   `,
+  sizeH2: css`
+    font-size: ${units.fontSizeH2};
+    line-height: 1.5;
+  `,
   sizeH3: css`
     font-size: ${units.fontSizeH3};
     line-height: 1.5;
@@ -54,6 +61,15 @@ const font = {
   colorLight: css`
     color: ${colors.grey};
   `,
+  colorDark: css`
+    color: ${colors.dark};
+  `,
+  alignCenter: css`
+    text-align: center;
+  `,
+  alignEnd: css`
+    text-align: end;
+  `,
 }
 
 /**
@@ -64,10 +80,10 @@ const padding = {
     padding: ${units.paddingDefault};
   `,
   defaultHorizontal: css`
-    padding: ${units.paddingDefault} 0;
+    padding: 0 ${units.paddingDefault};
   `,
   defaultVertical: css`
-    padding: 0 ${units.paddingDefault};
+    padding: ${units.paddingDefault} 0;
   `,
   defaultBottom: css`
     padding-bottom: ${units.paddingDefault};
@@ -86,10 +102,10 @@ const padding = {
     padding: ${units.paddingSmall};
   `,
   smallHorizontal: css`
-    padding: ${units.paddingSmall} 0;
+    padding: 0 ${units.paddingSmall};
   `,
   smallVertical: css`
-    padding: 0 ${units.paddingSmall};
+    padding: ${units.paddingSmall} 0;
   `,
   smallBottom: css`
     padding-bottom: ${units.paddingSmall};
@@ -113,7 +129,7 @@ const border = {
     border: 1px solid ${colors.border};
   `,
   defaultRadius: css`
-    border-radius: 4px;
+    border-radius: ${units.radiusDefault};
   `,
 }
 
@@ -125,10 +141,12 @@ const flex = {
     flex-direction: row;
     display: flex;
   `,
+  alignItemsCenter: css`
+    align-items: center;
+    display: flex;
+  `,
   one: css`
     flex: 1;
-    width: '100%',
-    height: '100%',
   `,
 }
 
