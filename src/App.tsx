@@ -1,12 +1,16 @@
 import React from 'react'
+import { ThemeProvider } from 'styled-components'
+import ModalTemplate from './templates/Modal'
+import PaymentsComponent from './components/Payments'
+import theme from './theme'
 
 function App() {
   return (
-    <div>
-      <header>
-        <p>anypay sdk</p>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <ModalTemplate>
+        <PaymentsComponent />
+      </ModalTemplate>
+    </ThemeProvider>
   )
 }
 
