@@ -16,7 +16,6 @@ const MainStyled = styled.div`
 
 const ContentStyled = styled.div`
   width: 60%;
-
   ${props => props.theme.padding.smallRight}
 `
 

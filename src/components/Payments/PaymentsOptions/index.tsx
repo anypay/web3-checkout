@@ -2,7 +2,7 @@ import React from 'react'
 import PaymentsOptionsItemComponent from './PaymentsOptionsItem'
 import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
 
-function PaymentsHeaderComponent() {
+function PaymentsOptionsComponent() {
   return (
     <div>
       <PaymentsOptionsItemComponent
@@ -26,4 +26,4 @@ function PaymentsHeaderComponent() {
   )
 }
 
-export default PaymentsHeaderComponent
+export default PaymentsOptionsComponent

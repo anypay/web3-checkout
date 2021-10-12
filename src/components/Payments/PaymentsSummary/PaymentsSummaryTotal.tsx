@@ -1,9 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-type IPaymentsSummaryTotalContent = {
-}
-
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultTop}
 `
@@ -34,7 +31,7 @@ const PriceStyled = styled.div`
   ${props => props.theme.font.alignEnd}
 `
 
-function PaymentsSummaryTotalContent({}: IPaymentsSummaryTotalContent) {
+function PaymentsSummaryTotalContent() {
   return (
     <WrapperStyled>
       <ComponentStyled>
