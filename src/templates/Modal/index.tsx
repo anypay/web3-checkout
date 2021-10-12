@@ -7,10 +7,14 @@ type IModalTemplate = {
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.default}
-  ${props => props.theme.background.card}
 `
 
 const ComponentStyled = styled.div`
+  max-width: 48rem;
+
+  ${props => props.theme.padding.default}
+  ${props => props.theme.background.default}
+  ${props => props.theme.border.defaultRadius}
 `
 
 function ModalTemplate({ children }: IModalTemplate) {
