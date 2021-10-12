@@ -1,5 +1,5 @@
 import React from 'react'
-import PaymentsHeaderComponent from './PaymentsHeader'
+import PaymentsHeaderComponent from 'components/Payments/PaymentsHeader'
 
 function PaymentsComponent() {
   return (
