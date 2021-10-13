@@ -1,0 +1,19 @@
+/* .accordion {}
+.accordion__item + .accordion__item {}
+.accordion__button {}
+.accordion__button:hover {}
+.accordion__panel {} */
+
+[hidden] {
+  display: none;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

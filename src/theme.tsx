@@ -128,6 +128,9 @@ const border = {
   default: css`
     border: 1px solid ${colors.border};
   `,
+  active: css`
+    border: 1px solid ${colors.primary};
+  `,
   defaultRadius: css`
     border-radius: ${units.radiusDefault};
   `,
