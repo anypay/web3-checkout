@@ -1,20 +1,28 @@
 import React from 'react'
 import styled from 'styled-components'
 
-type IPaymentsOptionsItemComponent = {
+type IPaymentsOptionsItemHeaderComponent = {
   title: string;
   subtitle: string;
   icon?: JSX.Element;
+  active?: boolean;
 }
+
+type IComponentStyled = {
+  readonly active?: boolean;
+};
+
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultBottom}
 `
 
-const ComponentStyled = styled.div`
+const ComponentStyled = styled.div<IComponentStyled>`
+  ${props => props.active && props.theme.border.active}
+  ${props => !props.active && props.theme.border.default}
+
   ${props => props.theme.background.default}
   ${props => props.theme.padding.default}
-  ${props => props.theme.border.default}
   ${props => props.theme.border.defaultRadius}
 
   ${props => props.theme.flex.one}
@@ -40,10 +48,10 @@ const IconStyled = styled.div`
   ${props => props.theme.padding.defaultLeft}
 `
 
-function PaymentsOptionsItemComponent({ title, subtitle, icon }: IPaymentsOptionsItemComponent) {
+function PaymentsOptionsItemComponent({ title, subtitle, icon, active }: IPaymentsOptionsItemHeaderComponent) {
   return (
     <WrapperStyled>
-      <ComponentStyled>
+      <ComponentStyled active={active}>
         <ContentStyled>
           <TitleStyled>{title}</TitleStyled>
           <SubtitleStyled>{subtitle}</SubtitleStyled>
