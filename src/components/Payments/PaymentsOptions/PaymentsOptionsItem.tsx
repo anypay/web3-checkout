@@ -12,6 +12,7 @@ const WrapperStyled = styled.div`
 `
 
 const ComponentStyled = styled.div`
+  ${props => props.theme.background.default}
   ${props => props.theme.padding.default}
   ${props => props.theme.border.default}
   ${props => props.theme.border.defaultRadius}
