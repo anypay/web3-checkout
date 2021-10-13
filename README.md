@@ -17,7 +17,7 @@ You will also see any lint errors in the console.
 ### `yarn example`
 
 Runs the example integration.\
-Open [http://localhost:672/](http://localhost:672/) to view it in the browser.
+Open [http://localhost:5672/](http://localhost:5672/) to view it in the browser.
 
 ### `yarn storybook`
 
