@@ -14,6 +14,11 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
+### `yarn storybook`
+
+Runs the storybook mode.\
+Open [http://localhost:6006/](http://localhost:6006/) to view it in the browser.
+
 ### `yarn test`
 
 Launches the test runner in the interactive watch mode.\
@@ -39,12 +44,14 @@ Use [styled components](https://styled-components.com/docs/advanced#theming) for
 
 Custom component styling should be minimized as much as possible. Styling should be created by composing and reusing smaller chunks defined at `theme.tsx`.\
 
-```
+```js
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.default}
   ${props => props.theme.background.card}
 `
+
 ...
+
 <WrapperStyled>
   ${this.props.children}
 </WrapperStyled>
