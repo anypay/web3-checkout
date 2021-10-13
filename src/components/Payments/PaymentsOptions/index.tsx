@@ -1,28 +1,82 @@
 import React from 'react'
-import PaymentsOptionsItemComponent from './PaymentsOptionsItem'
+import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
+import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
 import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
+
+import PaymentRelayService from 'services/PaymentRelay'
+
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemButton,
+  AccordionItemPanel,
+} from 'react-accessible-accordion'
 
 function PaymentsOptionsComponent() {
   return (
-    <div>
-      <PaymentsOptionsItemComponent
-        title="Relay"
-        subtitle="Swipe to pay using your favourite web wallet."
-        icon={<PaymentsOptionsIconComponent />}
-      />
+    <Accordion>
+      {/**
+       * Relay
+       */}
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="Relay"
+              subtitle="Swipe to pay using your favourite web wallet."
+              icon={<PaymentsOptionsIconComponent />}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
 
-      <PaymentsOptionsItemComponent
-        title="Handcash / Simply Cash / Electrum"
-        subtitle="Scan and pay using Simplified Payments / BIP270."
-        icon={<PaymentsOptionsIconComponent />}
-      />
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <PaymentRelayService
+              recepient="me@azimgd.com"
+              amount={40}
+              currency="BSV"
+            />
+          </PaymentsOptionsItemBodyComponent>
+        </AccordionItemPanel>
+      </AccordionItem>
 
-      <PaymentsOptionsItemComponent
-        title="Volt / Maxthon VBox"
-        subtitle="Pay using the Open Payment Protocol."
-        icon={<PaymentsOptionsIconComponent />}
-      />
-    </div>
+      {/**
+       * Handcash
+       */}
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="Handcash / Simply Cash / Electrum"
+              subtitle="Scan and pay using Simplified Payments / BIP270."
+              icon={<PaymentsOptionsIconComponent />}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+        </AccordionItemPanel>
+      </AccordionItem>
+
+      {/**
+       * Vold
+       */}
+      <AccordionItem>
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="Volt / Maxthon VBox"
+              subtitle="Pay using the Open Payment Protocol."
+              icon={<PaymentsOptionsIconComponent />}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+        </AccordionItemPanel>
+      </AccordionItem>
+    </Accordion>
   )
 }
 

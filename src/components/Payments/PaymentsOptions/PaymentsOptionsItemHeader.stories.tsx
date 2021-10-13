@@ -1,22 +1,22 @@
 import { Meta } from '@storybook/react'
 
-import PaymentsOptionsItemComponent from './PaymentsOptionsItem'
+import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
 
 export default {
-  component: PaymentsOptionsItemComponent,
-  title: 'Components/PaymentsOptionsItem',
+  component: PaymentsOptionsItemHeaderComponent,
+  title: 'Components/PaymentsOptionsItemHeader',
 } as Meta
 
 export const Default: React.VFC<{}> = () => (
-  <PaymentsOptionsItemComponent
+  <PaymentsOptionsItemHeaderComponent
     title="Payment option"
     subtitle="Payment option description, could be long as well"
   />
 )
 
 export const WithIcon: React.VFC<{}> = () => (
-  <PaymentsOptionsItemComponent
+  <PaymentsOptionsItemHeaderComponent
     title="Payment option"
     subtitle="Payment option description, could be long as well"
     icon={<PaymentsOptionsIconComponent />}

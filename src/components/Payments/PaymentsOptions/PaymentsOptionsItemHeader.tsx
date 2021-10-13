@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-type IPaymentsOptionsItemComponent = {
+type IPaymentsOptionsItemHeaderComponent = {
   title: string;
   subtitle: string;
   icon?: JSX.Element;
@@ -40,7 +40,7 @@ const IconStyled = styled.div`
   ${props => props.theme.padding.defaultLeft}
 `
 
-function PaymentsOptionsItemComponent({ title, subtitle, icon }: IPaymentsOptionsItemComponent) {
+function PaymentsOptionsItemComponent({ title, subtitle, icon }: IPaymentsOptionsItemHeaderComponent) {
   return (
     <WrapperStyled>
       <ComponentStyled>
