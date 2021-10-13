@@ -6,7 +6,6 @@ type IModalTemplate = {
 }
 
 const WrapperStyled = styled.div`
-  ${props => props.theme.padding.default}
 `
 
 const ComponentStyled = styled.div`
