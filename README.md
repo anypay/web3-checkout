@@ -14,6 +14,11 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
+### `yarn example`
+
+Runs the example integration.\
+Open [http://localhost:5672/](http://localhost:5672/) to view it in the browser.
+
 ### `yarn storybook`
 
 Runs the storybook mode.\
@@ -42,7 +47,7 @@ Use [styled components](https://styled-components.com/docs/advanced#theming) for
 
 ### compose and reuse
 
-Custom component styling should be minimized as much as possible. Styling should be created by composing and reusing smaller chunks defined at `theme.tsx`.\
+Custom component styling should be minimized as much as possible. Styling should be created by composing and reusing smaller chunks defined at `theme.tsx`.
 
 ```js
 const WrapperStyled = styled.div`
