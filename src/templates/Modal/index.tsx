@@ -9,7 +9,7 @@ const WrapperStyled = styled.div`
 `
 
 const ComponentStyled = styled.div`
-  max-width: 48rem;
+  max-width: 40rem;
 
   ${props => props.theme.padding.default}
   ${props => props.theme.background.default}
