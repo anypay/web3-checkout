@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Modal template renders 1`] = `
+.c0 {
+  max-width: 48rem;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+}
+
+<div
+  className=""
+>
+  <div
+    className="c0"
+  >
+    <div>
+      Modal contents
+    </div>
+  </div>
+</div>
+`;
