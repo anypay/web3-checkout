@@ -80,10 +80,12 @@ const padding = {
     padding: ${units.paddingDefault};
   `,
   defaultHorizontal: css`
-    padding: 0 ${units.paddingDefault};
+    padding-left: ${units.paddingDefault};
+    padding-right: ${units.paddingDefault};
   `,
   defaultVertical: css`
-    padding: ${units.paddingDefault} 0;
+    padding-top: ${units.paddingDefault};
+    padding-bottom: ${units.paddingDefault};
   `,
   defaultBottom: css`
     padding-bottom: ${units.paddingDefault};
@@ -102,10 +104,12 @@ const padding = {
     padding: ${units.paddingSmall};
   `,
   smallHorizontal: css`
-    padding: 0 ${units.paddingSmall};
+    padding-left: ${units.paddingSmall};
+    padding-right: ${units.paddingSmall};
   `,
   smallVertical: css`
-    padding: ${units.paddingSmall} 0;
+    padding-top: ${units.paddingSmall};
+    padding-bottom: ${units.paddingSmall};
   `,
   smallBottom: css`
     padding-bottom: ${units.paddingSmall};
@@ -128,8 +132,15 @@ const border = {
   default: css`
     border: 1px solid ${colors.border};
   `,
+  defaultGlow: css`
+    border: 1px solid ${colors.border};
+  `,
   active: css`
     border: 1px solid ${colors.primary};
+  `,
+  activeGlow: css`
+    border: 1px solid ${colors.primary};
+    box-shadow: 0px 0px 2px ${colors.primary};
   `,
   defaultRadius: css`
     border-radius: ${units.radiusDefault};
