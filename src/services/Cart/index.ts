@@ -1,9 +1,10 @@
-import { atom, useRecoilState } from 'recoil';
+import { atom, useRecoilState } from 'recoil'
 
 const cartState = atom({
   key: 'cart',
   default: {
     products: [],
+    date: Date.now(),
   } as ICart,
 })
 
@@ -24,6 +25,14 @@ const Cart = () => {
     return getState
   }
 
+  const getTotal = () => {
+    return getState.products.reduce((acc, item) => acc + item.price, 0)
+  }
+
+  const getTotalInCrypto = (rate: number) => {
+    return getTotal() * rate
+  }
+
   const addProduct = (product: IProduct) => {
     setState(state => ({ ...state, products: state.products.concat([product]) }))
   }
@@ -34,6 +43,8 @@ const Cart = () => {
 
   return {
     get,
+    getTotal,
+    getTotalInCrypto,
     addProduct,
     removeProduct,
   }
