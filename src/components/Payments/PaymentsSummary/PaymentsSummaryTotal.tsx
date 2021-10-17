@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import type { ICartService } from 'services/Cart'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultTop}
@@ -24,6 +25,9 @@ const SubtitleStyled = styled.div`
 `
 
 const PriceStyled = styled.div`
+  overflow: hidden;
+  white-space: nowrap;
+
   ${props => props.theme.font.sizeH2}
   ${props => props.theme.font.weight600}
   ${props => props.theme.font.colorDark}
@@ -31,13 +35,13 @@ const PriceStyled = styled.div`
   ${props => props.theme.font.alignEnd}
 `
 
-function PaymentsSummaryTotalContent() {
+function PaymentsSummaryTotalContent({ cart }: { cart: ICartService }) {
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Total</TitleStyled>
         <SubtitleStyled>
-          <PriceStyled>Đ 5.3</PriceStyled>
+          <PriceStyled>Đ {cart.getTotalInCrypto(0.00002653).toFixed(8)}</PriceStyled>
           0.00002653
         </SubtitleStyled>
       </ComponentStyled>

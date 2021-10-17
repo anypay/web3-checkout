@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PaymentsHeaderComponent from 'components/Payments/PaymentsHeader'
 import PaymentsOptionsComponent from 'components/Payments/PaymentsOptions'
 import PaymentsSummaryComponent from 'components/Payments/PaymentsSummary'
 import styled from 'styled-components'
+import CartService from 'services/Cart'
 
 const WrapperStyled = styled.div`
 `
@@ -25,6 +26,19 @@ const SidebarStyled = styled.div`
 `
 
 function PaymentsComponent() {
+  const cart = CartService()
+
+  const products = [
+    { id: '1', name: 'Ancient Vase', description: 'Ancient vase from ancient times', price: 19.00 },
+    { id: '2', name: 'Ancient Clock', description: 'Ancient clock from ancient times', price: 47.00 },
+  ]
+
+  useEffect(() => {
+    if (!cart.get().initialized) {
+      cart.initialize(products)
+    }
+  }, [])
+
   return (
     <WrapperStyled>
       <ComponentStyled>

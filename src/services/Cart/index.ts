@@ -5,21 +5,41 @@ const cartState = atom({
   default: {
     products: [],
     date: Date.now(),
+    initialized: false,
   } as ICart,
 })
 
-type IProduct = {
+export type IProduct = {
   id: string;
   name: string;
+  description: string;
   price: number;
 }
 
-type ICart = {
+export type ICart = {
   products: IProduct[];
+  date: number;
+  initialized: boolean;
 }
 
-const Cart = () => {
+export type ICartService = {
+  initialize: (products: IProduct[]) => void
+  get: () => ICart
+  getTotal: () => number
+  getTotalInCrypto: (rate: number) => number
+  addProduct: (product: IProduct) => void
+  removeProduct: (product: IProduct) => void
+}
+
+const CartService = () => {
   const [getState, setState] = useRecoilState<ICart>(cartState)
+
+  const initialize = (products: IProduct[]) => {
+    if (getState.initialized) {
+      throw new Error('Cannot initialize more than once')
+    }
+    setState(state => ({ ...state, products, initialized: true }))
+  }
 
   const get = () => {
     return getState
@@ -42,6 +62,7 @@ const Cart = () => {
   }
 
   return {
+    initialize,
     get,
     getTotal,
     getTotalInCrypto,
@@ -50,4 +71,4 @@ const Cart = () => {
   }
 }
 
-export default Cart
+export default CartService

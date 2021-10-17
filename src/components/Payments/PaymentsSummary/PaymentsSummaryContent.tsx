@@ -1,11 +1,16 @@
 import React from 'react'
 import styled from 'styled-components'
+import type { ICartService } from 'services/Cart'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.smallVertical}
 `
 
 const ComponentStyled = styled.div`
+`
+
+const ProductStyled = styled.div`
+  ${props => props.theme.padding.smallBottom}
 `
 
 const TitleStyled = styled.div`
@@ -19,12 +24,16 @@ const SubtitleStyled = styled.div`
   ${props => props.theme.font.colorLight}
 `
 
-function PaymentsSummaryContentContent() {
+function PaymentsSummaryContentContent({ cart }: { cart: ICartService }) {
   return (
     <WrapperStyled>
       <ComponentStyled>
-        <TitleStyled>Memo</TitleStyled>
-        <SubtitleStyled>Paypresto graffiti demo</SubtitleStyled>
+        {cart.get().products.map(product => (
+          <ProductStyled>
+            <TitleStyled>{product.name}</TitleStyled>
+            <SubtitleStyled>{product.description}</SubtitleStyled>
+          </ProductStyled>
+        ))}
       </ComponentStyled>
     </WrapperStyled>
   )

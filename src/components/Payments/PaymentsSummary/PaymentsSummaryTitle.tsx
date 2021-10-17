@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import dayjs from 'dayjs'
+import type { ICartService } from 'services/Cart'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultBottom}
@@ -21,12 +23,12 @@ const SubtitleStyled = styled.div`
   ${props => props.theme.font.colorLight}
 `
 
-function PaymentsSummaryTitleComponent() {
+function PaymentsSummaryTitleComponent({ cart }: { cart: ICartService }) {
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Invoice</TitleStyled>
-        <SubtitleStyled>12 October 2021</SubtitleStyled>
+        <SubtitleStyled>{dayjs(cart.get().date).format('DD MMMM YYYY')}</SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>
   )

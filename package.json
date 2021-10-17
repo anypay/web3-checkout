@@ -32,7 +32,8 @@
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
     "serve-build": "serve ./build -p 5671",
-    "serve-example": "serve ./example -p 5672"
+    "serve-example": "serve ./example -p 5672",
+    "serve": "concurrently \"yarn:serve-*\""
   },
   "eslintConfig": {
     "extends": [

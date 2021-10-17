@@ -6,16 +6,28 @@ import {expect, jest, test} from '@jest/globals'
 jest.useFakeTimers('modern')
 
 const products = [
-  { id: '1', name: 'First product', price: 1.99 },
-  { id: '2', name: 'Second product', price: 2.99 },
-  { id: '3', name: 'Third product', price: 3.99 },
-  { id: '4', name: 'Fourth product', price: 4.99 },
+  { id: '1', name: 'First product', description: 'First description', price: 1.99 },
+  { id: '2', name: 'Second product', description: 'Second description', price: 2.99 },
+  { id: '3', name: 'Third product', description: 'Third description', price: 3.99 },
+  { id: '4', name: 'Fourth product', description: 'Fourth description', price: 4.99 },
 ]
 
-test('Products cart initializes, add/remove operations work', () => {
+test('Products cart initializes', () => {
   const { result } = renderHook(() => CartService(), { wrapper: RecoilRoot })
 
   expect(result.current.get()).toMatchObject({ products: [] })
+
+  act(() => {
+    result.current.initialize(products)
+  })
+
+  expect(result.current.get()).toMatchObject({ products, initialized: true })
+
+  expect(result.current.initialize).toThrow('Cannot initialize more than once')
+})
+
+test('Cart adds and removes products', () => {
+  const { result } = renderHook(() => CartService(), { wrapper: RecoilRoot })
 
   act(() => {
     result.current.addProduct(products[0])
