@@ -6,7 +6,6 @@ type IPaymentsHeaderComponent = {
 }
 
 const WrapperStyled = styled.div`
-  padding-bottom: 3rem;
 `
 
 const ComponentStyled = styled.div`

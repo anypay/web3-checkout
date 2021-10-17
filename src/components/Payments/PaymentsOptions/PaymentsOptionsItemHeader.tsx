@@ -18,11 +18,12 @@ const WrapperStyled = styled.div`
 `
 
 const ComponentStyled = styled.div<IComponentStyled>`
-  ${props => props.active && props.theme.border.active}
-  ${props => !props.active && props.theme.border.default}
+  ${props => props.active && props.theme.border.activeGlow}
+  ${props => !props.active && props.theme.border.defaultGlow}
 
   ${props => props.theme.background.default}
-  ${props => props.theme.padding.default}
+  ${props => props.theme.padding.defaultHorizontal}
+  ${props => props.theme.padding.smallVertical}
   ${props => props.theme.border.defaultRadius}
 
   ${props => props.theme.flex.one}
