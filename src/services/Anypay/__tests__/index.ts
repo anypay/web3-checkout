@@ -1,5 +1,5 @@
 import AnypayService from 'services/Anypay'
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act, cleanup } from '@testing-library/react-hooks'
 import * as bsv from 'bsv'
 
 describe('AnypayService', () => {
@@ -23,6 +23,10 @@ describe('AnypayService', () => {
   }]
 
   const anypay = renderHook(() => AnypayService())
+
+  afterEach(async () => {
+    await cleanup()
+  })
   
   test('AnypayService#configure', () => {
     expect(anypay.result.current.getState()).toMatchObject({
@@ -38,11 +42,14 @@ describe('AnypayService', () => {
       isLoading: false,
       description: 'Anypay demo invoice',
     })
-  })
 
-  test('AnypayService#setupTransaction', () => {
-    anypay.result.current.setupTransaction({ outputs, inputs, changeTo: address.toString() })
-    anypay.result.current.buildTransaction({ keyPair })
-    expect(anypay.result.current.getTransaction()).toEqual('01000000011d85aa9d7a31930dba37e5583a663d6ee7f70006704c25b12df2a44fd70dc277010000006b483045022100eb4b056c34272435c71303987769504ca061292c1e7180fda2c35fbf3e8e8ac1022071b69b63b487c80a18bc4c27f3ddb282e4fab2c6517791cc0dae15a053018584412103844410072031656adfefabdc47c294e6a64b74fd3215478b74cbf54999d030b1ffffffff02e8030000000000001976a91485b55443c7d5b7cd69813136ce428ad861aeb87088ac190b4c00000000001976a9144db43e454efd2125fc8b500cba8403b580e929ae88ac00000000')
+    act(() => {
+      anypay.result.current.configure({
+        description: 'Anypay demo invoice',
+      })
+    })
+    act(() => {
+      anypay.result.current.setupTransaction({ outputs, inputs, changeTo: address.toString() })
+    })
   })
 })

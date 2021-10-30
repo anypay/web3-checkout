@@ -6,6 +6,14 @@ jest.mock('services/Anypay', () =>
   () => ({
     configure: () => {},
     getState: () => ({ isLoading: false }),
+    setupTransaction: () => {},
+    buildTransaction: () => {},
+    getTransaction: () => '',
+    getCoinInSatoshis: () => 'number',
+
+    handleExternalTransactionLoad: () => {},
+    handleExternalTransactionError: () => {},
+    handleExternalTransactionPayment: () => {},
   })
 )
 
