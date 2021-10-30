@@ -11,16 +11,25 @@ export type IAnypayServiceResponse = {
   setupTransaction: (args : IAnypayServiceSetupTransaction) => void
   buildTransaction: (args : IAnypayServiceBuildTransaction) => void
   getTransaction: () => string
+  getCoinInSatoshis: (args: number) => number
+
+  handleExternalTransactionLoad: () => void
+  handleExternalTransactionError: () => void
+  handleExternalTransactionPayment: (args: IAnypayServiceHandleExternalTransactionPayment) => void
 }
 
 export type IAnypayServiceGetStateResponse = {
   isLoading: boolean
   description: string
+  estimateFee: number
+  outputSum: number
+  payment: IAnypayServiceHandleExternalTransactionPayment | {}
 }
 
 export type IAnypayServiceConfigureOutputs = {
   satoshis: number
-  script: string
+  script?: string
+  to?: string
 }
 
 export type IAnypayServiceConfigureInputs = {
@@ -60,11 +69,23 @@ export type IAnypayServiceConfigureResponse = {
   }
 }
 
+export type IAnypayServiceHandleExternalTransactionPayment = {
+  amount: number
+  currency: string
+  identity: string
+  paymail: string
+  rawTx: string
+  satoshis: number
+  txid: string
+}
+
 const AnypayService = () : IAnypayServiceResponse => {
   const [state, setState] = useState<IAnypayServiceGetStateResponse>({
     isLoading: true,
     description: '',
-    outputs: [],
+    estimateFee: 0,
+    outputSum: 0,
+    payment: {},
   })
 
   const forge = new Forge()
@@ -83,6 +104,7 @@ const AnypayService = () : IAnypayServiceResponse => {
     forge.addInput(inputs)
     forge.addOutput(outputs)
     forge.changeTo = changeTo
+    setState((state) => ({ ...state, estimateFee: forge.estimateFee(), outputSum: forge.outputSum, inputSum: forge.inputSum }))
   }
 
   /**
@@ -95,13 +117,44 @@ const AnypayService = () : IAnypayServiceResponse => {
   /**
    * 
    */
-  const getTransaction = () => forge.tx.toHex()
+  const getTransaction = () => {
+    return forge.tx.toHex()
+  }
 
   /**
    * Configure and Initialize the service
    */
   const configure = ({ description } : IAnypayServiceConfigure) => {
-    setState(() => ({ isLoading: false, description }))
+    setState((state) => ({ ...state, isLoading: false, description }))
+  }
+
+  /**
+   * Get satoshi representation in full coin
+   */
+  const getCoinInSatoshis = (satoshis : number) : number => {
+    return satoshis / 100000000
+  }
+
+  /**
+   * Relayx payment provider
+   * Callback triggered when the button is loaded.
+   */
+  const handleExternalTransactionLoad = (...args: any) => {
+  }
+
+  /**
+   * Relayx payment provider
+   * Callback triggered when an error occurs.
+   */
+  const handleExternalTransactionError = (...args: any) => {
+  }
+
+  /**
+   * Relayx payment provider
+   * Callback triggered when payment completed.
+   */
+  const handleExternalTransactionPayment = (payment : IAnypayServiceHandleExternalTransactionPayment) => {
+    setState((state) => ({ ...state, payment }))
   }
 
   return ({
@@ -110,6 +163,11 @@ const AnypayService = () : IAnypayServiceResponse => {
     setupTransaction,
     buildTransaction,
     getTransaction,
+    getCoinInSatoshis,
+
+    handleExternalTransactionLoad,
+    handleExternalTransactionError,
+    handleExternalTransactionPayment,
   })
 }
 
