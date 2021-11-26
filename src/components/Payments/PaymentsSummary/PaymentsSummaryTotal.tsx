@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
+import { PaymentsComponentContext } from 'components/Payments/context'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultTop}
@@ -32,13 +33,15 @@ const PriceStyled = styled.div`
 `
 
 function PaymentsSummaryTotalContent() {
+  const payments = useContext(PaymentsComponentContext)
+
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Total</TitleStyled>
         <SubtitleStyled>
           <PriceStyled>Đ 5.3</PriceStyled>
-          0.00002653
+          {payments.getCoinInSatoshis(payments.getState().outputSum + payments.getState().estimateFee)}
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>
