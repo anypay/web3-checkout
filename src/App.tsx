@@ -9,11 +9,9 @@ import theme from 'theme'
 function App() {
   const anypay = AnypayService()
 
-  useEffect(() => {
-    anypay.init({ invoiceId: 'gO9jGah-o' })
-  }, [])
-
-  console.log(anypay.state())
+  // useEffect(() => {
+  //   anypay.init({ invoiceId: 'gO9jGah-o' })
+  // }, [])
 
   return (
     <ThemeProvider theme={theme}>

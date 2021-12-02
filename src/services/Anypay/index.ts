@@ -37,12 +37,24 @@ const Api = () => {
 export type IStateService = {
 }
 
+export type IInvoiceResponse = {
+  network: 'bitcoin-sv' | string
+  outputs: { script: string, amount: number }[]
+  creationTimestamp: string
+  expirationTimestamp: string
+  memo: string
+  paymentUrl: string
+  merchantData: string
+}
+
 export type IStateServiceResponse = {
   set: (state: IStateServiceSet) => IStateServiceSetResponse
   get: () => IStateServiceGetResponse
 }
 
 export type IStateServiceState = {
+  initialized: boolean
+  invoice: IInvoiceResponse | {}
 }
 
 export type IStateServiceSet = IStateServiceState & {
@@ -56,7 +68,10 @@ export type IStateServiceGetResponse = IStateService & {
 }
 
 const State = () : IStateServiceResponse => {
-  const [state, setState] = useState<IStateServiceState>({})
+  const [state, setState] = useState<IStateServiceState>({
+    initialized: false,
+    invoice: {},
+  })
 
   const set = (payload: IStateServiceSet) : IStateServiceSetResponse => {
     setState(payload)
@@ -97,7 +112,8 @@ const AnypayService = () : IAnypayServiceResponse => {
     const invoice = await api.invoiceGet({ invoiceId })
 
     state.set({
-      invoice
+      initialized: true,
+      invoice,
     })
   }
 
