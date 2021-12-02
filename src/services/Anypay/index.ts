@@ -1,235 +1,111 @@
-import { useState, useRef } from 'react'
-import { Forge } from 'txforge'
+import axios from 'axios'
+import { useState } from 'react'
 
-export type IAnypayService = {
+export type IApiService = {
 }
 
-export type IAnypayServiceListeners = {
-  handleExternalTransactionLoad?: () => void
-  handleExternalTransactionError?: () => void
-  handleExternalTransactionPayment?: (args: IAnypayServiceHandleExternalTransactionPayment) => void
+export type IApiServiceResponse = {
+  invoiceGet: (state: IApiServiceGet) => IApiServiceGetResponse
 }
 
-export type IAnypayServiceResponse = {
-  configure: (args : IAnypayServiceConfigure) => void
-  getState: () => IAnypayServiceGetStateResponse
-  setupTransaction: (args : IAnypayServiceSetupTransaction) => void
-  buildTransaction: (args : IAnypayServiceBuildTransaction) => void
-  getTransaction: () => string
-  getCoinInSatoshis: (args: number) => number
-
-  handleExternalTransactionLoad: () => void
-  handleExternalTransactionError: () => void
-  handleExternalTransactionPayment: (args: IAnypayServiceHandleExternalTransactionPayment) => void
+export type IApiServiceGet = {
+  invoiceId: string
 }
 
-export type IAnypayServiceGetStateResponse = {
-  isLoading: boolean
-  description: string
-  estimateFee: number
-  outputSum: number
-  inputSum: number
-  changeTo: string
-  payment: IAnypayServiceHandleExternalTransactionPayment | {}
-}
+export type IApiServiceGetResponse = Promise<{
+}>
 
-export type IAnypayServiceConfigureOutputs = {
-  satoshis: number
-  script?: string
-  to?: string
-}
+const Api = () => {
+  const instance = axios.create({
+    baseURL: 'https://api.anypayinc.com/'
+  })
 
-export type IAnypayServiceConfigureInputs = {
-  address: string
-  txid: string
-  vout: number
-  amount: number
-  satoshis: number
-  value: number
-  height: number
-  confirmations: number
-  scriptPubKey: string
-  script: string
-  outputIndex: number
-}
-
-export type IAnypayServiceSetupTransaction = {
-  inputs: IAnypayServiceConfigureInputs[]
-  outputs: IAnypayServiceConfigureOutputs[]
-  changeTo: string
-}
-
-export type IAnypayServiceBuildTransaction = {
-  keyPair: any
-}
-
-export type IAnypayServiceConfigure = IAnypayServiceListeners & {
-  description: string
-}
-
-export type IAnypayServiceConfigureResponse = {
-  forge: {
-    tx: any
-    inputs: any
-    outputs: any
-    options: any
+  // @ts-ignore
+  const invoiceGet = async ({ invoiceId }: IApiServiceGet) : IApiServiceGetResponse => {
+    const request = await instance.get(`/r/${invoiceId}`)
+    return request.data
   }
+
+  return ({
+    invoiceGet,
+  })
 }
 
-export type IAnypayServiceHandleExternalTransactionPayment = {
-  amount: number
-  currency: string
-  identity: string
-  paymail: string
-  rawTx: string
-  satoshis: number
-  txid: string
+/**
+ * 
+ */
+export type IStateService = {
+}
+
+export type IStateServiceResponse = {
+  set: (state: IStateServiceSet) => IStateServiceSetResponse
+  get: () => IStateServiceGetResponse
+}
+
+export type IStateServiceState = {
+}
+
+export type IStateServiceSet = IStateServiceState & {
+}
+
+export type IStateServiceSetResponse = void
+
+export type IStateServiceGet = void
+
+export type IStateServiceGetResponse = IStateService & {
+}
+
+const State = () : IStateServiceResponse => {
+  const [state, setState] = useState<IStateServiceState>({})
+
+  const set = (payload: IStateServiceSet) : IStateServiceSetResponse => {
+    setState(payload)
+  }
+
+  const get = () : IStateServiceGetResponse => {
+    return state
+  }
+
+  return ({
+    set,
+    get,
+  })
 }
 
 /**
  * Anypay payment service
- * to setup and create transaction use .configure .setupTransaction
  */
+export type IAnypayService = {
+}
+
+export type IAnypayServiceResponse = {
+  init: (state: IAnypayServiceInit) => IAnypayServiceInitResponse
+  state: () => IAnypayServiceInitResponse
+}
+
+export type IAnypayServiceInit = IApiServiceGet & {
+}
+
+export type IAnypayServiceInitResponse = void
+
 const AnypayService = () : IAnypayServiceResponse => {
-  const [state, setState] = useState<IAnypayServiceGetStateResponse>({
-    isLoading: true,
-    description: '',
-    estimateFee: 0,
-    outputSum: 0,
-    inputSum: 0,
-    changeTo: '',
-    payment: {},
-  })
+  const state = State()
+  const api = Api()
 
-  const forge = useRef(new Forge())
-  
-  const listeners = useRef<IAnypayServiceListeners>({
-    handleExternalTransactionLoad: () => {},
-    handleExternalTransactionError: () => {},
-    handleExternalTransactionPayment: () => {},
-  })
+  // @ts-ignore
+  const init = async ({ invoiceId } : IAnypayServiceInit) : IAnypayServiceInitResponse => {
+    const invoice = await api.invoiceGet({ invoiceId })
 
-  /**
-   * Get service state
-   */
-  const getState = () : IAnypayServiceGetStateResponse => {
-    return state
-  }
-
-  /**
-   * 
-   */
-  const setupTransaction = ({ inputs, outputs, changeTo } : IAnypayServiceSetupTransaction) => {
-    if (state.isLoading) {
-      throw new Error('You must first use .configure AnypayService')
-    }
-
-    /**
-     * It looks like forge is mutating the inputs and outputs,
-     * therefore recreating an object here
-     */
-    forge.current.addInput(inputs.map(input => Object.assign({}, input)))
-    forge.current.addOutput(outputs.map(output => Object.assign({}, output)))
-
-    forge.current.changeTo = changeTo
-
-    setState((state) => ({
-      ...state,
-      estimateFee: forge.current.estimateFee(),
-      outputSum: forge.current.outputSum,
-      inputSum: forge.current.inputSum,
-      changeTo: forge.current.changeTo,
-    }))
-  }
-
-  /**
-   * 
-   */
-  const buildTransaction = ({
-    keyPair,
-  } : IAnypayServiceBuildTransaction) => {
-    if (state.isLoading) {
-      throw new Error('You must first use .configure AnypayService')
-    }
-    if (!state.inputSum || !state.changeTo.length) {
-      throw new Error('You must first use .setupTransaction AnypayService')
-    }
-
-    forge.current.build().sign({ keyPair })
-  }
-
-  /**
-   * get raw transaction, output of this function could be directly broadcasted on BSV
-   */
-  const getTransaction = () => {
-    return forge.current.tx.toHex()
-  }
-
-  /**
-   * Configure and Initialize the service
-   */
-  const configure = ({
-    description,
-    handleExternalTransactionLoad,
-    handleExternalTransactionError,
-    handleExternalTransactionPayment,
-  } : IAnypayServiceConfigure) => {
-    setState((state) => ({ ...state, isLoading: false, description }))
-
-    listeners.current.handleExternalTransactionLoad = handleExternalTransactionLoad
-    listeners.current.handleExternalTransactionError = handleExternalTransactionError
-    listeners.current.handleExternalTransactionPayment = handleExternalTransactionPayment
-  }
-
-  /**
-   * Get satoshi representation in full coin
-   */
-  const getCoinInSatoshis = (satoshis : number) : number => {
-    return satoshis / 100000000
-  }
-
-  /**
-   * Relayx payment provider
-   * Callback triggered when the button is loaded.
-   */
-  const handleExternalTransactionLoad = (...args: any) => {
-    if (typeof listeners.current.handleExternalTransactionLoad === 'function') {
-      listeners.current.handleExternalTransactionLoad()
-    }
-  }
-
-  /**
-   * Relayx payment provider
-   * Callback triggered when an error occurs.
-   */
-  const handleExternalTransactionError = (...args: any) => {
-    if (typeof listeners.current.handleExternalTransactionError === 'function') {
-      listeners.current.handleExternalTransactionError()
-    }
-  }
-
-  /**
-   * Relayx payment provider
-   * Callback triggered when payment completed.
-   */
-  const handleExternalTransactionPayment = (payment : IAnypayServiceHandleExternalTransactionPayment) => {
-    setState((state) => ({ ...state, payment }))
-    if (typeof listeners.current.handleExternalTransactionPayment === 'function') {
-      listeners.current.handleExternalTransactionPayment(payment)
-    }
+    state.set({
+      invoice
+    })
   }
 
   return ({
-    getState,
-    configure,
-    setupTransaction,
-    buildTransaction,
-    getTransaction,
-    getCoinInSatoshis,
-
-    handleExternalTransactionLoad,
-    handleExternalTransactionError,
-    handleExternalTransactionPayment,
+    init,
+    state: () => {
+      return state.get()
+    },
   })
 }
 

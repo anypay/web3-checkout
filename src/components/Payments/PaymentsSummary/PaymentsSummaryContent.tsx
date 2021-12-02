@@ -1,6 +1,5 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { PaymentsComponentContext } from 'components/Payments/context'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.smallVertical}
@@ -21,13 +20,11 @@ const SubtitleStyled = styled.div`
 `
 
 function PaymentsSummaryContentContent() {
-  const payments = useContext(PaymentsComponentContext)
-
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Memo</TitleStyled>
-        <SubtitleStyled>{payments.getState().description}</SubtitleStyled>
+        <SubtitleStyled>Description memo</SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>
   )

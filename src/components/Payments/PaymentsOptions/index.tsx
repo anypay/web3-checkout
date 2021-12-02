@@ -1,5 +1,4 @@
-import React, { useContext } from 'react'
-import { PaymentsComponentContext } from 'components/Payments/context'
+import React from 'react'
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
 import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
@@ -17,7 +16,6 @@ import {
 } from 'react-accessible-accordion'
 
 function PaymentsOptionsComponent() {
-  const payments = useContext(PaymentsComponentContext)
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
 
@@ -47,12 +45,12 @@ function PaymentsOptionsComponent() {
           <PaymentsOptionsItemBodyComponent>
             <PaymentRelayService
               recepient="185rxHtU6RxDtbERpcnenNXh2mZCs3PVBC"
-              amount={payments.getCoinInSatoshis(payments.getState().outputSum)}
+              amount={1000}
               currency="BSV"
 
-              onLoad={payments.handleExternalTransactionLoad}
-              onError={payments.handleExternalTransactionError}
-              onPayment={payments.handleExternalTransactionPayment}
+              onLoad={() => {}}
+              onError={() => {}}
+              onPayment={() => {}}
             />
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
