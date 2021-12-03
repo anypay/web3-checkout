@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useState } from 'react'
+import * as bsv from 'bsv'
 
 export type IApiService = {
 }
@@ -150,12 +151,18 @@ const AnypayService = () : IAnypayServiceResponse => {
   }
 
   const getPaymentInputForRelayX = () => {
-    const outputsMapper = (output: { script: string, amount: number }) => ({
-      script: output.script,
-      amount: getAmountFromSatoshis(output.amount),
-      // @ts-ignore
-      currency: getCurrencyFromNetwork(state.state.invoice.network),
-    })
+    const outputsMapper = (output: { script: string, amount: number }) => {
+
+      let script = new bsv.Script(output.script)
+
+      return {
+        to: script.toASM(),
+
+        amount: getAmountFromSatoshis(output.amount),
+        // @ts-ignore
+        currency: getCurrencyFromNetwork(state.state.invoice.network),
+      }
+    }
     // @ts-ignore
     const outputs = state.state.invoice.outputs.map(outputsMapper)
     return {
@@ -171,13 +178,13 @@ const AnypayService = () : IAnypayServiceResponse => {
 
     return {
       // @ts-ignore
-      transactions: [state.state.processed.payload.rawTx],
-      // @ts-ignore
-      currency: getCurrencyFromNetwork(state.state.invoice.network),
+      transaction: state.state.processed.payload.rawTx
     }
   }
 
   const onLoadCallbackForRelayX = (payload: any) => {
+    console.log('relayx.onload', payload)
+
   }
 
   const onErrorCallbackForRelayX = () => {
