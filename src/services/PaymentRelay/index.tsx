@@ -2,9 +2,7 @@ import React, { useMemo } from 'react'
 import { Helmet } from 'react-helmet'
 
 type IPaymentRelayComponent = {
-  recepient: string;
-  amount: number;
-  currency: string;
+  outputs: { amount: number, currency: string, script: string };
 
   onLoad: (args: any) => void;
   onPayment: (args: any) => void;
@@ -23,9 +21,7 @@ const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IS
       
       // @ts-ignore
       window.relayone.render(div, {
-        to: args.recepient,
-        amount: args.amount,
-        currency: args.currency,
+        outputs: args.outputs,
 
         onLoad: args.onLoad,
         onPayment: args.onPayment,
@@ -35,12 +31,12 @@ const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IS
   }
 }
 
-function PaymentRelayComponent({ recepient, amount, currency, onLoad, onPayment, onError }: IPaymentRelayComponent) {
-  const scriptInject = useMemo(() => handleScriptInject({ recepient, amount, currency, onLoad, onPayment, onError }), [
-    recepient, amount, currency, onLoad, onPayment, onError
+function PaymentRelayComponent({ outputs, onLoad, onPayment, onError }: IPaymentRelayComponent) {
+  const scriptInject = useMemo(() => handleScriptInject({ outputs, onLoad, onPayment, onError }), [
+    outputs, onLoad, onPayment, onError
   ])
 
-  if (!recepient || !amount || !currency) {
+  if (!outputs) {
     return null
   }
 

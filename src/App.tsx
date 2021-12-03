@@ -9,15 +9,25 @@ import theme from 'theme'
 function App() {
   const anypay = AnypayService()
 
-  // useEffect(() => {
-  //   anypay.init({ invoiceId: 'gO9jGah-o' })
-  // }, [])
+  useEffect(() => {
+    anypay.init({ invoiceId: '-8A64Ef5L' })
+  }, [])
 
+  useEffect(() => {
+    if (anypay.state.status === 'broadcasted') {
+      const payload = anypay.getPaymentOutputForRelayX()
+      // @ts-ignore
+      anypay.publishBroadcastedTransaction(payload)
+    }
+  }, [anypay.state.status])
+  
   return (
     <ThemeProvider theme={theme}>
       <ModalTemplate>
         <PaymentsComponentContext.Provider value={anypay}>
-          <PaymentsComponent />
+          {anypay.state.initialized ?
+            <PaymentsComponent />
+          : null}
         </PaymentsComponentContext.Provider>
       </ModalTemplate>
     </ThemeProvider>
