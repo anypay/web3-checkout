@@ -6,11 +6,16 @@ import { PaymentsComponentContext } from 'components/Payments/context'
 import AnypayService from 'services/Anypay'
 import theme from 'theme'
 
+const getInvoiceIdFromPathname = (pathname: string) => {
+  return pathname.split('/invoices/')[1].split('/')[0]
+}
+
 function App() {
   const anypay = AnypayService()
 
   useEffect(() => {
-    anypay.init({ invoiceId: '-8A64Ef5L' })
+    const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
+    anypay.init({ invoiceId })
   }, [])
 
   useEffect(() => {
