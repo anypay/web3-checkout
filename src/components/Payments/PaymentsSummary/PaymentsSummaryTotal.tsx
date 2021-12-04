@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
+import { PaymentsComponentContext } from 'components/Payments/context'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultTop}
@@ -13,7 +14,6 @@ const ComponentStyled = styled.div`
 const TitleStyled = styled.div`
   ${props => props.theme.font.sizeP}
   ${props => props.theme.font.colorLight}
-  ${props => props.theme.flex.one}
 `
 
 const SubtitleStyled = styled.div`
@@ -32,13 +32,19 @@ const PriceStyled = styled.div`
 `
 
 function PaymentsSummaryTotalContent() {
+  const anypay = useContext(PaymentsComponentContext)
+  // @ts-ignore
+  const total = anypay.state.invoice.outputs.reduce((acc, item) => acc + item.amount, 0)
+  // @ts-ignore
+  const network = anypay.state.invoice.network
+
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Total</TitleStyled>
         <SubtitleStyled>
-          <PriceStyled>Đ 5.3</PriceStyled>
-          123123123
+          <PriceStyled>{anypay.getCurrencyFromNetwork(network)} {anypay.getAmountFromSatoshis(total)}</PriceStyled>
+          {anypay.getAmountFromSatoshis(total)}
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>

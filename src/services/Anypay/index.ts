@@ -113,6 +113,8 @@ export type IAnypayServiceResponse = {
   onLoadCallbackForRelayX: () => {}
   onErrorCallbackForRelayX: () => {}
   onPaymentCallbackForRelayX: () => {}
+  getAmountFromSatoshis: (state: number) => number
+  getCurrencyFromNetwork: (state: string) => string
 }
 
 export type IAnypayServiceInit = IApiServiceGet & {
@@ -226,6 +228,8 @@ const AnypayService = () : IAnypayServiceResponse => {
     // @ts-ignore
     onPaymentCallbackForRelayX,
     publishBroadcastedTransaction,
+    getAmountFromSatoshis,
+    getCurrencyFromNetwork,
   })
 }
 
