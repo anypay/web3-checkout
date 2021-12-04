@@ -14,8 +14,15 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (anypay.state.status === 'broadcasted') {
+    // @ts-ignore
+    if (anypay.state.status === 'broadcasted' && anypay.state.processed.provider === 'relayx') {
       const payload = anypay.getPaymentOutputForRelayX()
+      // @ts-ignore
+      anypay.publishBroadcastedTransaction(payload)
+    
+    // @ts-ignore
+    } else if (anypay.state.status === 'broadcasted' && anypay.state.processed.provider === 'moneybutton') {
+      const payload = anypay.getPaymentOutputForMoneybutton()
       // @ts-ignore
       anypay.publishBroadcastedTransaction(payload)
     }

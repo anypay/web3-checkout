@@ -109,10 +109,17 @@ export type IAnypayServiceResponse = {
   init: (state: IAnypayServiceInit) => IAnypayServiceInitResponse
   getPaymentInputForRelayX: () => IAnypayServiceInitResponse
   getPaymentOutputForRelayX: () => IAnypayServiceInitResponse
+  getPaymentOutputForMoneybutton: () => IAnypayServiceInitResponse
+  getPaymentInputForMoneybutton: () => IAnypayServiceInitResponse
   state: IStateServiceGetResponse
   onLoadCallbackForRelayX: () => {}
   onErrorCallbackForRelayX: () => {}
   onPaymentCallbackForRelayX: () => {}
+
+  onLoadCallbackForMoneybutton: () => {}
+  onErrorCallbackForMoneybutton: () => {}
+  onPaymentCallbackForMoneybutton: () => {}
+
   getAmountFromSatoshis: (state: number) => number
   getCurrencyFromNetwork: (state: string) => string
 }
@@ -154,12 +161,10 @@ const AnypayService = () : IAnypayServiceResponse => {
 
   const getPaymentInputForRelayX = () => {
     const outputsMapper = (output: { script: string, amount: number }) => {
-
-      let script = new bsv.Script(output.script)
+      const script = new bsv.Script(output.script)
 
       return {
         to: script.toASM(),
-
         amount: getAmountFromSatoshis(output.amount),
         // @ts-ignore
         currency: getCurrencyFromNetwork(state.state.invoice.network),
@@ -184,22 +189,66 @@ const AnypayService = () : IAnypayServiceResponse => {
     }
   }
 
-  const onLoadCallbackForRelayX = (payload: any) => {
-    console.log('relayx.onload', payload)
+  const getPaymentInputForMoneybutton = () => {
+    const outputsMapper = (output: { script: string, amount: number }) => {
+      const script = new bsv.Script(output.script)
 
+      return {
+        to: script.toASM(),
+        amount: getAmountFromSatoshis(output.amount),
+        // @ts-ignore
+        currency: getCurrencyFromNetwork(state.state.invoice.network),
+      }
+    }
+    // @ts-ignore
+    const outputs = state.state.invoice.outputs.map(outputsMapper)
+    return {
+      outputs,
+    }
+  }
+
+  const getPaymentOutputForMoneybutton = () => {
+    // @ts-ignore
+    if (state.state.processed.provider !== 'moneybutton') {
+      throw new Error('Incompatible network provider, only moneybutton is supported')
+    }
+
+    return {
+      // @ts-ignore
+      transaction: state.state.processed.payload.rawtx
+    }
+  }
+
+  const onLoadCallbackForRelayX = (payload: any) => {
   }
 
   const onErrorCallbackForRelayX = () => {
     
   }
 
-  const onPaymentCallbackForRelayX = (payload: any, ...rest: any) => {
-    console.log(payload, 39, rest)
+  const onPaymentCallbackForRelayX = (payload: any) => {
     // @ts-ignore
     state.set({
       status: 'broadcasted',
       processed: {
         provider: 'relayx',
+        payload,
+      },
+    })
+  }
+
+  const onLoadCallbackForMoneybutton = (payload: any) => {
+  }
+
+  const onErrorCallbackForMoneybutton = (payload: any) => {
+  }
+
+  const onPaymentCallbackForMoneybutton = (payload: any) => {
+    // @ts-ignore
+    state.set({
+      status: 'broadcasted',
+      processed: {
+        provider: 'moneybutton',
         payload,
       },
     })
@@ -220,6 +269,8 @@ const AnypayService = () : IAnypayServiceResponse => {
     init,
     getPaymentInputForRelayX,
     getPaymentOutputForRelayX,
+    getPaymentOutputForMoneybutton,
+    getPaymentInputForMoneybutton,
     state: state.state,
     // @ts-ignore
     onLoadCallbackForRelayX,
@@ -227,6 +278,12 @@ const AnypayService = () : IAnypayServiceResponse => {
     onErrorCallbackForRelayX,
     // @ts-ignore
     onPaymentCallbackForRelayX,
+    // @ts-ignore
+    onLoadCallbackForMoneybutton,
+    // @ts-ignore
+    onErrorCallbackForMoneybutton,
+    // @ts-ignore
+    onPaymentCallbackForMoneybutton,
     publishBroadcastedTransaction,
     getAmountFromSatoshis,
     getCurrencyFromNetwork,

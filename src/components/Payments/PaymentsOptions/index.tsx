@@ -6,6 +6,7 @@ import { useAccordionState } from './service'
 import './index.css'
 
 import PaymentRelayService from 'services/PaymentRelay'
+import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
 import { PaymentsComponentContext } from 'components/Payments/context'
 
 import {
@@ -52,6 +53,35 @@ function PaymentsOptionsComponent() {
               onLoad={anypay.onLoadCallbackForRelayX}
               onError={anypay.onErrorCallbackForRelayX}
               onPayment={anypay.onPaymentCallbackForRelayX}
+            />
+          </PaymentsOptionsItemBodyComponent>
+        </AccordionItemPanel>
+      </AccordionItem>
+      
+      {/**
+       * Relay
+       */}
+      <AccordionItem uuid="payment-moneybutton">
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="Moneybutton"
+              subtitle="Swipe to pay using Moneybutton."
+              icon={<PaymentsOptionsIconComponent />}
+              active={accordionState.getActive() === 'payment-moneybutton'}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <PaymentMoneybuttonService
+              // @ts-ignore
+              outputs={anypay.getPaymentInputForMoneybutton().outputs}
+
+              onLoad={anypay.onLoadCallbackForMoneybutton}
+              onError={anypay.onErrorCallbackForMoneybutton}
+              onPayment={anypay.onPaymentCallbackForMoneybutton}
             />
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
