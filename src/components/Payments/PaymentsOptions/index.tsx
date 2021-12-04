@@ -8,6 +8,7 @@ import './index.css'
 import PaymentRelayService from 'services/PaymentRelay'
 import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
 import { PaymentsComponentContext } from 'components/Payments/context'
+import QRCode from 'react-qr-code'
 
 import {
   Accordion,
@@ -103,6 +104,8 @@ function PaymentsOptionsComponent() {
         </AccordionItemHeading>
 
         <AccordionItemPanel>
+          {/* @ts-ignore */}
+          <QRCode value={`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`} size={128} />,
         </AccordionItemPanel>
       </AccordionItem>
 
