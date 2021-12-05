@@ -19,9 +19,9 @@ function PaymentsOptionsItemBodyComponent({ children }: IPaymentsOptionsItemBody
   const anypay = useContext(PaymentsComponentContext)
   const status = anypay.state.invoice?.status
 
-  if (status === 'paid') {
-    return null
-  }
+  // if (status === 'paid') {
+  //   return null
+  // }
 
   return (
     <WrapperStyled>
