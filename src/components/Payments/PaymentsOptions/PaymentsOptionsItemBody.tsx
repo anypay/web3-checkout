@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
+import { PaymentsComponentContext } from 'components/Payments/context'
 
 type IPaymentsOptionsItemBodyComponent = {
   children: JSX.Element;
@@ -15,6 +16,13 @@ const ComponentStyled = styled.div`
 `
 
 function PaymentsOptionsItemBodyComponent({ children }: IPaymentsOptionsItemBodyComponent) {
+  const anypay = useContext(PaymentsComponentContext)
+  const status = anypay.state.invoice?.status
+
+  if (status === 'paid') {
+    return null
+  }
+
   return (
     <WrapperStyled>
       <ComponentStyled>

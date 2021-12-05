@@ -1,19 +1,25 @@
 import React, { useMemo } from 'react'
 import { Helmet } from 'react-helmet'
+import type {
+  IAnypayServiceGetPaymentInputForRelayXResponse,
+  IAnypayServiceOnLoadCallbackForRelayX,
+  IAnypayServiceOnPaymentCallbackForRelayX,
+  IAnypayServiceOnErrorCallbackForRelayX,
+} from 'services/Anypay'
 
-type IPaymentRelayComponent = {
-  outputs: { amount: number, currency: string, script: string };
+type IPaymentRelayXComponent = {
+  outputs: IAnypayServiceGetPaymentInputForRelayXResponse['outputs'];
 
-  onLoad: (args: any) => void;
-  onPayment: (args: any) => void;
-  onError: (args: any) => void;
+  onLoad: IAnypayServiceOnLoadCallbackForRelayX;
+  onPayment: IAnypayServiceOnPaymentCallbackForRelayX;
+  onError: IAnypayServiceOnErrorCallbackForRelayX;
 }
 
 type IScriptInject = {
   scriptTags: any,
 }
 
-const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IScriptInject) => {
+const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: IScriptInject) => {
   if (scriptTags) {
     const scriptTag = scriptTags[0]
     scriptTag.onload = function() {
@@ -31,7 +37,7 @@ const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IS
   }
 }
 
-function PaymentRelayComponent({ outputs, onLoad, onPayment, onError }: IPaymentRelayComponent) {
+function PaymentRelayComponent({ outputs, onLoad, onPayment, onError }: IPaymentRelayXComponent) {
   const scriptInject = useMemo(() => handleScriptInject({ outputs, onLoad, onPayment, onError }), [
     outputs, onLoad, onPayment, onError
   ])

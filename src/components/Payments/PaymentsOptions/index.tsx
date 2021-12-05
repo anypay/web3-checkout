@@ -48,7 +48,6 @@ function PaymentsOptionsComponent() {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <PaymentRelayService
-              // @ts-ignore
               outputs={anypay.getPaymentInputForRelayX().outputs}
 
               onLoad={anypay.onLoadCallbackForRelayX}
@@ -77,7 +76,6 @@ function PaymentsOptionsComponent() {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <PaymentMoneybuttonService
-              // @ts-ignore
               outputs={anypay.getPaymentInputForMoneybutton().outputs}
 
               onLoad={anypay.onLoadCallbackForMoneybutton}
@@ -104,8 +102,9 @@ function PaymentsOptionsComponent() {
         </AccordionItemHeading>
 
         <AccordionItemPanel>
-          {/* @ts-ignore */}
-          <QRCode value={`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`} size={128} />,
+          <PaymentsOptionsItemBodyComponent>
+            <QRCode value={`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`} size={128} />
+          </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
 

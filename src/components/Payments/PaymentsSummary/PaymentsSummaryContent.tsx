@@ -21,8 +21,7 @@ const SubtitleStyled = styled.div`
 
 function PaymentsSummaryContentContent() {
   const anypay = useContext(PaymentsComponentContext)
-  // @ts-ignore
-  const memo = anypay.state.invoice.memo
+  const memo = anypay.state.invoiceReport?.memo
 
   return (
     <WrapperStyled>

@@ -33,18 +33,14 @@ const PriceStyled = styled.div`
 
 function PaymentsSummaryTotalContent() {
   const anypay = useContext(PaymentsComponentContext)
-  // @ts-ignore
-  const total = anypay.state.invoice.outputs.reduce((acc, item) => acc + item.amount, 0)
-  // @ts-ignore
-  const network = anypay.state.invoice.network
 
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Total</TitleStyled>
         <SubtitleStyled>
-          <PriceStyled>{anypay.getCurrencyFromNetwork(network)} {anypay.getAmountFromSatoshis(total)}</PriceStyled>
-          {anypay.getAmountFromSatoshis(total)}
+          <PriceStyled>{anypay.state.invoice?.currency} {anypay.state.invoice?.invoice_amount}</PriceStyled>
+          {anypay.state.invoice?.denomination_currency} {anypay.state.invoice?.denomination_amount}
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>

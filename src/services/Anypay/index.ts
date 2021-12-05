@@ -1,103 +1,7 @@
-import axios from 'axios'
-import { useState } from 'react'
 import * as bsv from 'bsv'
-
-export type IApiService = {
-}
-
-export type IApiServiceResponse = {
-  invoiceGet: (state: IApiServiceGet) => IApiServiceGetResponse
-  invoicePost: (state: IApiServicePost) => IApiServicePostResponse
-}
-
-export type IApiServiceGet = {
-  invoiceId: string
-}
-
-export type IApiServiceGetResponse = Promise<{
-}>
-
-export type IApiServicePost = {
-  invoiceId: string
-}
-
-export type IApiServicePostResponse = Promise<{
-}>
-
-const Api = () => {
-  const instance = axios.create({
-    baseURL: 'https://api.anypayinc.com/'
-  })
-
-  // @ts-ignore
-  const invoiceGet = async ({ invoiceId }: IApiServiceGet) : IApiServiceGetResponse => {
-    const request = await instance.get(`/r/${invoiceId}`)
-    return request.data
-  }
-
-  // @ts-ignore
-  const invoicePost = async ({ invoiceId }: IApiServicePost, payload) : IApiServicePostResponse => {
-    const request = await instance.post(`/r/${invoiceId}/pay/BSV/bip270`, payload)
-    return request.data
-  }
-
-  return ({
-    invoiceGet,
-    invoicePost,
-  })
-}
-
-/**
- * 
- */
-export type IInvoiceResponse = {
-  network: 'bitcoin-sv' | string
-  outputs: { script: string, amount: number }[]
-  creationTimestamp: string
-  expirationTimestamp: string
-  memo: string
-  paymentUrl: string
-  merchantData: string
-}
-
-export type IStateServiceResponse = {
-  set: (state: IStateServiceSet) => IStateServiceSetResponse
-  state: IStateServiceGetResponse
-}
-
-export type IStateServiceState = {
-  initialized: boolean
-  invoice: IInvoiceResponse | {}
-  status: 'pending' | 'broadcasted' | 'published' | 'failure'
-  processed: {}
-}
-
-export type IStateServiceSet = IStateServiceState & {
-}
-
-export type IStateServiceSetResponse = void
-
-export type IStateServiceGet = void
-
-export type IStateServiceGetResponse = IStateServiceState
-
-const State = () : IStateServiceResponse => {
-  const [state, setState] = useState<IStateServiceState>({
-    initialized: false,
-    invoice: {},
-    status: 'pending',
-    processed: {},
-  })
-
-  const set = (payload: IStateServiceSet) : IStateServiceSetResponse => {
-    setState(state => ({ ...state, ...payload }))
-  }
-
-  return ({
-    set,
-    state,
-  })
-}
+import ApiService from './api'
+import StateService from './state'
+import type { IStateServiceGetResponse } from './state'
 
 /**
  * Anypay payment service
@@ -106,33 +10,84 @@ export type IAnypayService = {
 }
 
 export type IAnypayServiceResponse = {
-  init: (state: IAnypayServiceInit) => IAnypayServiceInitResponse
-  getPaymentInputForRelayX: () => IAnypayServiceInitResponse
-  getPaymentOutputForRelayX: () => IAnypayServiceInitResponse
-  getPaymentOutputForMoneybutton: () => IAnypayServiceInitResponse
-  getPaymentInputForMoneybutton: () => IAnypayServiceInitResponse
+  init: (state: IAnypayServiceInit) => void
+  fail: (state: IAnypayServiceFail) => void
+  getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse
+  getPaymentOutputForRelayX: () => IAnypayServiceGetPaymentOutputForRelayXResponse
+  getPaymentInputForMoneybutton: () => IAnypayServiceGetPaymentInputForMoneybuttonResponse
+  getPaymentOutputForMoneybutton: () => IAnypayServiceGetPaymentOutputForMoneybuttonResponse
   state: IStateServiceGetResponse
-  onLoadCallbackForRelayX: () => {}
-  onErrorCallbackForRelayX: () => {}
-  onPaymentCallbackForRelayX: () => {}
 
-  onLoadCallbackForMoneybutton: () => {}
-  onErrorCallbackForMoneybutton: () => {}
-  onPaymentCallbackForMoneybutton: () => {}
+  onLoadCallbackForRelayX: (payload: IAnypayServiceOnLoadCallbackForRelayX) => IAnypayServiceOnLoadCallbackForRelayXResponse
+  onErrorCallbackForRelayX: (payload: IAnypayServiceOnErrorCallbackForRelayX) => IAnypayServiceOnErrorCallbackForRelayXResponse
+  onPaymentCallbackForRelayX: (payload: IAnypayServiceOnPaymentCallbackForRelayX) => IAnypayServiceOnPaymentCallbackForRelayXResponse
 
+  onLoadCallbackForMoneybutton: (payload: IAnypayServiceOnLoadCallbackForMoneybutton) => IAnypayServiceOnLoadCallbackForMoneybuttonResponse
+  onErrorCallbackForMoneybutton: (payload: IAnypayServiceOnErrorCallbackForMoneybutton) => IAnypayServiceOnErrorCallbackForMoneybuttonResponse
+  onPaymentCallbackForMoneybutton: (payload: IAnypayServiceOnPaymentCallbackForMoneybutton) => IAnypayServiceOnPaymentCallbackForMoneybuttonResponse
+
+  publishBroadcastedTransaction: (payload: any) => Promise<void>
   getAmountFromSatoshis: (state: number) => number
   getCurrencyFromNetwork: (state: string) => string
 }
 
-export type IAnypayServiceInit = IApiServiceGet & {
+export type IAnypayServiceInit = {
+  invoiceId: string
 }
 
-export type IAnypayServiceInitResponse = void
+export type IAnypayServiceFail = {
+  error: string
+}
+
+export type IAnypayServiceGetPaymentInputForRelayXResponse = {
+  outputs: {
+    to: string
+    amount: number
+    currency: string
+  }[]
+}
+
+export type IAnypayServiceGetPaymentOutputForRelayXResponse = {
+  transaction: string
+}
+
+export type IAnypayServiceGetPaymentInputForMoneybuttonResponse = {
+  outputs: {
+    to: string
+    amount: number
+    currency: string
+  }[]
+}
+
+export type IAnypayServiceGetPaymentOutputForMoneybuttonResponse = {
+  transaction: string
+}
+
+export type IAnypayServiceOnLoadCallbackForRelayX = any
+export type IAnypayServiceOnLoadCallbackForRelayXResponse = void
+
+export type IAnypayServiceOnPaymentCallbackForRelayX = any
+export type IAnypayServiceOnPaymentCallbackForRelayXResponse = void
+
+export type IAnypayServiceOnErrorCallbackForRelayX = any
+export type IAnypayServiceOnErrorCallbackForRelayXResponse = void
+
+export type IAnypayServiceOnLoadCallbackForMoneybutton = any
+export type IAnypayServiceOnLoadCallbackForMoneybuttonResponse = void
+
+export type IAnypayServiceOnPaymentCallbackForMoneybutton = any
+export type IAnypayServiceOnPaymentCallbackForMoneybuttonResponse = void
+
+export type IAnypayServiceOnErrorCallbackForMoneybutton = any
+export type IAnypayServiceOnErrorCallbackForMoneybuttonResponse = void
 
 const AnypayService = () : IAnypayServiceResponse => {
-  const state = State()
-  const api = Api()
+  const state = StateService()
+  const api = ApiService()
 
+  /**
+   * Currency abbreviation based on network
+   */
   const getCurrencyFromNetwork = (currency: string) => {
     if (currency === 'bitcoin-sv') {
       return 'BSV'
@@ -145,89 +100,100 @@ const AnypayService = () : IAnypayServiceResponse => {
     return amount / 100000000
   }
 
-  // @ts-ignore
-  const init = async ({ invoiceId } : IAnypayServiceInit) : IAnypayServiceInitResponse => {
+  const init = async ({ invoiceId } : IAnypayServiceInit) : Promise<void> => {
     const invoice = await api.invoiceGet({ invoiceId })
+    const invoiceReport = await api.invoiceReportGet({ invoiceId })
 
     state.set({
-      // @ts-ignore
-      invoiceId,
       initialized: true,
-      invoice,
       status: 'pending',
-      processed: {},
+      invoiceId,
+      invoiceReport,
+      invoice,
     })
   }
 
-  const getPaymentInputForRelayX = () => {
-    const outputsMapper = (output: { script: string, amount: number }) => {
+  const fail = ({ error } : IAnypayServiceFail) : void => {
+    state.set({
+      initialized: true,
+      status: 'failure',
+    })
+  }
+
+  const getPaymentInputForRelayX = () : IAnypayServiceGetPaymentInputForRelayXResponse => {
+    const networkMapper = (output: { script: string, amount: number }) => ({
+      ...output, network: state.state.invoiceReport?.network || '',
+    })
+
+    const outputsMapper = (output: { script: string, amount: number, network: string }) => {
       const script = new bsv.Script(output.script)
 
       return {
         to: script.toASM(),
         amount: getAmountFromSatoshis(output.amount),
-        // @ts-ignore
-        currency: getCurrencyFromNetwork(state.state.invoice.network),
+        currency: getCurrencyFromNetwork(output.network),
       }
     }
-    // @ts-ignore
-    const outputs = state.state.invoice.outputs.map(outputsMapper)
+
+    const outputs = state.state.invoiceReport?.outputs.map(networkMapper).map(outputsMapper) || []
+
     return {
       outputs,
     }
   }
 
-  const getPaymentOutputForRelayX = () => {
-    // @ts-ignore
-    if (state.state.processed.provider !== 'relayx') {
+  const getPaymentOutputForRelayX = () : IAnypayServiceGetPaymentOutputForRelayXResponse => {
+    if (state.state.processed?.provider !== 'relayx') {
       throw new Error('Incompatible network provider, only relayx is supported')
     }
 
     return {
-      // @ts-ignore
       transaction: state.state.processed.payload.rawTx
     }
   }
 
-  const getPaymentInputForMoneybutton = () => {
-    const outputsMapper = (output: { script: string, amount: number }) => {
+  const getPaymentInputForMoneybutton = () : IAnypayServiceGetPaymentInputForMoneybuttonResponse => {
+    const networkMapper = (output: { script: string, amount: number }) => ({
+      ...output, network: state.state.invoiceReport?.network || '',
+    })
+
+    const outputsMapper = (output: { script: string, amount: number, network: string }) => {
       const script = new bsv.Script(output.script)
 
       return {
         to: script.toASM(),
         amount: getAmountFromSatoshis(output.amount),
-        // @ts-ignore
-        currency: getCurrencyFromNetwork(state.state.invoice.network),
+        currency: getCurrencyFromNetwork(output.network),
       }
     }
-    // @ts-ignore
-    const outputs = state.state.invoice.outputs.map(outputsMapper)
+
+    const outputs = state.state.invoiceReport?.outputs.map(networkMapper).map(outputsMapper) || []
+
     return {
       outputs,
     }
   }
 
-  const getPaymentOutputForMoneybutton = () => {
-    // @ts-ignore
-    if (state.state.processed.provider !== 'moneybutton') {
+  const getPaymentOutputForMoneybutton = () : IAnypayServiceGetPaymentOutputForMoneybuttonResponse => {
+    if (state.state.processed?.provider !== 'moneybutton') {
       throw new Error('Incompatible network provider, only moneybutton is supported')
     }
 
     return {
-      // @ts-ignore
       transaction: state.state.processed.payload.rawtx
     }
   }
 
-  const onLoadCallbackForRelayX = (payload: any) => {
+  const onLoadCallbackForRelayX = (payload: IAnypayServiceOnLoadCallbackForRelayX) : IAnypayServiceOnLoadCallbackForRelayXResponse => {
+    console.log('relayx.onload', payload)
   }
 
-  const onErrorCallbackForRelayX = () => {
-    
+  const onErrorCallbackForRelayX = (payload: IAnypayServiceOnErrorCallbackForRelayX) : IAnypayServiceOnErrorCallbackForRelayXResponse => {
+    console.log('relayx.onerror', payload)
   }
 
-  const onPaymentCallbackForRelayX = (payload: any) => {
-    // @ts-ignore
+  const onPaymentCallbackForRelayX = (payload: IAnypayServiceOnPaymentCallbackForRelayX) : IAnypayServiceOnPaymentCallbackForRelayXResponse => {
+    console.log('relayx.onpayment', payload)
     state.set({
       status: 'broadcasted',
       processed: {
@@ -237,14 +203,16 @@ const AnypayService = () : IAnypayServiceResponse => {
     })
   }
 
-  const onLoadCallbackForMoneybutton = (payload: any) => {
+  const onLoadCallbackForMoneybutton = (payload: IAnypayServiceOnLoadCallbackForMoneybutton) : IAnypayServiceOnLoadCallbackForMoneybuttonResponse => {
+    console.log('moneybutton.onload', payload)
   }
 
-  const onErrorCallbackForMoneybutton = (payload: any) => {
+  const onErrorCallbackForMoneybutton = (payload: IAnypayServiceOnErrorCallbackForMoneybutton) : IAnypayServiceOnErrorCallbackForMoneybuttonResponse => {
+    console.log('moneybutton.onerror', payload)
   }
 
-  const onPaymentCallbackForMoneybutton = (payload: any) => {
-    // @ts-ignore
+  const onPaymentCallbackForMoneybutton = (payload: IAnypayServiceOnPaymentCallbackForMoneybutton) : IAnypayServiceOnPaymentCallbackForMoneybuttonResponse => {
+    console.log('moneybutton.onpayment', payload)
     state.set({
       status: 'broadcasted',
       processed: {
@@ -254,39 +222,37 @@ const AnypayService = () : IAnypayServiceResponse => {
     })
   }
 
-  // @ts-ignore
-  const publishBroadcastedTransaction = async (payload) => {
-    // @ts-ignore
-    api.invoicePost({ invoiceId: state.state.invoiceId }, payload)
+  const publishBroadcastedTransaction = async (payload: any) => {
+    if (!state.state.invoiceId) {
+      throw new Error('Transaction could not be broadcasted as it wasn\'t initialized')
+    }
 
-    // @ts-ignore
+    api.invoiceReportPost({ invoiceId: state.state.invoiceId }, payload)
+
     state.set({
       status: 'broadcasted',
     })
   }
 
   return ({
+    state: state.state,
     init,
+    fail,
+    
     getPaymentInputForRelayX,
     getPaymentOutputForRelayX,
     getPaymentOutputForMoneybutton,
     getPaymentInputForMoneybutton,
-    state: state.state,
-    // @ts-ignore
-    onLoadCallbackForRelayX,
-    // @ts-ignore
-    onErrorCallbackForRelayX,
-    // @ts-ignore
-    onPaymentCallbackForRelayX,
-    // @ts-ignore
-    onLoadCallbackForMoneybutton,
-    // @ts-ignore
-    onErrorCallbackForMoneybutton,
-    // @ts-ignore
-    onPaymentCallbackForMoneybutton,
     publishBroadcastedTransaction,
     getAmountFromSatoshis,
     getCurrencyFromNetwork,
+
+    onLoadCallbackForRelayX,
+    onErrorCallbackForRelayX,
+    onPaymentCallbackForRelayX,
+    onLoadCallbackForMoneybutton,
+    onErrorCallbackForMoneybutton,
+    onPaymentCallbackForMoneybutton,
   })
 }
 

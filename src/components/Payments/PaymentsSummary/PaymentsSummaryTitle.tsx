@@ -12,6 +12,12 @@ const ComponentStyled = styled.div`
   ${props => props.theme.flex.alignItemsCenter}
 `
 
+const StatusStyled = styled.div`
+  ${props => props.theme.font.sizeH3}
+  ${props => props.theme.font.weight600}
+  ${props => props.theme.font.colorRed}
+`
+
 const TitleStyled = styled.div`
   ${props => props.theme.font.sizeH3}
   ${props => props.theme.font.weight600}
@@ -26,14 +32,23 @@ const SubtitleStyled = styled.div`
 
 function PaymentsSummaryTitleComponent() {
   const anypay = useContext(PaymentsComponentContext)
-  // @ts-ignore
-  const createdAt = dayjs.unix(anypay.state.invoice.creationTimestamp).format('D MMMM YYYY')
+  const createdAt = dayjs(anypay.state.invoice?.createdAt).format('D MMMM YYYY')
+  const paidAt = dayjs(anypay.state.invoice?.paidAt).format('D MMMM YYYY')
 
   return (
     <WrapperStyled>
+      {anypay.state.invoice?.status === 'paid' ?
+        <StatusStyled>PAID</StatusStyled>
+      : null}
+
       <ComponentStyled>
         <TitleStyled>Invoice</TitleStyled>
-        <SubtitleStyled>{createdAt}</SubtitleStyled>
+        {anypay.state.invoice?.status === 'paid' ?
+          <SubtitleStyled>{paidAt}</SubtitleStyled>
+        : null}
+        {anypay.state.invoice?.status !== 'paid' ?
+          <SubtitleStyled>{createdAt}</SubtitleStyled>
+          : null}
       </ComponentStyled>
     </WrapperStyled>
   )

@@ -7,6 +7,7 @@ export const colors = {
   border: '#eeeeee',
   grey: '#777777',
   dark: '#333333',
+  red: '#e74c3c',
 }
 
 export const units = {
@@ -63,6 +64,9 @@ const font = {
   `,
   colorDark: css`
     color: ${colors.dark};
+  `,
+  colorRed: css`
+    color: ${colors.red};
   `,
   alignCenter: css`
     text-align: center;
