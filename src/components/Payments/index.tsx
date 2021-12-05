@@ -26,6 +26,11 @@ const MainStyled = styled.div`
   ${media.greaterThan('medium')`
     ${props => props.theme.flex.directionRow}
   `}
+
+  ${media.lessThan('medium')`
+    display: flex;
+    flex-direction: column;
+  `}
 `
 
 const ContentStyled = styled.div`
@@ -33,12 +38,20 @@ const ContentStyled = styled.div`
     width: 60%;
     ${props => props.theme.padding.smallRight}
   `}
+
+  ${media.lessThan('medium')`
+    order: 2;
+  `}
 `
 
 const SidebarStyled = styled.div`
   ${media.greaterThan('medium')`
     width: 40%;
     ${props => props.theme.padding.smallLeft}
+  `}
+
+  ${media.lessThan('medium')`
+    order: 1;
   `}
 `
 
