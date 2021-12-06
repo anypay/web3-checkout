@@ -8,6 +8,7 @@ export type IApiServiceResponse = {
   invoiceReportGet: (state: IApiServiceInvoiceGet) => IApiServiceInvoiceGetResponse
   invoiceReportPost: (state: IApiServiceInvoicePost) => IApiServiceInvoicePostResponse
   invoiceGet: (state: IApiServiceStatusGet) => IApiServiceStatusGetResponse
+  invoicePoll: (state: IApiServiceStatusPoll) => IApiServiceStatusPollResponse
 }
 
 export type IApiServiceInvoiceGet = {
@@ -28,6 +29,13 @@ export type IApiServiceStatusGet = {
 }
 
 export type IApiServiceStatusGetResponse = Promise<AnypayApiResponse.InvoiceGetResponse>
+
+export type IApiServiceStatusPoll = {
+  invoiceId: string
+  callback: (payload: any) => void
+}
+
+export type IApiServiceStatusPollResponse = NodeJS.Timer
 
 const ApiService = () => {
   const instance = axios.create({
@@ -53,10 +61,21 @@ const ApiService = () => {
     return request.data
   }
 
+  // @ts-ignore
+  const invoiceGetPoll = ({ invoiceId, callback }: IApiServiceStatusPoll) : IApiServiceStatusPollResponse => {
+    const interval = setInterval(async () => {
+      const invoice = await invoiceGet({ invoiceId })
+      callback(invoice)
+    }, 2000)
+
+    return interval
+  }
+
   return ({
     invoiceReportGet,
     invoiceReportPost,
     invoiceGet,
+    invoiceGetPoll,
   })
 }
 

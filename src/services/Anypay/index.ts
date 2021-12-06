@@ -2,6 +2,7 @@ import * as bsv from 'bsv'
 import ApiService from './api'
 import StateService from './state'
 import type { IStateServiceGetResponse } from './state'
+import { AnypayApiResponse } from 'types/api'
 
 /**
  * Anypay payment service
@@ -12,6 +13,7 @@ export type IAnypayService = {
 export type IAnypayServiceResponse = {
   init: (state: IAnypayServiceInit) => void
   fail: (state: IAnypayServiceFail) => void
+  pollInvoice: () => NodeJS.Timer
   getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse
   getPaymentOutputForRelayX: () => IAnypayServiceGetPaymentOutputForRelayXResponse
   getPaymentInputForMoneybutton: () => IAnypayServiceGetPaymentInputForMoneybuttonResponse
@@ -84,6 +86,25 @@ export type IAnypayServiceOnErrorCallbackForMoneybuttonResponse = void
 const AnypayService = () : IAnypayServiceResponse => {
   const state = StateService()
   const api = ApiService()
+
+  const pollInvoice = () => {
+    if (!state.state.invoiceId) {
+      throw new Error('Invoice could not be polled as it wasn\'t initialized')
+    }
+
+    const callback = (invoice: AnypayApiResponse.InvoiceGetResponse) => {
+      if (invoice.status === 'paid') {
+        state.set({
+          status: 'broadcasted',
+          invoice,
+        })
+        clearInterval(interval)
+      }
+    }
+
+    const interval = api.invoiceGetPoll({ invoiceId: state.state.invoiceId, callback })
+    return interval
+  }
 
   /**
    * Currency abbreviation based on network
@@ -242,6 +263,7 @@ const AnypayService = () : IAnypayServiceResponse => {
     state: state.state,
     init,
     fail,
+    pollInvoice,
     
     getPaymentInputForRelayX,
     getPaymentOutputForRelayX,

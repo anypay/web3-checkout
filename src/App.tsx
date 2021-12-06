@@ -25,6 +25,13 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (anypay.state.invoiceId) {
+      const interval = anypay.pollInvoice()
+      return () => clearInterval(interval)
+    }
+  }, [anypay.state.initialized])
+
+  useEffect(() => {
     if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'relayx') {
       const payload = anypay.getPaymentOutputForRelayX()
       anypay.publishBroadcastedTransaction(payload)
