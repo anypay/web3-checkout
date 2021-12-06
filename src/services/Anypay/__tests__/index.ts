@@ -6,21 +6,20 @@ import * as apiMocks from 'services/Anypay/mocks'
 
 var mock = new MockAdapter(axios)
 
-mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
-mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
-mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
-
 describe('AnypayService', () => {
-  test('AnypayService#getState', async () => {
+  afterEach(() => {
+    mock.resetHandlers()
+  })
+
+  test('AnypayService#workflow', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+    mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
+    
     const anypay = renderHook(() => AnypayService())
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
-    })
-
-    expect(anypay.result.current.state).toMatchObject({
-      initialized: true,
-      invoiceReport: apiMocks.invoiceReportGetPrepaid,
     })
 
     expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
@@ -43,5 +42,134 @@ describe('AnypayService', () => {
     })
 
     expect(anypay.result.current.state.status).toEqual('broadcasted')
+  })
+
+  test('AnypayService#init/success', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+    mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.state).toMatchObject({
+      initialized: true,
+      status: 'pending',
+      invoiceReport: apiMocks.invoiceReportGetPrepaid,
+      invoice: apiMocks.invoiceGetPrepaid,
+    })
+  })
+
+  test('AnypayService#init/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.state).toMatchObject({
+      initialized: true,
+      status: 'failure',
+    })
+  })
+
+  test('AnypayService#fail', async () => {
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.fail({ error: 'Network error' })
+    })
+
+    expect(anypay.result.current.state).toMatchObject({
+      initialized: true,
+      status: 'failure',
+    })
+  })
+
+  test('AnypayService#getPaymentInputForRelayX/success', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
+      outputs: [
+        {'amount':0.000608, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 b0b343aa5025eb12f0ff4f63243449df9e4ef223 OP_EQUALVERIFY OP_CHECKSIG'},
+        {'amount':0.00007, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 fde8f61612beecbf7532765d17ce9c36c8601878 OP_EQUALVERIFY OP_CHECKSIG'}
+      ]
+    })   
+  })
+
+  test('AnypayService#getPaymentInputForRelayX/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
+      outputs: []
+    })   
+  })
+
+  test('AnypayService#getPaymentInputForMoneybutton/success', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForMoneybutton()).toEqual({
+      outputs: [
+        {'amount':0.000608, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 b0b343aa5025eb12f0ff4f63243449df9e4ef223 OP_EQUALVERIFY OP_CHECKSIG'},
+        {'amount':0.00007, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 fde8f61612beecbf7532765d17ce9c36c8601878 OP_EQUALVERIFY OP_CHECKSIG'}
+      ]
+    })   
+  })
+
+  test('AnypayService#getPaymentInputForMoneybutton/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForMoneybutton()).toEqual({
+      outputs: []
+    })   
+  })
+
+  test('AnypayService#publishBroadcastedTransaction/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    await expect((() => anypay.result.current.publishBroadcastedTransaction({})))
+      .rejects
+      .toThrow('Transaction could not be broadcasted as it wasn\'t initialized')
   })
 })

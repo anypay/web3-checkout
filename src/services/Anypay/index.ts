@@ -101,16 +101,20 @@ const AnypayService = () : IAnypayServiceResponse => {
   }
 
   const init = async ({ invoiceId } : IAnypayServiceInit) : Promise<void> => {
-    const invoice = await api.invoiceGet({ invoiceId })
-    const invoiceReport = await api.invoiceReportGet({ invoiceId })
+    try {
+      const invoice = await api.invoiceGet({ invoiceId })
+      const invoiceReport = await api.invoiceReportGet({ invoiceId })
 
-    state.set({
-      initialized: true,
-      status: 'pending',
-      invoiceId,
-      invoiceReport,
-      invoice,
-    })
+      state.set({
+        initialized: true,
+        status: 'pending',
+        invoiceId,
+        invoiceReport,
+        invoice,
+      })
+    } catch (error) {
+      fail({ error: error as string })
+    }
   }
 
   const fail = ({ error } : IAnypayServiceFail) : void => {
