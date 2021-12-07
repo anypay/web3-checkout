@@ -9,8 +9,8 @@ jobs:
           name: Install Dependencies
           command: yarn
       - run:
-          name: Test Application
-          command: yarn test
+          name: Build Application
+          command: yarn build
           
   deploy:
     machine:
@@ -18,8 +18,14 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install Dependencies
+          command: yarn
+      - run:
+          name: Build Application
+          command: yarn build
+      - run:
           name: Deploy to Webservers
-          command: echo "no deploy"
+          command: scp -r build/* ubuntu@sv.anypayx.com:/opt/anypay.sv/build
 
 workflows:
   version: 2
