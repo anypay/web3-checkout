@@ -13,8 +13,8 @@ jobs:
           command: yarn build
           
   deploy:
-    machine:
-      image: circleci/node:12
+    docker:
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
