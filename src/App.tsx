@@ -4,6 +4,7 @@ import ModalTemplate from 'templates/Modal'
 import PaymentsComponent from 'components/Payments'
 import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
 import PaymentsErrorComponent from 'components/Payments/PaymentsError'
+import PaymentsSuccessComponent from 'components/Payments/PaymentsSuccess'
 import { PaymentsComponentContext } from 'components/Payments/context'
 import AnypayService from 'services/Anypay'
 import theme from 'theme'
@@ -49,8 +50,13 @@ function App() {
             <PaymentsLoadingComponent />
           : null}
 
-          {anypay.state.initialized && anypay.state.status !== 'failure' ?
+          {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status !== 'paid' ?
             <PaymentsComponent />
+          : null}
+
+
+          {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'paid' ?
+            <PaymentsSuccessComponent />
           : null}
 
           {anypay.state.initialized && anypay.state.status === 'failure' ?
