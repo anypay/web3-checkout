@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
+import { PaymentsComponentContext } from 'components/Payments/context'
+import dayjs from 'dayjs'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.defaultBottom}
@@ -10,23 +12,43 @@ const ComponentStyled = styled.div`
   ${props => props.theme.flex.alignItemsCenter}
 `
 
+const StatusStyled = styled.div`
+  ${props => props.theme.font.sizeH3}
+  ${props => props.theme.font.weight600}
+  ${props => props.theme.font.colorRed}
+`
+
 const TitleStyled = styled.div`
   ${props => props.theme.font.sizeH3}
   ${props => props.theme.font.weight600}
-  ${props => props.theme.flex.one}
 `
 
 const SubtitleStyled = styled.div`
+  ${props => props.theme.flex.one}
   ${props => props.theme.font.sizeP}
   ${props => props.theme.font.colorLight}
+  ${props => props.theme.font.alignEnd}
 `
 
 function PaymentsSummaryTitleComponent() {
+  const anypay = useContext(PaymentsComponentContext)
+  const createdAt = dayjs(anypay.state.invoice?.createdAt).format('D MMMM YYYY')
+  const paidAt = dayjs(anypay.state.invoice?.paidAt).format('D MMMM YYYY')
+
   return (
     <WrapperStyled>
+      {anypay.state.invoice?.status === 'paid' ?
+        <StatusStyled>PAID</StatusStyled>
+      : null}
+
       <ComponentStyled>
         <TitleStyled>Invoice</TitleStyled>
-        <SubtitleStyled>12 October 2021</SubtitleStyled>
+        {anypay.state.invoice?.status === 'paid' ?
+          <SubtitleStyled>{paidAt}</SubtitleStyled>
+        : null}
+        {anypay.state.invoice?.status !== 'paid' ?
+          <SubtitleStyled>{createdAt}</SubtitleStyled>
+          : null}
       </ComponentStyled>
     </WrapperStyled>
   )

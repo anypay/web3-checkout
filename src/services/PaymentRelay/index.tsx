@@ -1,21 +1,25 @@
 import React, { useMemo } from 'react'
 import { Helmet } from 'react-helmet'
+import type {
+  IAnypayServiceGetPaymentInputForRelayXResponse,
+  IAnypayServiceOnLoadCallbackForRelayX,
+  IAnypayServiceOnPaymentCallbackForRelayX,
+  IAnypayServiceOnErrorCallbackForRelayX,
+} from 'services/Anypay'
 
-type IPaymentRelayComponent = {
-  recepient: string;
-  amount: number;
-  currency: string;
+type IPaymentRelayXComponent = {
+  outputs: IAnypayServiceGetPaymentInputForRelayXResponse['outputs'];
 
-  onLoad: (args: any) => void;
-  onPayment: (args: any) => void;
-  onError: (args: any) => void;
+  onLoad: IAnypayServiceOnLoadCallbackForRelayX;
+  onPayment: IAnypayServiceOnPaymentCallbackForRelayX;
+  onError: IAnypayServiceOnErrorCallbackForRelayX;
 }
 
 type IScriptInject = {
   scriptTags: any,
 }
 
-const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IScriptInject) => {
+const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: IScriptInject) => {
   if (scriptTags) {
     const scriptTag = scriptTags[0]
     scriptTag.onload = function() {
@@ -23,9 +27,7 @@ const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IS
       
       // @ts-ignore
       window.relayone.render(div, {
-        to: args.recepient,
-        amount: args.amount,
-        currency: args.currency,
+        outputs: args.outputs,
 
         onLoad: args.onLoad,
         onPayment: args.onPayment,
@@ -35,12 +37,12 @@ const handleScriptInject = (args: IPaymentRelayComponent) => ({ scriptTags }: IS
   }
 }
 
-function PaymentRelayComponent({ recepient, amount, currency, onLoad, onPayment, onError }: IPaymentRelayComponent) {
-  const scriptInject = useMemo(() => handleScriptInject({ recepient, amount, currency, onLoad, onPayment, onError }), [
-    recepient, amount, currency, onLoad, onPayment, onError
+function PaymentRelayComponent({ outputs, onLoad, onPayment, onError }: IPaymentRelayXComponent) {
+  const scriptInject = useMemo(() => handleScriptInject({ outputs, onLoad, onPayment, onError }), [
+    outputs, onLoad, onPayment, onError
   ])
 
-  if (!recepient || !amount || !currency) {
+  if (!outputs) {
     return null
   }
 

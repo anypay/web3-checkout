@@ -7,6 +7,8 @@ export const colors = {
   border: '#eeeeee',
   grey: '#777777',
   dark: '#333333',
+  red: '#e74c3c',
+  green: '#27ae60',
 }
 
 export const units = {
@@ -33,6 +35,9 @@ const background = {
   card: css`
     background-color: ${colors.card};
   `,
+  success: css`
+    background-color: ${colors.green};
+  `,
 }
 
 /**
@@ -58,11 +63,20 @@ const font = {
   weight600: css`
     font-weight: ${units.fontWeight600};
   `,
+  colorWhite: css`
+    color: ${colors.white};
+  `,
   colorLight: css`
     color: ${colors.grey};
   `,
   colorDark: css`
     color: ${colors.dark};
+  `,
+  colorRed: css`
+    color: ${colors.red};
+  `,
+  colorGreen: css`
+    color: ${colors.green};
   `,
   alignCenter: css`
     text-align: center;
@@ -153,6 +167,10 @@ const border = {
 const flex = {
   directionRow: css`
     flex-direction: row;
+    display: flex;
+  `,
+  directionColumn: css`
+    flex-direction: column;
     display: flex;
   `,
   alignItemsCenter: css`

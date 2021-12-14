@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { PaymentsComponentContext } from 'components/Payments/context'
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
 import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
@@ -7,6 +6,9 @@ import { useAccordionState } from './service'
 import './index.css'
 
 import PaymentRelayService from 'services/PaymentRelay'
+import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
+import { PaymentsComponentContext } from 'components/Payments/context'
+import QRCode from 'react-qr-code'
 
 import {
   Accordion,
@@ -17,7 +19,7 @@ import {
 } from 'react-accessible-accordion'
 
 function PaymentsOptionsComponent() {
-  const payments = useContext(PaymentsComponentContext)
+  const anypay = useContext(PaymentsComponentContext)
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
 
@@ -46,13 +48,39 @@ function PaymentsOptionsComponent() {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <PaymentRelayService
-              recepient="185rxHtU6RxDtbERpcnenNXh2mZCs3PVBC"
-              amount={payments.getCoinInSatoshis(payments.getState().outputSum)}
-              currency="BSV"
+              outputs={anypay.getPaymentInputForRelayX().outputs}
 
-              onLoad={payments.handleExternalTransactionLoad}
-              onError={payments.handleExternalTransactionError}
-              onPayment={payments.handleExternalTransactionPayment}
+              onLoad={anypay.onLoadCallbackForRelayX}
+              onError={anypay.onErrorCallbackForRelayX}
+              onPayment={anypay.onPaymentCallbackForRelayX}
+            />
+          </PaymentsOptionsItemBodyComponent>
+        </AccordionItemPanel>
+      </AccordionItem>
+      
+      {/**
+       * Relay
+       */}
+      <AccordionItem uuid="payment-moneybutton">
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="Moneybutton"
+              subtitle="Swipe to pay using Moneybutton."
+              icon={<PaymentsOptionsIconComponent />}
+              active={accordionState.getActive() === 'payment-moneybutton'}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <PaymentMoneybuttonService
+              outputs={anypay.getPaymentInputForMoneybutton().outputs}
+
+              onLoad={anypay.onLoadCallbackForMoneybutton}
+              onError={anypay.onErrorCallbackForMoneybutton}
+              onPayment={anypay.onPaymentCallbackForMoneybutton}
             />
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
@@ -74,6 +102,9 @@ function PaymentsOptionsComponent() {
         </AccordionItemHeading>
 
         <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <QRCode value={`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`} size={128} />
+          </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
 

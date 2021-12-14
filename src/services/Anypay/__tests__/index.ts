@@ -1,127 +1,175 @@
 import AnypayService from 'services/Anypay'
 import { renderHook, act, cleanup } from '@testing-library/react-hooks'
-import * as bsv from 'bsv'
+import axios from 'axios'
+import MockAdapter from 'axios-mock-adapter'
+import * as apiMocks from 'services/Anypay/mocks'
 
-jest.mock('services/Anypay', () =>
-  jest.requireActual('services/Anypay')
-)
-
-const privateKey = bsv.PrivKey.Mainnet.fromString('L5GUQs2D6vYAugfeTVeiCnS3BLYvSx2FskjrDQjgpeC3uUsWc5g6')
-const keyPair = bsv.KeyPair.Mainnet.fromPrivKey(privateKey)
-const address = bsv.Address.Mainnet.fromPrivKey(privateKey)
-
-const outputs = [{ to: '1DBz6V6CmvjZTvfjvWpvvwuM1X7GkRmWEq', satoshis: 1000 },]
-const inputs = [{
-  address: '185rxHtU6RxDtbERpcnenNXh2mZCs3PVBC',
-  txid: '77c20dd74fa4f22db1254c700600f7e76e3d663a58e537ba0d93317a9daa851d',
-  vout: 1,
-  amount: 0.0498469,
-  satoshis: 4984690,
-  value: 4984690,
-  height: 711180,
-  confirmations: 134,
-  scriptPubKey: '76a9144db43e454efd2125fc8b500cba8403b580e929ae88ac',
-  script: '76a9144db43e454efd2125fc8b500cba8403b580e929ae88ac',
-  outputIndex: 1
-}]
-
+var mock = new MockAdapter(axios)
 
 describe('AnypayService', () => {
-  test('AnypayService#getState', () => {
+  afterEach(() => {
+    mock.resetHandlers()
+  })
+
+  test('AnypayService#workflow', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+    mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
+    
     const anypay = renderHook(() => AnypayService())
 
-    expect(anypay.result.current.getState()).toEqual({
-      isLoading: true,
-      description: '',
-      estimateFee: 0,
-      outputSum: 0,
-      changeTo: '',
-      inputSum: 0,
-      payment: {},
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
     })
+
+    expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
+      outputs: [
+        {'amount':0.000608, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 b0b343aa5025eb12f0ff4f63243449df9e4ef223 OP_EQUALVERIFY OP_CHECKSIG'},
+        {'amount':0.00007, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 fde8f61612beecbf7532765d17ce9c36c8601878 OP_EQUALVERIFY OP_CHECKSIG'}
+      ]
+    })
+
+    act(() => {
+      anypay.result.current.onPaymentCallbackForRelayX(apiMocks.relayxOnPayment)
+    })
+
+    expect(anypay.result.current.getPaymentOutputForRelayX()).toEqual({
+      transaction: '0100000001a420cc3165599f5511fbe4558df3dfb3ac7eb0c7cda5479b2320ec4e51b40582040000006b483045022100c7fcaac5a3c8f4ce8b9002fec3a6b42a83299ef1cbb7bef6b598b5e5cdde298f02206e91a62288d243b00c9de020e1d9def2a3e9a2c3881de052357af01f0a6f8d48412102e8c1da1de96f2d3cd9391d37ec5fd01755c9ae01f212046f1914c32a9b103910ffffffff0480ed0000000000001976a914b0b343aa5025eb12f0ff4f63243449df9e4ef22388ac581b0000000000001976a914fde8f61612beecbf7532765d17ce9c36c860187888ac00000000000000002f006a2231487948587459577947655072485669736e4e645339333156743643716f7555795a0972656c6179782e696fcdd30000000000001976a9148de288360fe7dea1ea4efded972918b5187d3a8c88ac00000000'
+    })
+
+    act(() => {
+      anypay.result.current.publishBroadcastedTransaction(apiMocks.relayxOnPayment)
+    })
+
+    expect(anypay.result.current.state.status).toEqual('broadcasted')
   })
 
-  test('AnypayService#configure', () => {
+  test('AnypayService#init/success', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+    mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
+
     const anypay = renderHook(() => AnypayService())
 
-    act(() => {
-      anypay.result.current.configure({ description: 'Anypay demo invoice' })
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
     })
 
-    expect(anypay.result.current.getState()).toEqual({
-      isLoading: false,
-      description: 'Anypay demo invoice',
-      estimateFee: 0,
-      outputSum: 0,
-      changeTo: '',
-      inputSum: 0,
-      payment: {},
+    expect(anypay.result.current.state).toMatchObject({
+      initialized: true,
+      status: 'pending',
+      invoiceReport: apiMocks.invoiceReportGetPrepaid,
+      invoice: apiMocks.invoiceGetPrepaid,
     })
   })
 
-  test('AnypayService#setupTransaction', () => {
+  test('AnypayService#init/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
     const anypay = renderHook(() => AnypayService())
 
-    act(() => {
-      expect(() => anypay.result.current.setupTransaction({ outputs, inputs, changeTo: address.toString() })).toThrowError()
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
     })
 
-    act(() => {
-      anypay.result.current.configure({ description: 'Anypay demo invoice' })
-    })
-
-    act(() => {
-      anypay.result.current.setupTransaction({ outputs, inputs, changeTo: address.toString() })
-    })
-    
-    act(() => {
-      expect(anypay.result.current.getState()).toEqual({
-        isLoading: false,
-        description: 'Anypay demo invoice',
-        estimateFee: 97,
-        inputSum: 4984690,
-        outputSum: 1000,
-        changeTo: '185rxHtU6RxDtbERpcnenNXh2mZCs3PVBC',
-        payment: {},
-      })      
+    expect(anypay.result.current.state).toMatchObject({
+      initialized: true,
+      status: 'failure',
     })
   })
 
-  test('AnypayService#buildTransaction', () => {
-    const anypay = renderHook(() => {
-      return AnypayService()
+  test('AnypayService#fail', async () => {
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.fail({ error: 'Network error' })
     })
 
-    act(() => {
-      expect(() => anypay.result.current.buildTransaction({ keyPair })).toThrowError()
-    })
-
-    act(() => {
-      expect(() => anypay.result.current.buildTransaction({ keyPair })).toThrowError()
-    })
-
-    act(() => {
-      anypay.result.current.configure({ description: 'Anypay demo invoice' })
-    })
-
-    act(() => {
-      anypay.result.current.setupTransaction({ outputs, inputs, changeTo: address.toString() })
-    })
-    
-    act(() => {
-      anypay.result.current.buildTransaction({ keyPair })
-    })
-    
-    act(() => {
-      expect(anypay.result.current.getTransaction()).toEqual('01000000011d85aa9d7a31930dba37e5583a663d6ee7f70006704c25b12df2a44fd70dc277010000006b483045022100eb4b056c34272435c71303987769504ca061292c1e7180fda2c35fbf3e8e8ac1022071b69b63b487c80a18bc4c27f3ddb282e4fab2c6517791cc0dae15a053018584412103844410072031656adfefabdc47c294e6a64b74fd3215478b74cbf54999d030b1ffffffff02e8030000000000001976a91485b55443c7d5b7cd69813136ce428ad861aeb87088ac190b4c00000000001976a9144db43e454efd2125fc8b500cba8403b580e929ae88ac00000000')
+    expect(anypay.result.current.state).toMatchObject({
+      initialized: true,
+      status: 'failure',
     })
   })
 
-  test('AnypayService#getCoinInSatoshis', () => {
-    const anypay = renderHook(() => {
-      return AnypayService()
+  test('AnypayService#getPaymentInputForRelayX/success', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
     })
-    
-    expect(anypay.result.current.getCoinInSatoshis(100)).toEqual(0.000001)
+
+    expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
+      outputs: [
+        {'amount':0.000608, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 b0b343aa5025eb12f0ff4f63243449df9e4ef223 OP_EQUALVERIFY OP_CHECKSIG'},
+        {'amount':0.00007, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 fde8f61612beecbf7532765d17ce9c36c8601878 OP_EQUALVERIFY OP_CHECKSIG'}
+      ]
+    })   
+  })
+
+  test('AnypayService#getPaymentInputForRelayX/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
+      outputs: []
+    })   
+  })
+
+  test('AnypayService#getPaymentInputForMoneybutton/success', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForMoneybutton()).toEqual({
+      outputs: [
+        {'amount':0.000608, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 b0b343aa5025eb12f0ff4f63243449df9e4ef223 OP_EQUALVERIFY OP_CHECKSIG'},
+        {'amount':0.00007, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 fde8f61612beecbf7532765d17ce9c36c8601878 OP_EQUALVERIFY OP_CHECKSIG'}
+      ]
+    })   
+  })
+
+  test('AnypayService#getPaymentInputForMoneybutton/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    expect(anypay.result.current.getPaymentInputForMoneybutton()).toEqual({
+      outputs: []
+    })   
+  })
+
+  test('AnypayService#publishBroadcastedTransaction/failure', async () => {
+    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+
+    const anypay = renderHook(() => AnypayService())
+
+    await act(async () => {
+      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+    })
+
+    await expect((() => anypay.result.current.publishBroadcastedTransaction({})))
+      .rejects
+      .toThrow('Transaction could not be broadcasted as it wasn\'t initialized')
   })
 })

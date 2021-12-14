@@ -14,7 +14,6 @@ const ComponentStyled = styled.div`
 const TitleStyled = styled.div`
   ${props => props.theme.font.sizeP}
   ${props => props.theme.font.colorLight}
-  ${props => props.theme.flex.one}
 `
 
 const SubtitleStyled = styled.div`
@@ -33,15 +32,15 @@ const PriceStyled = styled.div`
 `
 
 function PaymentsSummaryTotalContent() {
-  const payments = useContext(PaymentsComponentContext)
+  const anypay = useContext(PaymentsComponentContext)
 
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Total</TitleStyled>
         <SubtitleStyled>
-          <PriceStyled>Đ 5.3</PriceStyled>
-          {payments.getCoinInSatoshis(payments.getState().outputSum + payments.getState().estimateFee)}
+          <PriceStyled>{anypay.state.invoice?.currency} {anypay.state.invoice?.invoice_amount}</PriceStyled>
+          {anypay.state.invoice?.denomination_currency} {anypay.state.invoice?.denomination_amount}
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>

@@ -2,42 +2,68 @@ import React, { useEffect } from 'react'
 import { ThemeProvider } from 'styled-components'
 import ModalTemplate from 'templates/Modal'
 import PaymentsComponent from 'components/Payments'
+import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
+import PaymentsErrorComponent from 'components/Payments/PaymentsError'
+import PaymentsSuccessComponent from 'components/Payments/PaymentsSuccess'
 import { PaymentsComponentContext } from 'components/Payments/context'
 import AnypayService from 'services/Anypay'
-import { getWallet } from 'services/Anypay/wallet'
 import theme from 'theme'
+
+const getInvoiceIdFromPathname = (pathname: string) => {
+  return pathname.split('/invoices/')[1].split('/')[0]
+}
 
 function App() {
   const anypay = AnypayService()
-  const anypayIsReady = !anypay.getState().isLoading
 
   useEffect(() => {
-    anypay.configure({
-      description: 'Anypay demo invoice',
-      handleExternalTransactionLoad: console.log,
-      handleExternalTransactionError: console.log,
-      handleExternalTransactionPayment: console.log,
-    })
+    try {
+      const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
+      anypay.init({ invoiceId })
+    } catch (error) {
+      anypay.fail({ error: error as string })
+    }
+  // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
-    if (anypayIsReady) {
-      const wallet = getWallet({ privateKeyString: 'L5GUQs2D6vYAugfeTVeiCnS3BLYvSx2FskjrDQjgpeC3uUsWc5g6' })
-
-      anypay.setupTransaction({
-        outputs: wallet.outputs,
-        inputs: wallet.inputs,
-        changeTo: wallet.address.toString(),
-      })
+    if (anypay.state.invoiceId) {
+      const interval = anypay.pollInvoice()
+      return () => clearInterval(interval)
     }
-  }, [anypayIsReady])
+  // eslint-disable-next-line
+  }, [anypay.state.initialized])
 
+  useEffect(() => {
+    if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'relayx') {
+      const payload = anypay.getPaymentOutputForRelayX()
+      anypay.publishBroadcastedTransaction(payload)
+    } else if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'moneybutton') {
+      const payload = anypay.getPaymentOutputForMoneybutton()
+      anypay.publishBroadcastedTransaction(payload)
+    }
+  // eslint-disable-next-line
+  }, [anypay.state.status])
+  
   return (
     <ThemeProvider theme={theme}>
       <ModalTemplate>
         <PaymentsComponentContext.Provider value={anypay}>
-          {anypayIsReady ?
+          {!anypay.state.initialized ?
+            <PaymentsLoadingComponent />
+          : null}
+
+          {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status !== 'paid' ?
             <PaymentsComponent />
+          : null}
+
+
+          {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'paid' ?
+            <PaymentsSuccessComponent />
+          : null}
+
+          {anypay.state.initialized && anypay.state.status === 'failure' ?
+            <PaymentsErrorComponent />
           : null}
         </PaymentsComponentContext.Provider>
       </ModalTemplate>

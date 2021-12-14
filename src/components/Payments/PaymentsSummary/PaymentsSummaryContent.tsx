@@ -12,7 +12,6 @@ const ComponentStyled = styled.div`
 const TitleStyled = styled.div`
   ${props => props.theme.font.sizeH3}
   ${props => props.theme.font.weight600}
-  ${props => props.theme.flex.one}
 `
 
 const SubtitleStyled = styled.div`
@@ -21,13 +20,14 @@ const SubtitleStyled = styled.div`
 `
 
 function PaymentsSummaryContentContent() {
-  const payments = useContext(PaymentsComponentContext)
+  const anypay = useContext(PaymentsComponentContext)
+  const memo = anypay.state.invoiceReport?.memo
 
   return (
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>Memo</TitleStyled>
-        <SubtitleStyled>{payments.getState().description}</SubtitleStyled>
+        <SubtitleStyled>{memo}</SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>
   )
