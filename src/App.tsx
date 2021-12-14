@@ -23,6 +23,7 @@ function App() {
     } catch (error) {
       anypay.fail({ error: error as string })
     }
+  // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -30,6 +31,7 @@ function App() {
       const interval = anypay.pollInvoice()
       return () => clearInterval(interval)
     }
+  // eslint-disable-next-line
   }, [anypay.state.initialized])
 
   useEffect(() => {
@@ -40,6 +42,7 @@ function App() {
       const payload = anypay.getPaymentOutputForMoneybutton()
       anypay.publishBroadcastedTransaction(payload)
     }
+  // eslint-disable-next-line
   }, [anypay.state.status])
   
   return (
