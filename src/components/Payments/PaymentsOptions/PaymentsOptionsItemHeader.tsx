@@ -1,10 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
+import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
 
 type IPaymentsOptionsItemHeaderComponent = {
   title: string;
   subtitle: string;
-  icon?: JSX.Element;
   active?: boolean;
 }
 
@@ -49,7 +49,7 @@ const IconStyled = styled.div`
   ${props => props.theme.padding.defaultLeft}
 `
 
-function PaymentsOptionsItemComponent({ title, subtitle, icon, active }: IPaymentsOptionsItemHeaderComponent) {
+function PaymentsOptionsItemComponent({ title, subtitle, active }: IPaymentsOptionsItemHeaderComponent) {
   return (
     <WrapperStyled>
       <ComponentStyled active={active}>
@@ -59,7 +59,7 @@ function PaymentsOptionsItemComponent({ title, subtitle, icon, active }: IPaymen
         </ContentStyled>
 
         <IconStyled>
-          {icon}
+          <PaymentsOptionsIconComponent active={active} />
         </IconStyled>
       </ComponentStyled>
     </WrapperStyled>

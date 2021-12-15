@@ -19,6 +19,5 @@ export const WithIcon: React.VFC<{}> = () => (
   <PaymentsOptionsItemHeaderComponent
     title="Payment option"
     subtitle="Payment option description, could be long as well"
-    icon={<PaymentsOptionsIconComponent />}
   />
 )
