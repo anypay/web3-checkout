@@ -16,7 +16,7 @@ const SubtitleStyled = styled.div`
   word-break: break-all;
 `
 
-const LinkStyled = styled.a`
+const LinkStyled = styled.span`
   ${props => props.theme.font.sizeP}
   ${props => props.theme.font.colorLink}
   ${props => props.theme.padding.smallLeft}
@@ -30,7 +30,9 @@ function ReceiptSummaryInfoComponent() {
       <ComponentStyled>
         <SubtitleStyled>
           Transaction ID:
-          <LinkStyled>{anypay.state.invoice?.hash}</LinkStyled>
+          <LinkStyled>
+            <a href={`https://whatsonchain.com/tx/${anypay.state.invoice?.hash}`}>{anypay.state.invoice?.hash}</a>
+          </LinkStyled>
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>

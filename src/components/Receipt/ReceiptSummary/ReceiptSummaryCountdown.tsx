@@ -37,6 +37,10 @@ function ReceiptSummaryCountdownComponent() {
   // @ts-ignore
   const renderer = useCallback((props) => <CountdownMessageComponent {...props} anypay={anypay} />, [anypay])
   
+  if (!anypay.state.invoice?.redirect_url) {
+    return null
+  }
+
   return (
     <WrapperStyled>
       <ComponentStyled>

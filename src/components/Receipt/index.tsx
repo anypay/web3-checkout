@@ -3,6 +3,7 @@ import ReceiptHeaderComponent from 'components/Receipt/ReceiptHeader'
 import ReceiptSummaryComponent from 'components/Receipt/ReceiptSummary'
 import ReceiptSummaryInfoComponent from 'components/Receipt/ReceiptSummary/ReceiptSummaryInfo'
 import ReceiptSummaryCountdownComponent from 'components/Receipt/ReceiptSummary/ReceiptSummaryCountdown'
+import ReceiptSummaryActionComponent from 'components/Receipt/ReceiptSummary/ReceiptSummaryAction'
 import ReceiptSummarySuccessComponent from 'components/Receipt/ReceiptSummary/ReceiptSummarySuccess'
 import styled from 'styled-components'
 import { generateMedia } from 'styled-media-query'
@@ -69,6 +70,7 @@ function ReceiptComponent() {
           <ContentStyled>
             <ReceiptSummarySuccessComponent />
             <ReceiptSummaryInfoComponent />
+            <ReceiptSummaryActionComponent />
             <ReceiptSummaryCountdownComponent />
           </ContentStyled>
 
