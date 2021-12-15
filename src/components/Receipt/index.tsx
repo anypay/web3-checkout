@@ -7,6 +7,7 @@ import ReceiptSummaryActionComponent from 'components/Receipt/ReceiptSummary/Rec
 import ReceiptSummarySuccessComponent from 'components/Receipt/ReceiptSummary/ReceiptSummarySuccess'
 import styled from 'styled-components'
 import { generateMedia } from 'styled-media-query'
+import Confetti from 'react-confetti'
 
 const media = generateMedia({
   medium: '40rem',
@@ -67,6 +68,8 @@ function ReceiptComponent() {
         </HeaderStyled>
 
         <MainStyled>
+          <Confetti />
+
           <ContentStyled>
             <ReceiptSummarySuccessComponent />
             <ReceiptSummaryInfoComponent />
