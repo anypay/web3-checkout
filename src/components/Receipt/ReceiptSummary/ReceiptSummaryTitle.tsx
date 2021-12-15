@@ -24,7 +24,7 @@ const SubtitleStyled = styled.div`
   ${props => props.theme.font.alignEnd}
 `
 
-function PaymentsSummaryTitleComponent() {
+function ReceiptSummaryTitleComponent() {
   const anypay = useContext(PaymentsComponentContext)
   const createdAt = dayjs(anypay.state.invoice?.createdAt).format('D MMMM YYYY')
   const paidAt = dayjs(anypay.state.invoice?.paidAt).format('D MMMM YYYY')
@@ -32,16 +32,16 @@ function PaymentsSummaryTitleComponent() {
   return (
     <WrapperStyled>
       <ComponentStyled>
-        <TitleStyled>Invoice</TitleStyled>
+        <TitleStyled>Date</TitleStyled>
         {anypay.state.invoice?.status === 'paid' ?
           <SubtitleStyled>{paidAt}</SubtitleStyled>
         : null}
         {anypay.state.invoice?.status !== 'paid' ?
           <SubtitleStyled>{createdAt}</SubtitleStyled>
-          : null}
+        : null}
       </ComponentStyled>
     </WrapperStyled>
   )
 }
 
-export default PaymentsSummaryTitleComponent
+export default ReceiptSummaryTitleComponent
