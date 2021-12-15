@@ -1,7 +1,6 @@
 import React, { useContext } from 'react'
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
-import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
 import { useAccordionState } from './service'
 import './index.css'
 
@@ -39,7 +38,6 @@ function PaymentsOptionsComponent() {
             <PaymentsOptionsItemHeaderComponent
               title="Relay"
               subtitle="Swipe to pay using your favourite web wallet."
-              icon={<PaymentsOptionsIconComponent />}
               active={accordionState.getActive() === 'payment-relay'}
             />
           </AccordionItemButton>
@@ -67,7 +65,6 @@ function PaymentsOptionsComponent() {
             <PaymentsOptionsItemHeaderComponent
               title="Moneybutton"
               subtitle="Swipe to pay using Moneybutton."
-              icon={<PaymentsOptionsIconComponent />}
               active={accordionState.getActive() === 'payment-moneybutton'}
             />
           </AccordionItemButton>
@@ -95,7 +92,6 @@ function PaymentsOptionsComponent() {
             <PaymentsOptionsItemHeaderComponent
               title="Handcash / Simply Cash / Electrum"
               subtitle="Scan and pay using Simplified Payments / BIP270."
-              icon={<PaymentsOptionsIconComponent />}
               active={accordionState.getActive() === 'payment-handcash'}
             />
           </AccordionItemButton>
@@ -117,7 +113,6 @@ function PaymentsOptionsComponent() {
             <PaymentsOptionsItemHeaderComponent
               title="Volt / Maxthon VBox"
               subtitle="Pay using the Open Payment Protocol."
-              icon={<PaymentsOptionsIconComponent />}
               active={accordionState.getActive() === 'payment-volt'}
             />
           </AccordionItemButton>

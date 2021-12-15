@@ -1,4 +1,5 @@
 import React from 'react'
+import PaymentsSummaryQRComponent from './PaymentsSummaryQR'
 import PaymentsSummaryTitleComponent from './PaymentsSummaryTitle'
 import PaymentsSummaryContentComponent from './PaymentsSummaryContent'
 import PaymentsSummaryTotalComponent from './PaymentsSummaryTotal'
@@ -18,9 +19,16 @@ const ContentStyled = styled.div`
   ${props => props.theme.padding.small}
 `
 
+const SpacingStyled = styled.div`
+  ${props => props.theme.padding.defaultBottom}
+`
+
 function PaymentsSummaryComponent() {
   return (
     <WrapperStyled>
+      <PaymentsSummaryQRComponent />
+      <SpacingStyled />
+
       <ComponentStyled>
         <ContentStyled>
           <PaymentsSummaryTitleComponent />

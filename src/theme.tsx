@@ -72,6 +72,9 @@ const font = {
   colorDark: css`
     color: ${colors.dark};
   `,
+  colorPrimary: css`
+    color: ${colors.primary};
+  `,
   colorRed: css`
     color: ${colors.red};
   `,
@@ -177,6 +180,10 @@ const flex = {
     align-items: center;
     display: flex;
   `,
+  justifyContentCenter: css`
+    justify-content: center;
+    display: flex;
+  `,
   one: css`
     flex: 1;
   `,
@@ -186,11 +193,17 @@ const flex = {
  * Views
  */
 const views = {
-  iconSmall: css`
+  iconSmallActive: css`
     width: 28px;
     height: 28px;
     border-radius: 14px;
     background-color: ${colors.primary};
+  `,
+  iconSmallInactive: css`
+    width: 28px;
+    height: 28px;
+    border-radius: 14px;
+    background-color: ${colors.card};
   `,
 }
 
