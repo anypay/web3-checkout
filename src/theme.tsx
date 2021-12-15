@@ -9,6 +9,7 @@ export const colors = {
   dark: '#333333',
   red: '#e74c3c',
   green: '#27ae60',
+  link: '#0984e3',
 }
 
 export const units = {
@@ -65,6 +66,9 @@ const font = {
   `,
   colorWhite: css`
     color: ${colors.white};
+  `,
+  colorLink: css`
+    color: ${colors.link};
   `,
   colorLight: css`
     color: ${colors.grey};
