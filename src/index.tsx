@@ -3,13 +3,42 @@ import ReactDOM from 'react-dom'
 import 'index.css'
 import App from 'App'
 import reportWebVitals from 'reportWebVitals'
+import Modal from 'react-modal'
+import { IAnypayServiceResponse } from 'services/Anypay'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    border: 0,
+    borderRadius: '0.5rem',
+  },
+  overlay: {
+    backgroundColor: '#33333380',
+  }
+}
+
+type IAnypaySDK = {
+  onStateChanged?: (anypay: IAnypayServiceResponse) => void;
+}
+
+const AnypaySDK = ({ onStateChanged } : IAnypaySDK) => {
+  ReactDOM.render(
+    <React.StrictMode>
+      <Modal isOpen style={customStyles}>
+        <App onStateChanged={onStateChanged} />
+      </Modal>
+    </React.StrictMode>,
+    document.getElementById('root')
+  )
+}
+
+// @ts-ignore
+window.AnypaySDK = AnypaySDK
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -6,14 +6,18 @@ import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
 import PaymentsErrorComponent from 'components/Payments/PaymentsError'
 import ReceiptComponent from 'components/Receipt'
 import { PaymentsComponentContext } from 'components/Payments/context'
-import AnypayService from 'services/Anypay'
+import AnypayService, { IAnypayServiceResponse } from 'services/Anypay'
 import theme from 'theme'
 
 const getInvoiceIdFromPathname = (pathname: string) => {
   return pathname.split('/invoices/')[1].split('/')[0]
 }
 
-function App() {
+type IAppComponent = {
+  onStateChanged?: (anypay: IAnypayServiceResponse) => void;
+}
+
+function AppComponent({ onStateChanged } : IAppComponent) {
   const anypay = AnypayService()
 
   useEffect(() => {
@@ -44,6 +48,12 @@ function App() {
     }
   // eslint-disable-next-line
   }, [anypay.state.status])
+
+  useEffect(() => {
+    // @ts-ignore
+    onStateChanged(anypay)
+  // eslint-disable-next-line
+  }, [anypay])
   
   return (
     <ThemeProvider theme={theme}>
@@ -71,4 +81,4 @@ function App() {
   )
 }
 
-export default App
+export default AppComponent
