@@ -20,7 +20,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
@@ -53,7 +53,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.state).toMatchObject({
@@ -71,7 +71,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.state).toMatchObject({
@@ -100,7 +100,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
@@ -118,7 +118,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
@@ -133,7 +133,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.getPaymentInputForMoneybutton()).toEqual({
@@ -151,7 +151,7 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
     expect(anypay.result.current.getPaymentInputForMoneybutton()).toEqual({
@@ -166,11 +166,124 @@ describe('AnypayService', () => {
     const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
-      await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
+      await anypay.result.current.init()
     })
 
-    await expect((() => anypay.result.current.publishBroadcastedTransaction({})))
+    await act(async () => {
+      await expect((() => anypay.result.current.publishBroadcastedTransaction({})))
       .rejects
       .toThrow('Transaction could not be broadcasted as it wasn\'t initialized')
+    })
+
+    expect(anypay.result.current.state.status).toEqual('failure')
   })
+
+  test('AnypayService#onLoadCallbackForRelayX', async () => {
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onLoadCallbackForRelayX: jest.fn()
+    }
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
+
+    await act(async () => {
+      await anypay.result.current.init()
+    })
+
+    act(() => {
+      anypay.result.current.onLoadCallbackForRelayX(1)
+    })
+
+    expect(customConfig.onLoadCallbackForRelayX).toHaveBeenCalledWith(1)
+  })
+
+  test('AnypayService#onErrorCallbackForRelayX', async () => {
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onErrorCallbackForRelayX: jest.fn()
+    }
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
+
+    await act(async () => {
+      await anypay.result.current.init()
+    })
+
+    act(() => {
+      anypay.result.current.onErrorCallbackForRelayX(1)
+    })
+
+    expect(customConfig.onErrorCallbackForRelayX).toHaveBeenCalledWith(1)
+  })
+
+  test('AnypayService#onPaymentCallbackForRelayX', async () => {
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onPaymentCallbackForRelayX: jest.fn()
+    }
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
+
+    await act(async () => {
+      await anypay.result.current.init()
+    })
+
+    act(() => {
+      anypay.result.current.onPaymentCallbackForRelayX(1)
+    })
+
+    expect(customConfig.onPaymentCallbackForRelayX).toHaveBeenCalledWith(1)
+  })
+
+  test('AnypayService#onLoadCallbackForMoneybutton', async () => {
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onLoadCallbackForMoneybutton: jest.fn()
+    }
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
+
+    await act(async () => {
+      await anypay.result.current.init()
+    })
+
+    act(() => {
+      anypay.result.current.onLoadCallbackForMoneybutton(1)
+    })
+
+    expect(customConfig.onLoadCallbackForMoneybutton).toHaveBeenCalledWith(1)
+  })
+
+  test('AnypayService#onErrorCallbackForMoneybutton', async () => {
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onErrorCallbackForMoneybutton: jest.fn()
+    }
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
+
+    await act(async () => {
+      await anypay.result.current.init()
+    })
+
+    act(() => {
+      anypay.result.current.onErrorCallbackForMoneybutton(1)
+    })
+
+    expect(customConfig.onErrorCallbackForMoneybutton).toHaveBeenCalledWith(1)
+  })
+
+  test('AnypayService#onPaymentCallbackForMoneybutton', async () => {
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onPaymentCallbackForMoneybutton: jest.fn()
+    }
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
+
+    await act(async () => {
+      await anypay.result.current.init()
+    })
+
+    act(() => {
+      anypay.result.current.onPaymentCallbackForMoneybutton(1)
+    })
+
+    expect(customConfig.onPaymentCallbackForMoneybutton).toHaveBeenCalledWith(1)
+  })
+
 })

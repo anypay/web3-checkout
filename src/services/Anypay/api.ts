@@ -13,7 +13,6 @@ export type IApiServiceResponse = {
 }
 
 export type IIApiServiceCreatePost = {
-  invoiceId: string
   payload: {
     amount: number
     business_id?: string
