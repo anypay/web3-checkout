@@ -25,7 +25,7 @@ jobs:
           command: yarn build
       - run:
           name: Deploy to Webservers
-          command: scp -r build/* ubuntu@sv.anypayx.com:/opt/anypay.sv/build
+          command: scp -o StrictHostKeyChecking=no -r build/* ubuntu@sv.anypayx.com:/opt/anypay.sv/build
 
 workflows:
   version: 2
