@@ -60,14 +60,14 @@ const ApiService = () => {
   })
 
   // @ts-ignore
-  const invoiceCreatePost = async ({}: IApiServiceCreatePost) : IApiServiceCreatePostResponse => {
+  const invoiceCreatePost = async ({ payload }: IApiServiceCreatePost) : IApiServiceCreatePostResponse => {
     const options = {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Basic ${window.btoa(`${MERCHANT_API_KEY}:`)}`
       }
     }
-    const request = await instance.post(`/invoices`, {}, options)
+    const request = await instance.post(`/invoices`, payload, options)
     return request.data
   }
 
