@@ -21,7 +21,7 @@ export type IAnypayService = {
 }
 
 export type IAnypayServiceResponse = {
-  init: (state: IAnypayServiceInit) => void
+  init: () => void
   fail: (state: IAnypayServiceFail) => void
   pollInvoice: () => NodeJS.Timer
   getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse
@@ -41,10 +41,6 @@ export type IAnypayServiceResponse = {
   publishBroadcastedTransaction: (payload: any) => Promise<void>
   getAmountFromSatoshis: (state: number) => number
   getCurrencyFromNetwork: (state: string) => string
-}
-
-export type IAnypayServiceInit = {
-  invoiceId: string
 }
 
 export type IAnypayServiceFail = {
@@ -131,15 +127,15 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     return amount / 100000000
   }
 
-  const init = async ({ invoiceId } : IAnypayServiceInit) : Promise<void> => {
+  const init = async () : Promise<void> => {
     try {
-      const invoice = await api.invoiceGet({ invoiceId })
-      const invoiceReport = await api.invoiceReportGet({ invoiceId })
+      const invoice = await api.invoiceGet({ invoiceId: config.invoiceId })
+      const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
 
       state.set({
         initialized: true,
         status: 'pending',
-        invoiceId,
+        invoiceId: config.invoiceId,
         invoiceReport,
         invoice,
       })

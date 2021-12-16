@@ -14,9 +14,8 @@ function AppComponent({ config } : IAnypayService) {
 
   useEffect(() => {
     try {
-      anypay.init({ invoiceId: config.invoiceId })
+      anypay.init()
     } catch (error) {
-      console.log(config)
       anypay.fail({ error: error as string })
     }
   // eslint-disable-next-line

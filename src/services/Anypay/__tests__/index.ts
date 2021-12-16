@@ -5,6 +5,7 @@ import MockAdapter from 'axios-mock-adapter'
 import * as apiMocks from 'services/Anypay/mocks'
 
 var mock = new MockAdapter(axios)
+const config = { invoiceId: 'zMjwpQ7kk' }
 
 describe('AnypayService', () => {
   afterEach(() => {
@@ -16,7 +17,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
     mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
     
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -49,7 +50,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
     mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -67,7 +68,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -80,7 +81,7 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#fail', async () => {
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.fail({ error: 'Network error' })
@@ -96,7 +97,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -114,7 +115,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -129,7 +130,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -147,7 +148,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
@@ -162,7 +163,7 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
 
-    const anypay = renderHook(() => AnypayService())
+    const anypay = renderHook(() => AnypayService({ config }))
 
     await act(async () => {
       await anypay.result.current.init({ invoiceId: 'zMjwpQ7kk' })
