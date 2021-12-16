@@ -8,6 +8,16 @@ import { AnypayApiResponse } from 'types/api'
  * Anypay payment service
  */
 export type IAnypayService = {
+  config: {
+    invoiceId: string
+    onLoadCallbackForRelayX?: (payload: IAnypayServiceOnLoadCallbackForRelayX) => IAnypayServiceOnLoadCallbackForRelayXResponse
+    onErrorCallbackForRelayX?: (payload: IAnypayServiceOnErrorCallbackForRelayX) => IAnypayServiceOnErrorCallbackForRelayXResponse
+    onPaymentCallbackForRelayX?: (payload: IAnypayServiceOnPaymentCallbackForRelayX) => IAnypayServiceOnPaymentCallbackForRelayXResponse
+
+    onLoadCallbackForMoneybutton?: (payload: IAnypayServiceOnLoadCallbackForMoneybutton) => IAnypayServiceOnLoadCallbackForMoneybuttonResponse
+    onErrorCallbackForMoneybutton?: (payload: IAnypayServiceOnErrorCallbackForMoneybutton) => IAnypayServiceOnErrorCallbackForMoneybuttonResponse
+    onPaymentCallbackForMoneybutton?: (payload: IAnypayServiceOnPaymentCallbackForMoneybutton) => IAnypayServiceOnPaymentCallbackForMoneybuttonResponse
+  }
 }
 
 export type IAnypayServiceResponse = {
@@ -83,7 +93,7 @@ export type IAnypayServiceOnPaymentCallbackForMoneybuttonResponse = void
 export type IAnypayServiceOnErrorCallbackForMoneybutton = any
 export type IAnypayServiceOnErrorCallbackForMoneybuttonResponse = void
 
-const AnypayService = () : IAnypayServiceResponse => {
+const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => {
   const state = StateService()
   const api = ApiService()
 
@@ -210,14 +220,17 @@ const AnypayService = () : IAnypayServiceResponse => {
   }
 
   const onLoadCallbackForRelayX = (payload: IAnypayServiceOnLoadCallbackForRelayX) : IAnypayServiceOnLoadCallbackForRelayXResponse => {
+    config.onLoadCallbackForRelayX && config.onLoadCallbackForRelayX(payload)
     console.log('relayx.onload', payload)
   }
 
   const onErrorCallbackForRelayX = (payload: IAnypayServiceOnErrorCallbackForRelayX) : IAnypayServiceOnErrorCallbackForRelayXResponse => {
+    config.onErrorCallbackForRelayX && config.onErrorCallbackForRelayX(payload)
     console.log('relayx.onerror', payload)
   }
 
   const onPaymentCallbackForRelayX = (payload: IAnypayServiceOnPaymentCallbackForRelayX) : IAnypayServiceOnPaymentCallbackForRelayXResponse => {
+    config.onPaymentCallbackForRelayX && config.onPaymentCallbackForRelayX(payload)
     console.log('relayx.onpayment', payload)
     state.set({
       status: 'broadcasted',
@@ -229,14 +242,17 @@ const AnypayService = () : IAnypayServiceResponse => {
   }
 
   const onLoadCallbackForMoneybutton = (payload: IAnypayServiceOnLoadCallbackForMoneybutton) : IAnypayServiceOnLoadCallbackForMoneybuttonResponse => {
+    config.onLoadCallbackForMoneybutton && config.onLoadCallbackForMoneybutton(payload)
     console.log('moneybutton.onload', payload)
   }
 
   const onErrorCallbackForMoneybutton = (payload: IAnypayServiceOnErrorCallbackForMoneybutton) : IAnypayServiceOnErrorCallbackForMoneybuttonResponse => {
+    config.onErrorCallbackForMoneybutton && config.onErrorCallbackForMoneybutton(payload)
     console.log('moneybutton.onerror', payload)
   }
 
   const onPaymentCallbackForMoneybutton = (payload: IAnypayServiceOnPaymentCallbackForMoneybutton) : IAnypayServiceOnPaymentCallbackForMoneybuttonResponse => {
+    config.onPaymentCallbackForMoneybutton && config.onPaymentCallbackForMoneybutton(payload)
     console.log('moneybutton.onpayment', payload)
     state.set({
       status: 'broadcasted',

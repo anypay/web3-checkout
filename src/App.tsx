@@ -6,25 +6,17 @@ import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
 import PaymentsErrorComponent from 'components/Payments/PaymentsError'
 import ReceiptComponent from 'components/Receipt'
 import { PaymentsComponentContext } from 'components/Payments/context'
-import AnypayService, { IAnypayServiceResponse } from 'services/Anypay'
+import AnypayService, { IAnypayService } from 'services/Anypay'
 import theme from 'theme'
 
-const getInvoiceIdFromPathname = (pathname: string) => {
-  return pathname.split('/invoices/')[1].split('/')[0]
-}
-
-type IAppComponent = {
-  onStateChanged?: (anypay: IAnypayServiceResponse) => void;
-}
-
-function AppComponent({ onStateChanged } : IAppComponent) {
-  const anypay = AnypayService()
+function AppComponent({ config } : IAnypayService) {
+  const anypay = AnypayService({ config })
 
   useEffect(() => {
     try {
-      const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
-      anypay.init({ invoiceId })
+      anypay.init({ invoiceId: config.invoiceId })
     } catch (error) {
+      console.log(config)
       anypay.fail({ error: error as string })
     }
   // eslint-disable-next-line
@@ -48,12 +40,6 @@ function AppComponent({ onStateChanged } : IAppComponent) {
     }
   // eslint-disable-next-line
   }, [anypay.state.status])
-
-  useEffect(() => {
-    // @ts-ignore
-    onStateChanged(anypay)
-  // eslint-disable-next-line
-  }, [anypay])
   
   return (
     <ThemeProvider theme={theme}>

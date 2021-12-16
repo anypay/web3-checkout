@@ -4,7 +4,7 @@ import 'index.css'
 import App from 'App'
 import reportWebVitals from 'reportWebVitals'
 import Modal from 'react-modal'
-import { IAnypayServiceResponse } from 'services/Anypay'
+import { IAnypayService } from 'services/Anypay'
 
 const customStyles = {
   content: {
@@ -22,15 +22,12 @@ const customStyles = {
   }
 }
 
-type IAnypaySDK = {
-  onStateChanged?: (anypay: IAnypayServiceResponse) => void;
-}
-
-const AnypaySDK = ({ onStateChanged } : IAnypaySDK) => {
+const AnypaySDK = ({ config } : IAnypayService) => {
+  console.log(config, 3)
   ReactDOM.render(
     <React.StrictMode>
       <Modal isOpen style={customStyles}>
-        <App onStateChanged={onStateChanged} />
+        <App config={config} />
       </Modal>
     </React.StrictMode>,
     document.getElementById('root')

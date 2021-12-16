@@ -44,8 +44,13 @@
   </body>
 
   <script>
+    const getInvoiceIdFromPathname = (pathname) => {
+      return pathname.split('/invoices/')[1].split('/')[0]
+    }
+    const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
+
     window.onload = () => {
-      AnypaySDK({ onStateChanged: console.log })
+      window.AnypaySDK({ config: { invoiceId } })
     }
   </script>
 </html>
