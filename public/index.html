@@ -45,12 +45,22 @@
 
   <script>
     const getInvoiceIdFromPathname = (pathname) => {
-      return pathname.split('/invoices/')[1].split('/')[0]
+      try {
+        return pathname.split('/invoices/')[1].split('/')[0]
+      } catch (error) {
+        console.error('Missing invoice id in the URI')
+      }
     }
     const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
 
     window.onload = () => {
-      window.AnypaySDK({ config: { invoiceId, onAnypayInit: console.log } })
+      window.AnypaySDK({
+        config: {
+          invoiceId,
+          onAnypayInit: console.log,
+          onAnypayFail: console.error,
+        },
+      })
     }
   </script>
 </html>

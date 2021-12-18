@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.4.3",
     "@moneybutton/react-money-button": "^0.38.8",
     "axios": "^0.24.0",
     "bsv": "1.5.6",
@@ -21,9 +22,9 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "NODE_PATH=./src/ react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "NODE_PATH=./src/ craco test",
     "test-puppeteer": "concurrently \"yarn:serve-*\" \"jest -c jest-puppeteer.config.js\" --kill-others",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
