@@ -25,12 +25,9 @@
     "start": "craco start",
     "build": "craco build",
     "test": "NODE_PATH=./src/ craco test",
-    "test-puppeteer": "concurrently \"yarn:serve-*\" \"jest -c jest-puppeteer.config.js\" --kill-others",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "serve-build": "serve ./build -p 5671",
-    "serve-example": "serve ./example -p 5672",
-    "serve": "concurrently \"yarn:serve-*\""
+    "example": "npm run build && cp -R ./build/static ./example && serve ./example -p 8080"
   },
   "eslintConfig": {
     "extends": [
@@ -81,9 +78,7 @@
     "axios-mock-adapter": "^1.20.0",
     "babel-plugin-styled-components": "^1.13.2",
     "concurrently": "^6.3.0",
-    "jest-puppeteer": "^6.0.2",
     "jest-styled-components": "^7.0.5",
-    "puppeteer": "^10.4.0",
     "react-scripts": "^4.0.3",
     "react-test-renderer": "^17.0.2",
     "serve": "^12.0.1"

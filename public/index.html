@@ -57,8 +57,9 @@
       window.AnypaySDK({
         config: {
           invoiceId,
-          onAnypayInit: console.log,
-          onAnypayFail: console.error,
+          // onAnypayLoadSuccess: console.log,
+          // onAnypayLoadFailure: console.error,
+          onAnypayPaymentSuccess: console.log,
         },
       })
     }

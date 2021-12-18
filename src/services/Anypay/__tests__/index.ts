@@ -17,7 +17,13 @@ describe('AnypayService', () => {
     mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
     mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
     
-    const anypay = renderHook(() => AnypayService({ config }))
+    const customConfig = {
+      invoiceId: config.invoiceId,
+      onAnypayPaymentSuccess: jest.fn(),
+      onAnypayPaymentFailure: jest.fn(),
+    }
+
+    const anypay = renderHook(() => AnypayService({ config: customConfig }))
 
     await act(async () => {
       await anypay.result.current.init()
@@ -52,8 +58,8 @@ describe('AnypayService', () => {
 
     const customConfig = {
       invoiceId: config.invoiceId,
-      onAnypayInit: jest.fn(),
-      onAnypayFail: jest.fn(),
+      onAnypayLoadSuccess: jest.fn(),
+      onAnypayLoadFailure: jest.fn(),
     }
     const anypay = renderHook(() => AnypayService({ config: customConfig }))
 
@@ -67,8 +73,8 @@ describe('AnypayService', () => {
       invoiceReport: apiMocks.invoiceReportGetPrepaid,
       invoice: apiMocks.invoiceGetPrepaid,
     })
-    expect(customConfig.onAnypayInit).toHaveBeenCalledWith({ state: anypay.result.current.state })
-    expect(customConfig.onAnypayFail).not.toHaveBeenCalled()
+    expect(customConfig.onAnypayLoadSuccess).toHaveBeenCalledWith({ state: anypay.result.current.state })
+    expect(customConfig.onAnypayLoadFailure).not.toHaveBeenCalled()
   })
 
   test('AnypayService#init/failure', async () => {
@@ -77,8 +83,8 @@ describe('AnypayService', () => {
 
     const customConfig = {
       invoiceId: config.invoiceId,
-      onAnypayInit: jest.fn(),
-      onAnypayFail: jest.fn(),
+      onAnypayLoadSuccess: jest.fn(),
+      onAnypayLoadFailure: jest.fn(),
     }
 
     const anypay = renderHook(() => AnypayService({ config: customConfig }))
@@ -92,8 +98,8 @@ describe('AnypayService', () => {
       status: 'failure',
     })
 
-    expect(customConfig.onAnypayInit).not.toHaveBeenCalled()
-    expect(customConfig.onAnypayFail).toHaveBeenCalled()
+    expect(customConfig.onAnypayLoadSuccess).not.toHaveBeenCalled()
+    expect(customConfig.onAnypayLoadFailure).toHaveBeenCalled()
   })
 
   test('AnypayService#fail', async () => {
@@ -301,5 +307,4 @@ describe('AnypayService', () => {
 
     expect(customConfig.onPaymentCallbackForMoneybutton).toHaveBeenCalledWith(1)
   })
-
 })

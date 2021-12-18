@@ -11,8 +11,10 @@ export type IAnypayService = {
   config: {
     invoiceId: string
 
-    onAnypayInit?: ({ state }: { state: IStateServiceState }) => void
-    onAnypayFail?: ({ error }: { error: string }) => void
+    onAnypayLoadSuccess?: ({ state }: { state: IStateServiceState }) => void
+    onAnypayLoadFailure?: ({ error }: { error: string }) => void
+    onAnypayPaymentSuccess?: ({ state }: { state: IStateServiceState }) => void
+    onAnypayPaymentFailure?: ({ state }: { state: IStateServiceState }) => void
 
     onLoadCallbackForRelayX?: (payload: IAnypayServiceOnLoadCallbackForRelayX) => IAnypayServiceOnLoadCallbackForRelayXResponse
     onErrorCallbackForRelayX?: (payload: IAnypayServiceOnErrorCallbackForRelayX) => IAnypayServiceOnErrorCallbackForRelayXResponse
@@ -97,6 +99,30 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
   const state = StateService()
   const api = ApiService()
 
+  /**
+   * Callback to be executed once payment status has been changed
+   */
+  if (
+    state.state.initialized === true &&
+    state.state.status === 'broadcasted' &&
+    state.state.invoice?.status === 'paid'
+  ) {
+    config.onAnypayPaymentSuccess && config.onAnypayPaymentSuccess(state)
+  }
+
+  /**
+   * Callback to be executed once payment status has been changed
+   */
+  if (
+    state.state.initialized === true &&
+    state.state.status === 'failure'
+  ) {
+    config.onAnypayPaymentFailure && config.onAnypayPaymentFailure(state)
+  }
+
+  /**
+   * 
+   */
   const pollInvoice = () => {
     if (!state.state.invoiceId) {
       throw new Error('Invoice could not be polled as it wasn\'t initialized')
@@ -146,12 +172,12 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           invoice,
         } as IStateServiceState
 
-        config.onAnypayInit && config.onAnypayInit({ state: nextState })
+        config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({ state: nextState })
 
         return nextState
       })
     } catch (error) {
-      config.onAnypayFail && config.onAnypayFail({ error: error as string })
+      config.onAnypayLoadFailure && config.onAnypayLoadFailure({ error: error as string })
       fail({ error: error as string })
     }
   }
