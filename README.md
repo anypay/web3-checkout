@@ -2,6 +2,51 @@
 
 Payment popup widget for AnyPay, Inc.
 
+## Installation
+
+```
+<!-- Element the widget modal will be rendered into -->
+<div id="anypay-widget"></div>
+
+<!-- Script location, could be loaded from cdn or your server -->
+<script src="https://anypay.sv/static/js/main.js"></script>
+
+<!-- Show widget modal -->
+<script>
+  var loadModal = () => {
+    window.AnypaySDK({
+      element: 'anypay-widget',
+      config: {
+        invoiceId: 'GWT_QcGq-',
+        onAnypayLoadSuccess: console.log,
+        onAnypayLoadFailure: console.error,
+        onAnypayPaymentSuccess: console.log,
+        onAnypayPaymentFailure: console.error,
+      },
+    })
+  }
+</script>
+```
+
+## API
+### element
+input for `document.getElementById` selector that the widget will be render into
+
+### config.invoiceId
+Anypay invoice id
+
+### config.onAnypayLoadSuccess
+Callback when invoice data is loaded and modal is shown
+
+### config.onAnypayLoadFailure
+Callback when invoice data could not be loaded, most likely due to wrong invoiceId provided
+
+### config.onAnypayPaymentSuccess
+Callback when payment is done using any payment method (note: might be executed multiple times)
+
+### config.onAnypayPaymentFailure
+Callback when payment is could not be done (note: might be executed multiple times)
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -18,46 +63,3 @@ You will also see any lint errors in the console.
 
 Runs the example integration.\
 Open [http://localhost:5672/](http://localhost:5672/) to view it in the browser.
-
-### `yarn storybook`
-
-Runs the storybook mode.\
-Open [http://localhost:6006/](http://localhost:6006/) to view it in the browser.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-# Styling guide
-
-Common conventions for styling guide
-
-### styled components
-
-Use [styled components](https://styled-components.com/docs/advanced#theming) for common theming and styling. Components used in should follow following naming convention `[ComponentName]Styled`.
-
-### compose and reuse
-
-Custom component styling should be minimized as much as possible. Styling should be created by composing and reusing smaller chunks defined at `theme.tsx`.
-
-```js
-const WrapperStyled = styled.div`
-  ${props => props.theme.padding.default}
-  ${props => props.theme.background.card}
-`
-
-...
-
-<WrapperStyled>
-  ${this.props.children}
-</WrapperStyled>
-```

@@ -4,12 +4,12 @@ import 'index.css'
 import App from 'App'
 import { IAnypayService } from 'services/Anypay'
 
-const AnypaySDK = ({ config } : IAnypayService) => {
+const AnypaySDK = ({ config, element = 'root' } : IAnypayService & { element: string }) => {
   ReactDOM.render(
     <React.StrictMode>
       <App config={config} />
     </React.StrictMode>,
-    document.getElementById('root')
+    document.getElementById(element)
   )
 }
 
