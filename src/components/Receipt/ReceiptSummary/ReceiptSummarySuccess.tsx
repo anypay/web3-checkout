@@ -20,7 +20,7 @@ function ReceiptSuccessSuccessComponent() {
     <WrapperStyled>
       <ComponentStyled>
         <TitleStyled>
-          🎉 Receipt has been successfully PAID
+          🎉 Payment Complete
         </TitleStyled>
       </ComponentStyled>
     </WrapperStyled>
