@@ -9,7 +9,7 @@ const WrapperStyled = styled.div`
 const ComponentStyled = styled.div`
 `
 
-const ActionStyled = styled.a`
+const ActionStyled = styled.button`
   ${props => props.theme.font.sizeH1}
   ${props => props.theme.font.colorLight}
   ${props => props.theme.font.colorWhite}
@@ -23,14 +23,20 @@ const ActionStyled = styled.a`
 function ReceiptSummaryActionComponent() {
   const anypay = useContext(PaymentsComponentContext)
 
-  if (!anypay.state.invoice?.redirect_url) {
-    return null
+  const handleClick = () => {
+    if (anypay.state.invoice?.redirect_url) {
+      window.location.href = anypay.state.invoice?.redirect_url
+    }
+
+    else {
+      anypay.setModalState(false)
+    }
   }
 
   return (
     <WrapperStyled>
       <ComponentStyled>
-        <ActionStyled href={anypay.state.invoice?.redirect_url}>
+        <ActionStyled onClick={handleClick}>
           DONE
         </ActionStyled>
       </ComponentStyled>

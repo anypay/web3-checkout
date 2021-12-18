@@ -1,19 +1,37 @@
 import * as bsv from 'bsv'
 import ApiService from './api'
 import StateService from './state'
-import type { IStateServiceGetResponse } from './state'
+import type { IStateServiceGetResponse, IStateServiceState } from './state'
 import { AnypayApiResponse } from 'types/api'
 
 /**
  * Anypay payment service
  */
 export type IAnypayService = {
+  config: {
+    invoiceId: string
+
+    onAnypayLoadSuccess?: ({ state }: { state: IStateServiceState }) => void
+    onAnypayLoadFailure?: ({ error }: { error: string }) => void
+    onAnypayPaymentSuccess?: ({ state }: { state: IStateServiceState }) => void
+    onAnypayPaymentFailure?: ({ state }: { state: IStateServiceState }) => void
+
+    onLoadCallbackForRelayX?: (payload: IAnypayServiceOnLoadCallbackForRelayX) => IAnypayServiceOnLoadCallbackForRelayXResponse
+    onErrorCallbackForRelayX?: (payload: IAnypayServiceOnErrorCallbackForRelayX) => IAnypayServiceOnErrorCallbackForRelayXResponse
+    onPaymentCallbackForRelayX?: (payload: IAnypayServiceOnPaymentCallbackForRelayX) => IAnypayServiceOnPaymentCallbackForRelayXResponse
+
+    onLoadCallbackForMoneybutton?: (payload: IAnypayServiceOnLoadCallbackForMoneybutton) => IAnypayServiceOnLoadCallbackForMoneybuttonResponse
+    onErrorCallbackForMoneybutton?: (payload: IAnypayServiceOnErrorCallbackForMoneybutton) => IAnypayServiceOnErrorCallbackForMoneybuttonResponse
+    onPaymentCallbackForMoneybutton?: (payload: IAnypayServiceOnPaymentCallbackForMoneybutton) => IAnypayServiceOnPaymentCallbackForMoneybuttonResponse
+  }
 }
 
 export type IAnypayServiceResponse = {
-  init: (state: IAnypayServiceInit) => void
+  init: () => void
   fail: (state: IAnypayServiceFail) => void
   pollInvoice: () => NodeJS.Timer
+  setModalState: (visibility: boolean) => void
+
   getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse
   getPaymentOutputForRelayX: () => IAnypayServiceGetPaymentOutputForRelayXResponse
   getPaymentInputForMoneybutton: () => IAnypayServiceGetPaymentInputForMoneybuttonResponse
@@ -31,10 +49,6 @@ export type IAnypayServiceResponse = {
   publishBroadcastedTransaction: (payload: any) => Promise<void>
   getAmountFromSatoshis: (state: number) => number
   getCurrencyFromNetwork: (state: string) => string
-}
-
-export type IAnypayServiceInit = {
-  invoiceId: string
 }
 
 export type IAnypayServiceFail = {
@@ -83,10 +97,42 @@ export type IAnypayServiceOnPaymentCallbackForMoneybuttonResponse = void
 export type IAnypayServiceOnErrorCallbackForMoneybutton = any
 export type IAnypayServiceOnErrorCallbackForMoneybuttonResponse = void
 
-const AnypayService = () : IAnypayServiceResponse => {
+const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => {
   const state = StateService()
   const api = ApiService()
 
+  /**
+   * Callback to be executed once payment status has been changed
+   */
+  if (
+    state.state.initialized === true &&
+    state.state.status === 'broadcasted' &&
+    state.state.invoice?.status === 'paid'
+  ) {
+    config.onAnypayPaymentSuccess && config.onAnypayPaymentSuccess(state)
+  }
+
+  /**
+   * Callback to be executed once payment status has been changed
+   */
+  if (
+    state.state.initialized === true &&
+    state.state.status === 'failure'
+  ) {
+    config.onAnypayPaymentFailure && config.onAnypayPaymentFailure(state)
+  }
+
+  const setModalState = (visibility: boolean) => {
+    state.set({
+      modal: {
+        isOpen: visibility,
+      },
+    })
+  }
+
+  /**
+   * 
+   */
   const pollInvoice = () => {
     if (!state.state.invoiceId) {
       throw new Error('Invoice could not be polled as it wasn\'t initialized')
@@ -121,19 +167,30 @@ const AnypayService = () : IAnypayServiceResponse => {
     return amount / 100000000
   }
 
-  const init = async ({ invoiceId } : IAnypayServiceInit) : Promise<void> => {
+  const init = async () : Promise<void> => {
     try {
-      const invoice = await api.invoiceGet({ invoiceId })
-      const invoiceReport = await api.invoiceReportGet({ invoiceId })
+      const invoice = await api.invoiceGet({ invoiceId: config.invoiceId })
+      const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
 
-      state.set({
-        initialized: true,
-        status: 'pending',
-        invoiceId,
-        invoiceReport,
-        invoice,
+      state.set((payload) => {
+        const nextState = {
+          ...payload,
+          initialized: true,
+          status: 'pending',
+          invoiceId: config.invoiceId,
+          invoiceReport,
+          invoice,
+          modal: {
+            isOpen: true,
+          },
+        } as IStateServiceState
+
+        config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({ state: nextState })
+
+        return nextState
       })
     } catch (error) {
+      config.onAnypayLoadFailure && config.onAnypayLoadFailure({ error: error as string })
       fail({ error: error as string })
     }
   }
@@ -210,15 +267,15 @@ const AnypayService = () : IAnypayServiceResponse => {
   }
 
   const onLoadCallbackForRelayX = (payload: IAnypayServiceOnLoadCallbackForRelayX) : IAnypayServiceOnLoadCallbackForRelayXResponse => {
-    console.log('relayx.onload', payload)
+    config.onLoadCallbackForRelayX && config.onLoadCallbackForRelayX(payload)
   }
 
   const onErrorCallbackForRelayX = (payload: IAnypayServiceOnErrorCallbackForRelayX) : IAnypayServiceOnErrorCallbackForRelayXResponse => {
-    console.log('relayx.onerror', payload)
+    config.onErrorCallbackForRelayX && config.onErrorCallbackForRelayX(payload)
   }
 
   const onPaymentCallbackForRelayX = (payload: IAnypayServiceOnPaymentCallbackForRelayX) : IAnypayServiceOnPaymentCallbackForRelayXResponse => {
-    console.log('relayx.onpayment', payload)
+    config.onPaymentCallbackForRelayX && config.onPaymentCallbackForRelayX(payload)
     state.set({
       status: 'broadcasted',
       processed: {
@@ -229,15 +286,15 @@ const AnypayService = () : IAnypayServiceResponse => {
   }
 
   const onLoadCallbackForMoneybutton = (payload: IAnypayServiceOnLoadCallbackForMoneybutton) : IAnypayServiceOnLoadCallbackForMoneybuttonResponse => {
-    console.log('moneybutton.onload', payload)
+    config.onLoadCallbackForMoneybutton && config.onLoadCallbackForMoneybutton(payload)
   }
 
   const onErrorCallbackForMoneybutton = (payload: IAnypayServiceOnErrorCallbackForMoneybutton) : IAnypayServiceOnErrorCallbackForMoneybuttonResponse => {
-    console.log('moneybutton.onerror', payload)
+    config.onErrorCallbackForMoneybutton && config.onErrorCallbackForMoneybutton(payload)
   }
 
   const onPaymentCallbackForMoneybutton = (payload: IAnypayServiceOnPaymentCallbackForMoneybutton) : IAnypayServiceOnPaymentCallbackForMoneybuttonResponse => {
-    console.log('moneybutton.onpayment', payload)
+    config.onPaymentCallbackForMoneybutton && config.onPaymentCallbackForMoneybutton(payload)
     state.set({
       status: 'broadcasted',
       processed: {
@@ -264,7 +321,8 @@ const AnypayService = () : IAnypayServiceResponse => {
     init,
     fail,
     pollInvoice,
-    
+    setModalState,
+
     getPaymentInputForRelayX,
     getPaymentOutputForRelayX,
     getPaymentOutputForMoneybutton,

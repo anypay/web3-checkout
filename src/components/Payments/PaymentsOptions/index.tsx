@@ -103,24 +103,6 @@ function PaymentsOptionsComponent() {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-
-      {/**
-       * Volt
-       */}
-      <AccordionItem uuid="payment-volt">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="Volt / Maxthon VBox"
-              subtitle="Pay using the Open Payment Protocol."
-              active={accordionState.getActive() === 'payment-volt'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-        </AccordionItemPanel>
-      </AccordionItem>
     </Accordion>
   )
 }

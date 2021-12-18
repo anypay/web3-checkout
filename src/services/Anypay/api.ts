@@ -6,10 +6,25 @@ export type IApiService = {
 
 export type IApiServiceResponse = {
   invoiceReportGet: (state: IApiServiceInvoiceGet) => IApiServiceInvoiceGetResponse
+  invoiceCreatePost: (state: IApiServiceInvoiceGet) => IApiServiceInvoiceGetResponse
   invoiceReportPost: (state: IApiServiceInvoicePost) => IApiServiceInvoicePostResponse
   invoiceGet: (state: IApiServiceStatusGet) => IApiServiceStatusGetResponse
   invoicePoll: (state: IApiServiceStatusPoll) => IApiServiceStatusPollResponse
 }
+
+export type IIApiServiceCreatePost = {
+  payload: {
+    amount: number
+    business_id?: string
+    location_id?: string
+    register_id?: string
+    redirect_url?: string
+    webhook_url?: string
+    external_id?: string
+  }
+}
+
+export type IIApiServiceCreatePostResponse = Promise<AnypayApiResponse.InvoiceReportGetResponse>
 
 export type IApiServiceInvoiceGet = {
   invoiceId: string
@@ -37,10 +52,24 @@ export type IApiServiceStatusPoll = {
 
 export type IApiServiceStatusPollResponse = NodeJS.Timer
 
+const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
+
 const ApiService = () => {
   const instance = axios.create({
     baseURL: 'https://api.anypayinc.com/'
   })
+
+  // @ts-ignore
+  const invoiceCreatePost = async ({ payload }: IApiServiceCreatePost) : IApiServiceCreatePostResponse => {
+    const options = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${window.btoa(`${MERCHANT_API_KEY}:`)}`
+      }
+    }
+    const request = await instance.post(`/invoices`, payload, options)
+    return request.data
+  }
 
   // @ts-ignore
   const invoiceReportGet = async ({ invoiceId }: IApiServiceInvoiceGet) : IApiServiceInvoiceGetResponse => {
@@ -73,6 +102,7 @@ const ApiService = () => {
 
   return ({
     invoiceReportGet,
+    invoiceCreatePost,
     invoiceReportPost,
     invoiceGet,
     invoiceGetPoll,

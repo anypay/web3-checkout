@@ -42,4 +42,26 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
   </body>
+
+  <script>
+    const getInvoiceIdFromPathname = (pathname) => {
+      try {
+        return pathname.split('/invoices/')[1].split('/')[0]
+      } catch (error) {
+        console.error('Missing invoice id in the URI')
+      }
+    }
+    const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
+
+    window.onload = () => {
+      window.AnypaySDK({
+        config: {
+          invoiceId,
+          // onAnypayLoadSuccess: console.log,
+          // onAnypayLoadFailure: console.error,
+          onAnypayPaymentSuccess: console.log,
+        },
+      })
+    }
+  </script>
 </html>
