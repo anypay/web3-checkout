@@ -15,7 +15,10 @@ export type IStateServiceState = {
   processed?: {
     provider: string
     payload: any
-  }
+  },
+  modal?: {
+    isOpen: boolean
+  },
 }
 
 export type IStateServiceSet = (IStateServiceState & {

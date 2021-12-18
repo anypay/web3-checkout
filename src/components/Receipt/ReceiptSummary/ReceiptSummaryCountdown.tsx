@@ -2,6 +2,7 @@ import React, { useContext, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
 import { PaymentsComponentContext } from 'components/Payments/context'
 import Countdown, { CountdownRenderProps } from 'react-countdown'
+import type { IAnypayServiceResponse } from 'services/Anypay'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.default}
@@ -17,29 +18,28 @@ const SubtitleStyled = styled.div`
   word-break: break-all;
 `
 
-// @ts-ignore
-function CountdownMessageComponent({ seconds, completed, anypay } : CountdownRenderProps) {
+function CountdownMessageComponent({ seconds, completed, anypay } : CountdownRenderProps & { anypay: IAnypayServiceResponse }) {
   if (completed && anypay.state.invoice?.redirect_url) {
     window.location.href = anypay.state.invoice?.redirect_url
+  }
+
+  if (completed && !anypay.state.invoice?.redirect_url) {
+    anypay.setModalState(false)
   }
 
   return (
     <SubtitleStyled>
       {completed ? `You have been redirected back to merchant` : null}
-      {!completed ? `You will be redirected to merchant in ${seconds} seconds` : null}
+      {!completed ? `You will be redirected back to merchant in ${seconds} seconds` : null}
     </SubtitleStyled>
   )
 }
 
 function ReceiptSummaryCountdownComponent() {
   const anypay = useContext(PaymentsComponentContext)
-  const date = useMemo(() => Date.now() + 10000, [])
+  const date = useMemo(() => Date.now() + 20000, [])
   // @ts-ignore
   const renderer = useCallback((props) => <CountdownMessageComponent {...props} anypay={anypay} />, [anypay])
-  
-  if (!anypay.state.invoice?.redirect_url) {
-    return null
-  }
 
   return (
     <WrapperStyled>

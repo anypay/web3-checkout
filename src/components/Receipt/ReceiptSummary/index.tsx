@@ -4,6 +4,7 @@ import ReceiptSummaryInvoiceComponent from './ReceiptSummaryInvoice'
 import ReceiptSummaryContentComponent from './ReceiptSummaryContent'
 import ReceiptSummaryTotalComponent from './ReceiptSummaryTotal'
 import styled from 'styled-components'
+import Confetti from 'react-confetti'
 
 const WrapperStyled = styled.div`
 `
@@ -21,6 +22,8 @@ const ContentStyled = styled.div`
 function ReceiptSummaryComponent() {
   return (
     <WrapperStyled>
+      <Confetti recycle={false} />
+
       <ComponentStyled>
         <ContentStyled>
           <ReceiptSummaryInvoiceComponent />

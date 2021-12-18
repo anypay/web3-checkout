@@ -8,6 +8,7 @@ import ReceiptComponent from 'components/Receipt'
 import { PaymentsComponentContext } from 'components/Payments/context'
 import AnypayService, { IAnypayService, IAnypayServiceResponse } from 'services/Anypay'
 import theme from 'theme'
+import Modal from 'react-modal'
 
 export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServiceResponse, children: any }) {
   useEffect(() => {
@@ -44,26 +45,28 @@ export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServ
 export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
   return (
     <ThemeProvider theme={theme}>
-      <ModalTemplate>
-        <PaymentsComponentContext.Provider value={anypay}>
-          {!anypay.state.initialized ?
-            <PaymentsLoadingComponent />
-          : null}
+      <Modal isOpen={anypay.state.modal?.isOpen || false} style={theme.modal}>
+        <ModalTemplate>
+          <PaymentsComponentContext.Provider value={anypay}>
+            {!anypay.state.initialized ?
+              <PaymentsLoadingComponent />
+            : null}
 
-          {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status !== 'paid' ?
-            <PaymentsComponent />
-          : null}
+            {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status !== 'paid' ?
+              <PaymentsComponent />
+            : null}
 
 
-          {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'paid' ?
-            <ReceiptComponent />
-          : null}
+            {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'paid' ?
+              <ReceiptComponent />
+            : null}
 
-          {anypay.state.initialized && anypay.state.status === 'failure' ?
-            <PaymentsErrorComponent />
-          : null}
-        </PaymentsComponentContext.Provider>
-      </ModalTemplate>
+            {anypay.state.initialized && anypay.state.status === 'failure' ?
+              <PaymentsErrorComponent />
+            : null}
+          </PaymentsComponentContext.Provider>
+        </ModalTemplate>
+      </Modal>
     </ThemeProvider>
   )
 }
@@ -72,7 +75,7 @@ const Application = ({ config }: IAnypayService) => {
   const anypay = AnypayService({ config })
   return (
     <AppComponentWrapper anypay={anypay}>
-      {AppComponent}    
+      {AppComponent}
     </AppComponentWrapper>
   )
 }

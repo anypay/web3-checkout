@@ -211,6 +211,22 @@ const views = {
   `,
 }
 
+const modal = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    border: 0,
+    borderRadius: '0.5rem',
+  },
+  overlay: {
+    backgroundColor: '#33333380',
+  }
+}
+
 const combination = {
   colors,
   background,
@@ -219,6 +235,7 @@ const combination = {
   font,
   flex,
   views,
+  modal,
 }
 
 export default combination

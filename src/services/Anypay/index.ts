@@ -30,6 +30,8 @@ export type IAnypayServiceResponse = {
   init: () => void
   fail: (state: IAnypayServiceFail) => void
   pollInvoice: () => NodeJS.Timer
+  setModalState: (visibility: boolean) => void
+
   getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse
   getPaymentOutputForRelayX: () => IAnypayServiceGetPaymentOutputForRelayXResponse
   getPaymentInputForMoneybutton: () => IAnypayServiceGetPaymentInputForMoneybuttonResponse
@@ -120,6 +122,14 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     config.onAnypayPaymentFailure && config.onAnypayPaymentFailure(state)
   }
 
+  const setModalState = (visibility: boolean) => {
+    state.set({
+      modal: {
+        isOpen: visibility,
+      },
+    })
+  }
+
   /**
    * 
    */
@@ -170,6 +180,9 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           invoiceId: config.invoiceId,
           invoiceReport,
           invoice,
+          modal: {
+            isOpen: true,
+          },
         } as IStateServiceState
 
         config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({ state: nextState })
@@ -308,7 +321,8 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     init,
     fail,
     pollInvoice,
-    
+    setModalState,
+
     getPaymentInputForRelayX,
     getPaymentOutputForRelayX,
     getPaymentOutputForMoneybutton,
