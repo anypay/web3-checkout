@@ -4,7 +4,7 @@ Payment popup widget for AnyPay, Inc.
 
 ## Installation
 
-```
+```html
 <!-- Element the widget modal will be rendered into -->
 <div id="anypay-widget"></div>
 
@@ -29,22 +29,22 @@ Payment popup widget for AnyPay, Inc.
 ```
 
 ## API
-### element
+### `element`
 input for `document.getElementById` selector that the widget will be render into
 
-### config.invoiceId
+### `config.invoiceId`
 Anypay invoice id
 
-### config.onAnypayLoadSuccess
+### `config.onAnypayLoadSuccess`
 Callback when invoice data is loaded and modal is shown
 
-### config.onAnypayLoadFailure
+### `config.onAnypayLoadFailure`
 Callback when invoice data could not be loaded, most likely due to wrong invoiceId provided
 
-### config.onAnypayPaymentSuccess
+### `config.onAnypayPaymentSuccess`
 Callback when payment is done using any payment method (note: might be executed multiple times)
 
-### config.onAnypayPaymentFailure
+### `config.onAnypayPaymentFailure`
 Callback when payment is could not be done (note: might be executed multiple times)
 
 ## Available Scripts
