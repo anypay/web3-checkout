@@ -23,7 +23,6 @@ const customStyles = {
 }
 
 const AnypaySDK = ({ config } : IAnypayService) => {
-  console.log(config, 3)
   ReactDOM.render(
     <React.StrictMode>
       <Modal isOpen style={customStyles}>

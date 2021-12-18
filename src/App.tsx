@@ -6,12 +6,10 @@ import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
 import PaymentsErrorComponent from 'components/Payments/PaymentsError'
 import ReceiptComponent from 'components/Receipt'
 import { PaymentsComponentContext } from 'components/Payments/context'
-import AnypayService, { IAnypayService } from 'services/Anypay'
+import AnypayService, { IAnypayService, IAnypayServiceResponse } from 'services/Anypay'
 import theme from 'theme'
 
-function AppComponent({ config } : IAnypayService) {
-  const anypay = AnypayService({ config })
-
+export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServiceResponse, children: any }) {
   useEffect(() => {
     try {
       anypay.init()
@@ -39,7 +37,11 @@ function AppComponent({ config } : IAnypayService) {
     }
   // eslint-disable-next-line
   }, [anypay.state.status])
-  
+
+  return children({ anypay })
+}
+
+export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
   return (
     <ThemeProvider theme={theme}>
       <ModalTemplate>
@@ -66,4 +68,13 @@ function AppComponent({ config } : IAnypayService) {
   )
 }
 
-export default AppComponent
+const Application = ({ config }: IAnypayService) => {
+  const anypay = AnypayService({ config })
+  return (
+    <AppComponentWrapper anypay={anypay}>
+      {AppComponent}    
+    </AppComponentWrapper>
+  )
+}
+
+export default Application

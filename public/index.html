@@ -50,7 +50,7 @@
     const invoiceId = getInvoiceIdFromPathname(window.location.pathname)
 
     window.onload = () => {
-      window.AnypaySDK({ config: { invoiceId } })
+      window.AnypaySDK({ config: { invoiceId, onAnypayInit: console.log } })
     }
   </script>
 </html>

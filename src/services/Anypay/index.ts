@@ -1,7 +1,7 @@
 import * as bsv from 'bsv'
 import ApiService from './api'
 import StateService from './state'
-import type { IStateServiceGetResponse } from './state'
+import type { IStateServiceGetResponse, IStateServiceState } from './state'
 import { AnypayApiResponse } from 'types/api'
 
 /**
@@ -10,6 +10,10 @@ import { AnypayApiResponse } from 'types/api'
 export type IAnypayService = {
   config: {
     invoiceId: string
+
+    onAnypayInit?: ({ state }: { state: IStateServiceState }) => void
+    onAnypayFail?: ({ error }: { error: string }) => void
+
     onLoadCallbackForRelayX?: (payload: IAnypayServiceOnLoadCallbackForRelayX) => IAnypayServiceOnLoadCallbackForRelayXResponse
     onErrorCallbackForRelayX?: (payload: IAnypayServiceOnErrorCallbackForRelayX) => IAnypayServiceOnErrorCallbackForRelayXResponse
     onPaymentCallbackForRelayX?: (payload: IAnypayServiceOnPaymentCallbackForRelayX) => IAnypayServiceOnPaymentCallbackForRelayXResponse
@@ -132,14 +136,22 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
       const invoice = await api.invoiceGet({ invoiceId: config.invoiceId })
       const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
 
-      state.set({
-        initialized: true,
-        status: 'pending',
-        invoiceId: config.invoiceId,
-        invoiceReport,
-        invoice,
+      state.set((payload) => {
+        const nextState = {
+          ...payload,
+          initialized: true,
+          status: 'pending',
+          invoiceId: config.invoiceId,
+          invoiceReport,
+          invoice,
+        } as IStateServiceState
+
+        config.onAnypayInit && config.onAnypayInit({ state: nextState })
+
+        return nextState
       })
     } catch (error) {
+      config.onAnypayFail && config.onAnypayFail({ error: error as string })
       fail({ error: error as string })
     }
   }

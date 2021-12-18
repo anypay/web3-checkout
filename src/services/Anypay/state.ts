@@ -18,8 +18,8 @@ export type IStateServiceState = {
   }
 }
 
-export type IStateServiceSet = IStateServiceState & {
-}
+export type IStateServiceSet = (IStateServiceState & {
+}) | ((payload: IStateServiceState) => IStateServiceState)
 
 export type IStateServiceSetResponse = void
 
@@ -34,7 +34,13 @@ const StateService = () : IStateServiceResponse => {
   })
 
   const set = (payload: IStateServiceSet) : IStateServiceSetResponse => {
-    setState(state => ({ ...state, ...payload }))
+    if (typeof payload === 'object') {
+      setState(state => ({ ...state, ...payload }))
+    }
+
+    if (typeof payload === 'function') {
+      setState(payload)
+    }
   }
 
   return ({
