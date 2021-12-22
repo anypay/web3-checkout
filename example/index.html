@@ -52,12 +52,13 @@
     <button id="button" onclick="loadModal()">Press to purchase</button>
   </div>
 
-  <div id="root"></div>
+  <div id="anypay-widget"></div>
 
   <script src="http://localhost:8080/static/js/main.js"></script>
   <script>
     var loadModal = () => {
       window.AnypaySDK({
+        element: 'anypay-widget',
         config: {
           invoiceId: 'GWT_QcGq-',
           onAnypayLoadSuccess: console.log,
