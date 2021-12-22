@@ -30,6 +30,8 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div class="container">
       <div id="root"></div>
+
+      <button onclick="widgetshow()">Widget Show</button>
     </div>
     <!--
       This HTML file is a template.
@@ -44,6 +46,7 @@
   </body>
 
   <script>
+    let anypaysdk = null
     const getInvoiceIdFromPathname = (pathname) => {
       try {
         return pathname.split('/invoices/')[1].split('/')[0]
@@ -58,11 +61,17 @@
         element: 'root',
         config: {
           invoiceId,
-          // onAnypayLoadSuccess: console.log,
+          onAnypayLoadSuccess: (sdk) => {
+            anypaysdk = sdk;
+          },
           // onAnypayLoadFailure: console.error,
           onAnypayPaymentSuccess: console.log,
         },
       })
+    }
+
+    var widgetshow = () => {
+      anypaysdk.setModalState(true)
     }
   </script>
 </html>

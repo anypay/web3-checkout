@@ -11,7 +11,7 @@ export type IAnypayService = {
   config: {
     invoiceId: string
 
-    onAnypayLoadSuccess?: ({ state }: { state: IStateServiceState }) => void
+    onAnypayLoadSuccess?: ({ state, setModalState, }: { state: IStateServiceState, setModalState: (visibility: boolean) => void }) => void
     onAnypayLoadFailure?: ({ error }: { error: string }) => void
     onAnypayPaymentSuccess?: ({ state }: { state: IStateServiceState }) => void
     onAnypayPaymentFailure?: ({ state }: { state: IStateServiceState }) => void
@@ -122,12 +122,19 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     config.onAnypayPaymentFailure && config.onAnypayPaymentFailure(state)
   }
 
+  /**
+   * Modal show / hide. Application will reset the state entirely on modal close
+   */
   const setModalState = (visibility: boolean) => {
-    state.set({
-      modal: {
-        isOpen: visibility,
-      },
-    })
+    if (!visibility) {
+      init()
+    } else {
+      state.set(({
+        modal: {
+          isOpen: visibility,
+        },
+      }))
+    }
   }
 
   /**
@@ -181,11 +188,14 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           invoiceReport,
           invoice,
           modal: {
-            isOpen: true,
+            isOpen: false,
           },
         } as IStateServiceState
 
-        config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({ state: nextState })
+        config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({
+          state: nextState,
+          setModalState,
+        })
 
         return nextState
       })
