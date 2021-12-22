@@ -224,6 +224,7 @@ const modal = {
   },
   overlay: {
     backgroundColor: '#33333380',
+    zIndex: 9999,
   }
 }
 
