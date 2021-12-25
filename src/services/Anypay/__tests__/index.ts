@@ -73,7 +73,11 @@ describe('AnypayService', () => {
       invoiceReport: apiMocks.invoiceReportGetPrepaid,
       invoice: apiMocks.invoiceGetPrepaid,
     })
-    expect(customConfig.onAnypayLoadSuccess).toHaveBeenCalledWith({ state: anypay.result.current.state })
+    expect(customConfig.onAnypayLoadSuccess).toHaveBeenCalledWith(
+      expect.objectContaining({
+        state: anypay.result.current.state
+       })
+    )
     expect(customConfig.onAnypayLoadFailure).not.toHaveBeenCalled()
   })
 
