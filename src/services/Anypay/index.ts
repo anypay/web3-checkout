@@ -10,6 +10,9 @@ import { AnypayApiResponse } from 'types/api'
 export type IAnypayService = {
   config: {
     invoiceId: string
+    modal?: {
+      isOpen: boolean
+    },
 
     onAnypayLoadSuccess?: ({ state, setModalState, }: { state: IStateServiceState, setModalState: (visibility: boolean) => void }) => void
     onAnypayLoadFailure?: ({ error }: { error: string }) => void
@@ -188,7 +191,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           invoiceReport,
           invoice,
           modal: {
-            isOpen: false,
+            isOpen: config?.modal?.isOpen || false,
           },
         } as IStateServiceState
 
