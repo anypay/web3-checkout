@@ -20,12 +20,19 @@ const SubtitleStyled = styled.div`
   ${props => props.theme.font.sizeH3}
 `
 
+function HeaderLogo() {
+  // Import result is the URL of your image
+  return <img className="header-logo" src="https://anypayinc.com/wp-content/uploads/2020/09/logo-anypay-black.png" alt="Logo" style={{width:"100px",float:"right"}}/>;
+}
+
+
 function PaymentsHeaderComponent({ children }: IPaymentsHeaderComponent) {
   return (
     <WrapperStyled>
       <ComponentStyled>
-        <TitleStyled>How do you want to pay?</TitleStyled>
-        <SubtitleStyled>Select the wallet you want to pay from.</SubtitleStyled>
+      <HeaderLogo/>
+        <TitleStyled>Pay with Bitcoin SV</TitleStyled>
+        
       </ComponentStyled>
     </WrapperStyled>
   )

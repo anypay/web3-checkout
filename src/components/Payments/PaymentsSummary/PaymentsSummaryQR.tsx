@@ -44,10 +44,9 @@ function PaymentsSummaryQRComponent() {
           <ScanIconComponent />
 
           <TitleStyled>
-            Scan to pay instantly
+            Scan to Pay
           </TitleStyled>
         </AlignStyled>
-        <SubtitleStyled>Scan and pay using Simplified Payments.</SubtitleStyled>
 
         <SpacingStyled />
 

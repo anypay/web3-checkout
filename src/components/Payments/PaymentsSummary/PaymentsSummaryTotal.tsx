@@ -39,8 +39,7 @@ function PaymentsSummaryTotalContent() {
       <ComponentStyled>
         <TitleStyled>Total</TitleStyled>
         <SubtitleStyled>
-          <PriceStyled>{anypay.state.invoice?.currency} {anypay.state.invoice?.invoice_amount}</PriceStyled>
-          {anypay.state.invoice?.denomination_currency} {anypay.state.invoice?.denomination_amount}
+          <PriceStyled>{anypay.state.invoice?.currency} {anypay.state.invoice?.denomination_amount}</PriceStyled>
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>

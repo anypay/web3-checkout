@@ -91,7 +91,7 @@ function PaymentsOptionsComponent() {
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
               title="Handcash / Simply Cash / Electrum"
-              subtitle="Scan and pay using Simplified Payments / BIP270."
+              subtitle="Scan to pay using  BIP270."
               active={accordionState.getActive() === 'payment-handcash'}
             />
           </AccordionItemButton>
