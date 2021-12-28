@@ -90,16 +90,37 @@ function PaymentsOptionsComponent() {
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
-              title="Handcash / Simply Cash / Electrum"
-              subtitle="Scan to pay using  BIP270."
+              title="Handcash & Simply Cash"
+              subtitle="Click to open wallet app"
               active={accordionState.getActive() === 'payment-handcash'}
             />
           </AccordionItemButton>
         </AccordionItemHeading>
 
         <AccordionItemPanel>
+
           <PaymentsOptionsItemBodyComponent>
-            <QRCode value={`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`} size={128} />
+          <button>< a target="_blank" href="`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`">Open Wallet</a></button>
+          </PaymentsOptionsItemBodyComponent>
+
+
+        </AccordionItemPanel>
+      </AccordionItem>
+
+      <AccordionItem uuid="payment-handcash">
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="Electrum SV"
+              subtitle="Copy Payment Request URL"
+              active={accordionState.getActive() === 'payment-electrum'}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <small>pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}</small>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
