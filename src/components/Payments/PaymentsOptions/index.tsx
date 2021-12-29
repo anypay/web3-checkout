@@ -7,7 +7,7 @@ import './index.css'
 import PaymentRelayService from 'services/PaymentRelay'
 import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
 import { PaymentsComponentContext } from 'components/Payments/context'
-import QRCode from 'react-qr-code'
+//import QRCode from 'react-qr-code'
 
 import {
   Accordion,
@@ -100,7 +100,8 @@ function PaymentsOptionsComponent() {
         <AccordionItemPanel>
 
           <PaymentsOptionsItemBodyComponent>
-          <button>< a target="_blank" href="`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`">Open Wallet</a></button>
+        {/* eslint-disable-next-line */}
+          <button>< a target="_blank" rel="noreferrer" href="`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`">Open Wallet</a></button>
           </PaymentsOptionsItemBodyComponent>
 
 

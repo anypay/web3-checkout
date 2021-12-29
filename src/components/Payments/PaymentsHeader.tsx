@@ -16,9 +16,9 @@ const TitleStyled = styled.div`
   ${props => props.theme.font.weight600}
 `
 
-const SubtitleStyled = styled.div`
+/*const SubtitleStyled = styled.div`
   ${props => props.theme.font.sizeH3}
-`
+`*/
 
 function HeaderLogo() {
   // Import result is the URL of your image

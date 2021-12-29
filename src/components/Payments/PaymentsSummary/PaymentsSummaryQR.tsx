@@ -24,10 +24,10 @@ const TitleStyled = styled.div`
   ${props => props.theme.flex.alignItemsCenter}
 `
 
-const SubtitleStyled = styled.div`
+/*const SubtitleStyled = styled.div`
   ${props => props.theme.font.sizeP}
   ${props => props.theme.font.colorLight}
-`
+`*/
 
 const SpacingStyled = styled.div`
   ${props => props.theme.padding.small}
