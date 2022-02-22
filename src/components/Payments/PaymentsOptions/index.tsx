@@ -101,14 +101,14 @@ function PaymentsOptionsComponent() {
 
           <PaymentsOptionsItemBodyComponent>
         {/* eslint-disable-next-line */}
-          <button>< a target="_blank" rel="noreferrer" href="`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`">Open Wallet</a></button>
+          <h3>< a target="_blank" rel="noreferrer" href="`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`">Scan QR to Pay</a></h3>
           </PaymentsOptionsItemBodyComponent>
 
 
         </AccordionItemPanel>
       </AccordionItem>
 
-      <AccordionItem uuid="payment-handcash">
+      <AccordionItem uuid="payment-electrum">
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
