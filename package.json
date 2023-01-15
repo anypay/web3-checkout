@@ -1,8 +1,9 @@
 {
   "name": "anypay-sdk",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-syntax-typescript": "^7.20.0",
     "@craco/craco": "^6.4.3",
     "@moneybutton/react-money-button": "^0.38.8",
     "axios": "^0.24.0",
