@@ -9,6 +9,7 @@ export const colors = {
   dark: '#333333',
   red: '#e74c3c',
   green: '#27ae60',
+  yellow: '#F5C867',
   link: '#0984e3',
 }
 
@@ -38,6 +39,9 @@ const background = {
   `,
   success: css`
     background-color: ${colors.green};
+  `,
+  confirming: css`
+    background-color: ${colors.yellow};
   `,
 }
 

@@ -5,6 +5,7 @@ import PaymentsComponent from 'components/Payments'
 import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
 import PaymentsErrorComponent from 'components/Payments/PaymentsError'
 import ReceiptComponent from 'components/Receipt'
+import ConfirmingComponent from 'components/Confirming'
 import { PaymentsComponentContext } from 'components/Payments/context'
 import AnypayService, { IAnypayService, IAnypayServiceResponse } from 'services/Anypay'
 import theme from 'theme'
@@ -52,13 +53,17 @@ export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
               <PaymentsLoadingComponent />
             : null}
 
-            {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status !== 'paid' ?
+            {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'unpaid' ?
               <PaymentsComponent />
             : null}
 
 
             {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'paid' ?
               <ReceiptComponent />
+            : null}
+
+            {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'confirming' ?
+              <ConfirmingComponent />
             : null}
 
             {anypay.state.initialized && anypay.state.status === 'failure' ?
