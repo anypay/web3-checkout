@@ -24,7 +24,7 @@ const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: I
     const scriptTag = scriptTags[0]
     scriptTag.onload = function() {
       const div = document.querySelector('#relayx-button')
-      
+      console.log(div)
 
     }
   }
