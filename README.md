@@ -1,6 +1,6 @@
-# Getting started with AnyPay SDK
+# Getting started with Anypay SDK
 
-Payment popup widget for AnyPay, Inc.
+Payment popup widget for AnypayX
 
 ## Installation
 
