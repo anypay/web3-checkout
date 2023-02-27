@@ -31,7 +31,7 @@ function PaymentsHeaderComponent({ children }: IPaymentsHeaderComponent) {
     <WrapperStyled>
       <ComponentStyled>
       <HeaderLogo/>
-        <TitleStyled>Pay with Bitcoin SV</TitleStyled>
+        <TitleStyled>Pay With Your Blockchain Wallet</TitleStyled>
         
       </ComponentStyled>
     </WrapperStyled>

@@ -25,14 +25,7 @@ const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: I
     scriptTag.onload = function() {
       const div = document.querySelector('#relayx-button')
       
-      // @ts-ignore
-      window.relayone.render(div, {
-        outputs: args.outputs,
 
-        onLoad: args.onLoad,
-        onPayment: args.onPayment,
-        onError: args.onError,
-      })
     }
   }
 }
