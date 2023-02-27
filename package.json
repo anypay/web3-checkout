@@ -28,7 +28,8 @@
     "test": "NODE_PATH=./src/ craco test",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "example": "npm run build && cp -R ./build/static ./example && serve ./example -p 8080"
+    "example": "npm run build && cp -R ./build/static ./example && serve ./example -p 8080",
+    "scp": "scp  -r -i ~/.ssh/chef build/* root@anypayx.com:/opt/anypayx.com/invoices"
   },
   "eslintConfig": {
     "extends": [
