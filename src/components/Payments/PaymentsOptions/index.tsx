@@ -37,7 +37,7 @@ function PaymentsOptionsComponent() {
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
               title="Relay"
-              subtitle="Swipe to pay using your favourite web wallet."
+              subtitle="Swipe to pay using Relay wallet"
               active={accordionState.getActive() === 'payment-relay'}
             />
           </AccordionItemButton>
@@ -63,8 +63,8 @@ function PaymentsOptionsComponent() {
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
-              title="Moneybutton"
-              subtitle="Swipe to pay using Moneybutton."
+              title="MoneyButton"
+              subtitle="Swipe to pay using MoneyButton"
               active={accordionState.getActive() === 'payment-moneybutton'}
             />
           </AccordionItemButton>
@@ -84,13 +84,13 @@ function PaymentsOptionsComponent() {
       </AccordionItem>
 
       {/**
-       * Handcash
+       * HandCash
        */}
       <AccordionItem uuid="payment-handcash">
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
-              title="Handcash & Simply Cash"
+              title="HandCash & Simply Cash"
               subtitle="Click to open wallet app"
               active={accordionState.getActive() === 'payment-handcash'}
             />

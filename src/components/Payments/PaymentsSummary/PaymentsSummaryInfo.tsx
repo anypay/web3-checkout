@@ -20,7 +20,7 @@ function PaymentsSummaryInfoComponent() {
   return (
     <WrapperStyled>
       <ComponentStyled>
-        <SubtitleStyled>Wallets use their own live price data and BSV values may differ slightly.</SubtitleStyled>
+        <SubtitleStyled>Wallets use their own live price data, and values may differ slightly.</SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>
   )
