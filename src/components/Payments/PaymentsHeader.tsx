@@ -22,7 +22,7 @@ const TitleStyled = styled.div`
 
 function HeaderLogo() {
   // Import result is the URL of your image
-  return <img className="header-logo" src="https://anypayx.com/app/assets/assets/images/anypay-logo.png" alt="Logo" style={{width:"60px",float:"right"}}/>;
+  return <img className="header-logo" src="https://anypayx.com/app/assets/images/anypay-logo.png" alt="Logo" style={{width:"60px",float:"right"}}/>;
 }
 
 
