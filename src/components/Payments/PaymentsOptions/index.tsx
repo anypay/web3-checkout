@@ -3,7 +3,6 @@ import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
 import { useAccordionState } from './service'
 import './index.css'
-import * as ethers from 'ethers';
 
 import PaymentRelayService from 'services/PaymentRelay'
 import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
@@ -21,6 +20,10 @@ import {
 import detectEthereumProvider from '@metamask/detect-provider';
 
 import Web3 from 'web3'
+
+import SolanaWeb3 from '@solana/web3.js'
+
+import { PublicKey, SystemProgram  } from '@solana/web3.js'
 
 const ChainIDs = {
 
@@ -100,11 +103,15 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
     },
   };
-  
+
+  const SPL_TOKENS = {
+    'USDC': 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    'USDT': 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'
+  }  
 
   useEffect(() => {
 
-    if (metamaskConnected && provider) {
+    if (provider) {
 
       //@ts-ignore
       provider.request({ method: 'eth_requestAccounts' }).then(([account]: string[]) => {
@@ -118,7 +125,16 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       
     }
 
-  }, [metamaskConnected])
+  }, [provider])
+
+
+  /*useEffect(() => {
+
+    if (!metamaskConnected && provider.isConnected()) {
+      setMetamaskConnected(true)
+    }
+
+  }, [provider])*/
 
   async function switchMetamaskChain(network: string) {
 
@@ -153,37 +169,146 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   async function payPolygonUSDTMetamask() {
 
     await ensureChain('POLYGON_MAINNET')
+
+    const token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
+
+    const result = await payUSDC("0x78291d2aD33BB8577c53929961c38bc1Adc66Ee8", 1, token)
+
+    console.log('metamask.ethereum.usdt.send.result', result)
   }
 
   async function payAvalancheUSDCMetamask() {
 
     await ensureChain('AVALANCHE_MAINNET')
+
+    const token = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
+
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+
+    console.log('metamask.ethereum.usdt.send.result', result)
   }
 
   async function payAvalancheUSDTMetamask() {
 
     await ensureChain('AVALANCHE_MAINNET')
+
+    const token = "0xc7198437980c041c805A1EDcbA50c1Ce5db95118"
+
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+
+    console.log('metamask.ethereum.usdt.send.result', result)
   }
 
   async function payEthereumUSDCMetamask() {
 
+    console.log('payEthereumUSDCMetamask')
+
+    const token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
     await ensureChain('ETHEREUM_MAINNET')
 
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+
     console.log('pay ethereum usdc metamask')
+
+    console.log('metamask.ethereum.usdc.send.result', result)
   }
 
   async function payEthereumUSDTMetamask() {
 
+    const token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
     await ensureChain('ETHEREUM_MAINNET')
+
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+
+    console.log('metamask.ethereum.usdt.send.result', result)
+
   }
 
-  async function payUSDC(address: string, cents: number): Promise<any> {
+  const getProvider = () => {
+    if ('phantom' in window) {
+      //@ts-ignore
+      const provider = window.phantom?.solana;
+  
+      if (provider?.isPhantom) {
+        return provider;
+      }
+    }
+  
+    window.open('https://phantom.app/', '_blank');
+  };
+
+  async function phantomSolanaPayUSDC() {
+    
+    const sender = "Ef9ca7Uwkw9rrbdaWnUrrdMZJqPYykZ1dPLEv9yMpEjB"
+
+    const provider = getProvider(); // see "Detecting the Provider"
+    try {
+        const connection = await provider.connect();
+        console.log(connection.publicKey.toString());
+        // 26qv4GCcx98RihuK3c4T6ozB3J7L6VwCuFVc7Ta2A3Uo 
+
+        //const transaction = new provider.Transaction();
+
+        //const signedTransaction = await provider.signTransaction(transaction);
+
+        //console.log({ signedTransaction })
+
+        // create array of instructions
+        /*const instructions = [
+          SystemProgram.transfer({
+            fromPubkey: new PublicKey(sender),
+            toPubkey: new PublicKey("GeKcUd7Ftqhyyvf2zE9JNx5bud5N7QvUBnBQkYWwRnHg"),
+            lamports: 10,
+          }),
+        ];*/
+
+
+        /*let conn = new SolanaWeb3.Connection(SolanaWeb3.clusterApiUrl("mainnet-beta"));
+
+        console.log(conn)
+        */
+        
+        //const blockhash = await conn.getLatestBlockhash()
+
+        //console.log({ blockhash })
+
+        // create v0 compatible message
+        /*const messageV0 = new provider.TransactionMessage({
+          payerKey: sender,
+          recentBlockhash: blockhash,
+          instructions,
+        }).compileToV0Message();
+
+        // make a versioned transaction
+        const transactionV0 = new provider.VersionedTransaction(messageV0);
+
+        console.log({ transactionV0 })*/
+
+
+    } catch (err) {
+
+      console.error(err)
+        // { code: 4001, message: 'User rejected the request.' }
+    }
+  }
+
+  async function phantomSolanaPayUSDT() {
+
+    const phantom = getProvider()
+
+  }
+
+  async function payUSDC(address: string, cents: number, token: string): Promise<any> {
+
+    console.log('payUSDC', { address, cents, token})
 
     let _web3 = new Web3(provider)
 
 
-    let tokenAddress = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-    let toAddress = metamaskAccount;
+    let tokenAddress = token;
+    let toAddress = address;
     let fromAddress = metamaskAccount;// Use BigNumber
     let decimals = _web3.utils.toBN(4);
     let amount = _web3.utils.toBN(cents);
@@ -219,6 +344,21 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       return hash
     })
+    .on('sending', (payload: any) => {
+      console.log('metamask.sending', payload)
+    })
+    .on('sent', (payload: any) => {
+      console.log('metamask.sent', payload)
+    })
+    .on('receipt', (payload: any) => {
+      console.log('metamask.receipt', payload)
+    })
+    .on('confirmation', (payload: any) => {
+      console.log('metamask.confirmation', payload)
+    })
+    .on('error', (payload: any) => {
+      console.log('metamask.error', payload)
+    })
     .catch((error: Error) => {
 
       console.error('metamask.send.error', error)
@@ -226,11 +366,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   }
 
   async function payPolygonUSDCMetamask() {
-    console.log('payPolygonUSDCMetamask')
 
     await ensureChain('POLYGON_MAINNET')
 
-    const result = await payUSDC(String(metamaskAccount), 1)
+    const result = await payUSDC("0x78291d2aD33BB8577c53929961c38bc1Adc66Ee8", 1, "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174")
 
     console.log('payPolygonUSDCMetamask.result', result)
 
@@ -315,7 +454,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{(solanaOption) && (
+{(maticOption || solanaOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-solana-phantom">
@@ -331,7 +470,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
-            <button style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Open Phantom Wallet</button>
+          <button onClick={phantomSolanaPayUSDC} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Phantom</button>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
@@ -349,7 +488,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
-            <button style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Open Phantom Wallet</button>
+            <button onClick={phantomSolanaPayUSDT} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Phantom</button>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
