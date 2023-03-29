@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
 import { useAccordionState } from './service'
 import './index.css'
+import * as ethers from 'ethers';
 
 import PaymentRelayService from 'services/PaymentRelay'
 import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
@@ -16,6 +17,37 @@ import {
   AccordionItemButton,
   AccordionItemPanel,
 } from 'react-accessible-accordion'
+
+import detectEthereumProvider from '@metamask/detect-provider';
+
+import Web3 from 'web3'
+
+const ChainIDs = {
+
+}
+
+const ChainTokens = {
+  "MATIC": {
+    "id": "",
+    "USDC": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "USDT": ""
+  },
+  "AVAX": {
+    "id": "",
+    "USDC": "",
+    "USDT": ""
+  },
+  "ETH": {
+    "id": "",
+    "USDC": "",
+    "USDT": ""
+  },
+  "SOL": {
+    "id": "",
+    "USDC": "",
+    "USDT": ""
+  }
+}
 
 function PaymentsOptionsComponent({ paymentOptions }: any) {
   const anypay = useContext(PaymentsComponentContext)
@@ -32,7 +64,199 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const [avalancheOption, setAvalancheOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'AVAX')) // TODO: Fix USDC->MATIC for chain
   const [phantomOption, setPhantomOption] = useState(false)
 
-  console.log('MATIC OPTION', maticOption)
+  const [provider, setProvider] = useState<any>(null)
+  const [metamaskConnected, setMetamaskConnected] = useState<boolean>(false)
+  const [metamaskAccount, setMetamaskAccount] = useState<string | null>(null)
+
+  const [web3, setWeb3] = useState()
+
+  const networkMap: any = {
+    POLYGON_MAINNET: {
+      chainId: '0x89',//ethers.toBeHex(137), // '0x89'
+      chainName: "Matic(Polygon) Mainnet", 
+      nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 },
+      rpcUrls: ["https://polygon-rpc.com"],
+      blockExplorerUrls: ["https://www.polygonscan.com/"],
+    },
+    ETHEREUM_MAINNET: {
+      chainId: '0x1',//ethers.toBeHex(137), // '0x89'
+      chainName: "Ethereum Mainnet", 
+      nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
+      rpcUrls: ["https://mainnet.infura.io/v3/"],
+      blockExplorerUrls: ["https://etherscan.io"],
+    },
+    AVALANCHE_MAINNET: {
+      chainId: '0xa86a',//ethers.toBeHex(137), // '0x89'
+      chainName: "Avalanche Network C-Chain", 
+      nativeCurrency: { name: "AVAX", symbol: "AVAX", decimals: 18 },
+      rpcUrls: ["https://avalanche-mainnet.infura.io"],
+      blockExplorerUrls: ["https://snowtrace.io/"],
+    },
+    MUMBAI_TESTNET: {
+      chainId: '0x12881',//ethers.toBeHex(80001), // '0x13881'
+      chainName: "Matic(Polygon) Mumbai Testnet",
+      nativeCurrency: { name: "tMATIC", symbol: "tMATIC", decimals: 18 },
+      rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
+      blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
+    },
+  };
+  
+
+  useEffect(() => {
+
+    if (metamaskConnected && provider) {
+
+      //@ts-ignore
+      provider.request({ method: 'eth_requestAccounts' }).then(([account]: string[]) => {
+
+        console.log('ACCOUNT', account)
+
+        setMetamaskAccount(account)
+
+      })
+
+      
+    }
+
+  }, [metamaskConnected])
+
+  async function switchMetamaskChain(network: string) {
+
+    /*provider.request({
+      method: 'wallet_addEthereumChain',
+      params: [networkMap[network]]
+    })
+    .then(() => {*/
+
+      return provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: networkMap[network].chainId }],
+      })
+
+    //})
+    .then((result: any) => {
+
+      console.debug('switchMetamaskChain', result)
+
+    })
+    .catch((error: Error) => {
+      console.error('switchMetamaskChain.error', error)
+    })
+  }
+
+  async function ensureChain(network: string) {
+
+    await switchMetamaskChain(network)
+
+  }
+
+  async function payPolygonUSDTMetamask() {
+
+    await ensureChain('POLYGON_MAINNET')
+  }
+
+  async function payAvalancheUSDCMetamask() {
+
+    await ensureChain('AVALANCHE_MAINNET')
+  }
+
+  async function payAvalancheUSDTMetamask() {
+
+    await ensureChain('AVALANCHE_MAINNET')
+  }
+
+  async function payEthereumUSDCMetamask() {
+
+    await ensureChain('ETHEREUM_MAINNET')
+
+    console.log('pay ethereum usdc metamask')
+  }
+
+  async function payEthereumUSDTMetamask() {
+
+    await ensureChain('ETHEREUM_MAINNET')
+  }
+
+  async function payUSDC(address: string, cents: number): Promise<any> {
+
+    let _web3 = new Web3(provider)
+
+
+    let tokenAddress = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+    let toAddress = metamaskAccount;
+    let fromAddress = metamaskAccount;// Use BigNumber
+    let decimals = _web3.utils.toBN(4);
+    let amount = _web3.utils.toBN(cents);
+    let minABI: any = [
+      // transfer
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_to",
+            "type": "address"
+          },
+          {
+            "name": "_value",
+            "type": "uint256"
+          }
+        ],
+        "name": "transfer",
+        "outputs": [
+          {
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "type": "function"
+      }
+    ];// Get ERC20 Token contract instance
+    let contract = new _web3.eth.Contract(minABI, tokenAddress);// calculate ERC20 token amount
+    let value = amount.mul(_web3.utils.toBN(10).pow(decimals));// call transfer function
+    return contract.methods.transfer(toAddress, value).send({from: fromAddress})
+    .on('transactionHash', function(hash: string){
+      console.log('transactionHash', hash);
+
+      return hash
+    })
+    .catch((error: Error) => {
+
+      console.error('metamask.send.error', error)
+    })
+  }
+
+  async function payPolygonUSDCMetamask() {
+    console.log('payPolygonUSDCMetamask')
+
+    await ensureChain('POLYGON_MAINNET')
+
+    const result = await payUSDC(String(metamaskAccount), 1)
+
+    console.log('payPolygonUSDCMetamask.result', result)
+
+  }
+
+  useEffect(() => {
+    detectEthereumProvider().then(p => {
+      
+      setProvider(p)
+    })
+
+  }, [])
+
+  useEffect(() => {
+
+    if (!provider) { return }
+
+    const handleChainChanged = (chainId: string) => {
+
+      console.log('metamask.chainChanged', { chainId })
+
+    }
+
+    provider.on('chainChanged', handleChainChanged)
+
+  }, [provider])
 
   return (
     <>
@@ -60,7 +284,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <div>
-              <button style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+              <button onClick={payPolygonUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
               <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
             </div>
           </PaymentsOptionsItemBodyComponent>
@@ -81,7 +305,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <div>
-            <button style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+            <button onClick={payPolygonUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
             <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
             </div>
           </PaymentsOptionsItemBodyComponent>
@@ -91,7 +315,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{solanaOption && (
+{(solanaOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-solana-phantom">
@@ -133,7 +357,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{ethereumOption && (
+{(maticOption || ethereumOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-ethereum-metamask">
@@ -148,8 +372,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemHeading>
 
         <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <></>
+          <PaymentsOptionsItemBodyComponent>          
+            <button onClick={payEthereumUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
@@ -167,7 +391,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
-            <></>
+          <button onClick={payEthereumUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
@@ -175,7 +399,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{avalancheOption && (
+{(maticOption || avalancheOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-avalanche-metamask">
@@ -191,7 +415,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
-            <></>
+          <div>
+              <button onClick={payAvalancheUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+              <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
+            </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
@@ -209,7 +436,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
-            <></>
+          <div>
+              <button onClick={payAvalancheUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+              <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
+            </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
