@@ -23,8 +23,11 @@ export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServ
 
   useEffect(() => {
     if (anypay.state.invoiceId) {
-      const interval = anypay.pollInvoice()
-      return () => clearInterval(interval)
+      if (anypay.state.invoice?.status === 'unpaid') {
+console.log('POLL INVOICE', anypay.state)
+	      const interval = anypay.pollInvoice()
+	      return () => clearInterval(interval)
+	}
     }
   // eslint-disable-next-line
   }, [anypay.state.initialized])

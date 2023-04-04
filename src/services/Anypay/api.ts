@@ -5,7 +5,9 @@ export type IApiService = {
 }
 
 export type IApiServiceResponse = {
+  pay: (state: IApiServiceInvoiceGet) => IApiServiceInvoiceGetResponse
   invoiceReportGet: (state: IApiServiceInvoiceGet) => IApiServiceInvoiceGetResponse
+  paymentOptionsGet: (state: IApiServiceInvoiceGet) => IApiServicePaymentOptionsGetResponse
   invoiceCreatePost: (state: IApiServiceInvoiceGet) => IApiServiceInvoiceGetResponse
   invoiceReportPost: (state: IApiServiceInvoicePost) => IApiServiceInvoicePostResponse
   invoiceGet: (state: IApiServiceStatusGet) => IApiServiceStatusGetResponse
@@ -23,6 +25,8 @@ export type IIApiServiceCreatePost = {
     external_id?: string
   }
 }
+
+export type IApiServicePaymentOptionsGetResponse = Promise<any>
 
 export type IIApiServiceCreatePostResponse = Promise<AnypayApiResponse.InvoiceReportGetResponse>
 
@@ -45,6 +49,8 @@ export type IApiServiceStatusGet = {
 
 export type IApiServiceStatusGetResponse = Promise<AnypayApiResponse.InvoiceGetResponse>
 
+export type IApiServicePaymentOptionsResponse = Promise<any>
+
 export type IApiServiceStatusPoll = {
   invoiceId: string
   callback: (payload: any) => void
@@ -56,7 +62,7 @@ const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
 
 const ApiService = () => {
   const instance = axios.create({
-    baseURL: 'https://api.anypayinc.com/'
+    baseURL: 'https://api.anypayx.com/'
   })
 
   // @ts-ignore
@@ -73,6 +79,12 @@ const ApiService = () => {
 
   // @ts-ignore
   const invoiceReportGet = async ({ invoiceId }: IApiServiceInvoiceGet) : IApiServiceInvoiceGetResponse => {
+    const request = await instance.get(`/r/${invoiceId}`)
+    return request.data
+  }
+
+  // @ts-ignore
+  const paymentOptionsGet = async ({ invoiceId }: IApiServicePaymentOptionsGet) : IApiServicePaymentOptionsGetResponse => {
     const request = await instance.get(`/r/${invoiceId}`)
     return request.data
   }

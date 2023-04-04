@@ -1,13 +1,12 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Example usage of AnyPay SDK</title>
-  <meta name="description" content="A simple example of AnyPay SDK Usage.">
-  <meta name="author" content="AnyPay, Inc.">
+  <title>Example usage of Anypay SDK</title>
+  <meta name="description" content="A simple example of Anypay SDK Usage.">
+  <meta name="author" content="Anypay">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,700&display=swap" rel="stylesheet">
@@ -54,14 +53,17 @@
 
   <div id="anypay-widget"></div>
 
-  <script src="http://localhost:8080/static/js/main.js"></script>
+  <script src="http://localhost:3000/static/js/main.js"></script>
   <script>
     var loadModal = () => {
+      console.log('load modal')
       window.AnypaySDK({
         element: 'anypay-widget',
         config: {
-          invoiceId: 'GWT_QcGq-',
-          onAnypayLoadSuccess: console.log,
+          invoiceId: 'Z8wYS1hJJ',
+	  onAnypayLoadSuccess: (result) => {
+	    console.log(result, 'on anypay load success')
+          },
           onAnypayLoadFailure: console.error,
           onAnypayPaymentSuccess: console.log,
           onAnypayPaymentFailure: console.error,

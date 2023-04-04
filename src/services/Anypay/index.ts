@@ -191,9 +191,11 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           invoiceReport,
           invoice,
           modal: {
-            isOpen: config?.modal?.isOpen || false,
+            isOpen: config?.modal?.isOpen || true,
           },
         } as IStateServiceState
+
+	console.log(nextState)
 
         config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({
           state: nextState,

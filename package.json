@@ -1,7 +1,7 @@
 {
-  "name": "anypay-sdk",
-  "version": "0.2.0",
-  "private": true,
+  "name": "anypay-checkout",
+  "version": "0.2.1",
+  "private": false,
   "dependencies": {
     "@babel/plugin-syntax-typescript": "^7.20.0",
     "@craco/craco": "^6.4.3",
