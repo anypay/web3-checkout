@@ -103,6 +103,16 @@ export declare module AnypayApiResponse {
     amount: number;
   }
 
+  export interface GetBIP270InvoiceResponse {
+    network: string;
+    outputs: Output[];
+    creationTimestamp: number;
+    expirationTimestamp: number;
+    memo: string;
+    paymentUrl: string;
+    merchantData: string;
+  }
+
   export interface InvoiceReportGetResponse {
     network: string;
     outputs: Output[];
@@ -111,5 +121,6 @@ export declare module AnypayApiResponse {
     memo: string;
     paymentUrl: string;
     merchantData: string;
+    paymentOptions: any[];
   }
 }

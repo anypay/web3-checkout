@@ -11,6 +11,7 @@ export type IStateServiceState = {
   status?: 'pending' | 'broadcasted' | 'published' | 'failure'
   invoiceId?: string,
   invoiceReport?: AnypayApiResponse.InvoiceReportGetResponse
+  paymentOptions?: any[]
   invoice?: AnypayApiResponse.InvoiceGetResponse
   processed?: {
     provider: string
@@ -34,6 +35,7 @@ const StateService = () : IStateServiceResponse => {
   const [state, setState] = useState<IStateServiceState>({
     initialized: false,
     status: 'pending',
+    paymentOptions: []
   })
 
   const set = (payload: IStateServiceSet) : IStateServiceSetResponse => {

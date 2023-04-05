@@ -77,9 +77,12 @@ const ApiService = () => {
     return request.data
   }
 
-  // @ts-ignore
-  const invoiceReportGet = async ({ invoiceId }: IApiServiceInvoiceGet) : IApiServiceInvoiceGetResponse => {
-    const request = await instance.get(`/r/${invoiceId}`)
+  const invoiceReportGet = async ({ invoiceId }: IApiServiceInvoiceGet) : Promise<IApiServiceInvoiceGetResponse> => {
+    const request = await instance.get(`/r/${invoiceId}`, {
+      headers: {
+        'accept': 'application/payment-options'
+      }
+    })
     return request.data
   }
 

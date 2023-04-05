@@ -51,7 +51,7 @@ function PaymentsSummaryQRComponent() {
         <SpacingStyled />
 
         <QRCode
-          value={`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`}
+          value={`pay:?r=https://anypayx.com/r/${anypay.state.invoiceId}`}
           size={180}
           fgColor={theme.colors.dark}
         />

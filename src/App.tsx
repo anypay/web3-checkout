@@ -10,8 +10,11 @@ import { PaymentsComponentContext } from 'components/Payments/context'
 import AnypayService, { IAnypayService, IAnypayServiceResponse } from 'services/Anypay'
 import theme from 'theme'
 import Modal from 'react-modal'
+import { useState } from 'react'
 
 export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServiceResponse, children: any }) {
+  const [bsvOption, setBsvOption] = useState<Boolean>(false)
+
   useEffect(() => {
     try {
       anypay.init()
@@ -33,12 +36,24 @@ console.log('POLL INVOICE', anypay.state)
   }, [anypay.state.initialized])
 
   useEffect(() => {
-    if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'relayx') {
-      const payload = anypay.getPaymentOutputForRelayX()
-      anypay.publishBroadcastedTransaction(payload)
-    } else if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'moneybutton') {
-      const payload = anypay.getPaymentOutputForMoneybutton()
-      anypay.publishBroadcastedTransaction(payload)
+    if (anypay.state.paymentOptions && anypay.state.paymentOptions.find(option => option.currency === 'BSV')) {
+      setBsvOption(true)
+    } else {
+      setBsvOption(false)      
+    }
+  }, [anypay.state.paymentOptions])
+
+  useEffect(() => {
+    if (bsvOption) {
+
+      if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'relayx') {
+        const payload = anypay.getPaymentOutputForRelayX()
+        anypay.publishBroadcastedTransaction(payload)
+      } else if (anypay.state.status === 'broadcasted' && anypay.state.processed?.provider === 'moneybutton') {
+        const payload = anypay.getPaymentOutputForMoneybutton()
+        anypay.publishBroadcastedTransaction(payload)
+      }
+
     }
   // eslint-disable-next-line
   }, [anypay.state.status])
@@ -47,6 +62,8 @@ console.log('POLL INVOICE', anypay.state)
 }
 
 export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
+
+  console.log('OPTIONS', anypay.state.paymentOptions)
   return (
     <ThemeProvider theme={theme}>
       <Modal isOpen={anypay.state.modal?.isOpen || false} style={theme.modal}>
@@ -57,7 +74,7 @@ export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
             : null}
 
             {anypay.state.initialized && anypay.state.status !== 'failure' && anypay.state.invoice?.status === 'unpaid' ?
-              <PaymentsComponent />
+              <PaymentsComponent paymentOptions={anypay.state?.paymentOptions}/>
             : null}
 
 

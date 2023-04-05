@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PaymentsHeaderComponent from 'components/Payments/PaymentsHeader'
 import PaymentsOptionsComponent from 'components/Payments/PaymentsOptions'
 import PaymentsSummaryComponent from 'components/Payments/PaymentsSummary'
@@ -55,7 +55,25 @@ const SidebarStyled = styled.div`
   `}
 `
 
-function PaymentsComponent() {
+function PaymentsComponent({paymentOptions}: any) {
+
+  console.log("--options--", paymentOptions)
+
+
+  const [showWebPaymentOptions, setShowWebPaymentOptions] = useState<boolean>(false)
+
+  if (paymentOptions.find((o: any) => o.chain === 'BSV')) {
+    if (!showWebPaymentOptions) {
+      setShowWebPaymentOptions(true)  
+    }
+  }
+
+  if (paymentOptions.find((o: any) => o.chain === 'MATIC' || o.chain === 'USDC')) {
+    if (!showWebPaymentOptions) {
+      setShowWebPaymentOptions(true)  
+    }
+  }
+
   return (
     <WrapperStyled>
       <ComponentStyled>
@@ -63,15 +81,21 @@ function PaymentsComponent() {
           <PaymentsHeaderComponent />
         </HeaderStyled>
 
+        {showWebPaymentOptions ? (
         <MainStyled>
-          <ContentStyled>
-            <PaymentsOptionsComponent />
-          </ContentStyled>
+        <ContentStyled>
+          <PaymentsOptionsComponent paymentOptions={paymentOptions} />
+        </ContentStyled>
 
-          <SidebarStyled>
-            <PaymentsSummaryComponent />
-          </SidebarStyled>
-        </MainStyled>
+        <SidebarStyled>
+          <PaymentsSummaryComponent />
+        </SidebarStyled>
+      </MainStyled>
+        ) : (
+            <PaymentsSummaryComponent/>
+        )}
+
+
       </ComponentStyled>
     </WrapperStyled>
   )

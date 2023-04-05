@@ -34,7 +34,7 @@ const anypay = {
   getCurrencyFromNetwork: jest.fn(),
 }
 
-const renderAppComponentWrapper = ({ children, anypay }) => render(
+const renderAppComponentWrapper = ({ children, anypay }: any) => render(
   <AppComponentWrapper anypay={anypay}>
     {() => {
       children()

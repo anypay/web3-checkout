@@ -182,6 +182,8 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
       const invoice = await api.invoiceGet({ invoiceId: config.invoiceId })
       const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
 
+      console.log('invoiceReport', invoiceReport)
+
       state.set((payload) => {
         const nextState = {
           ...payload,
@@ -189,6 +191,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           status: 'pending',
           invoiceId: config.invoiceId,
           invoiceReport,
+          paymentOptions: invoiceReport.paymentOptions,
           invoice,
           modal: {
             isOpen: config?.modal?.isOpen || true,
@@ -214,6 +217,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     state.set({
       initialized: true,
       status: 'failure',
+      paymentOptions: []
     })
   }
 
