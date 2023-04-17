@@ -236,6 +236,8 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
       }
     }
 
+    console.log('state.state', state)
+
     const outputs = state.state.invoiceReport?.outputs.map(networkMapper).map(outputsMapper) || []
 
     return {

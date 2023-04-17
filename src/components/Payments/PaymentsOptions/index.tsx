@@ -1,3 +1,6 @@
+
+import axios from 'axios'
+
 import React, { useContext, useEffect, useState } from 'react'
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
@@ -54,13 +57,15 @@ const ChainTokens = {
 
 function PaymentsOptionsComponent({ paymentOptions }: any) {
   const anypay = useContext(PaymentsComponentContext)
+  console.log(anypay.state, 'STATE')
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
 
   const [metamaskOption, setMetamaskOption] = useState(false)
   const [bsvOption, setBsvOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'BSV')) // TODO: Fix USDC->MATIC for chain
 
-  const [maticOption, setMaticOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'MATIC' || o.chain === 'USDC')) // TODO: Fix USDC->MATIC for chain
+  const [maticOption, setMaticOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'MATIC' || o.currency === 'USDC'))
+  const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState<any>()
   const [solanaOption, setSolanaOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'SOL')) // TODO: Fix USDC->MATIC for chain
 
   const [ethereumOption, setEthereumOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'ETH')) // TODO: Fix USDC->MATIC for chain
@@ -300,9 +305,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
-  async function payUSDC(address: string, cents: number, token: string): Promise<any> {
-
-    console.log('payUSDC', { address, cents, token})
+  async function payUSDC(address: string, amount: any, token: string): Promise<any> {
 
     let _web3 = new Web3(provider)
 
@@ -310,8 +313,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     let tokenAddress = token;
     let toAddress = address;
     let fromAddress = metamaskAccount;// Use BigNumber
-    let decimals = _web3.utils.toBN(4);
-    let amount = _web3.utils.toBN(cents);
+    let value = _web3.utils.toBN(amount);
+
     let minABI: any = [
       // transfer
       {
@@ -337,7 +340,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       }
     ];// Get ERC20 Token contract instance
     let contract = new _web3.eth.Contract(minABI, tokenAddress);// calculate ERC20 token amount
-    let value = amount.mul(_web3.utils.toBN(10).pow(decimals));// call transfer function
     return contract.methods.transfer(toAddress, value).send({from: fromAddress})
     .on('transactionHash', function(hash: string){
       console.log('transactionHash', hash);
@@ -367,15 +369,64 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   async function payPolygonUSDCMetamask() {
 
-    await ensureChain('POLYGON_MAINNET')
+    if (!maticUSDCPaymentRequest) { return }
 
-    const result = await payUSDC("0x78291d2aD33BB8577c53929961c38bc1Adc66Ee8", 1, "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174")
+    try {
 
-    console.log('payPolygonUSDCMetamask.result', result)
+      console.log('Pay Polygon USDC Metamask', maticUSDCPaymentRequest)
+
+      await ensureChain('POLYGON_MAINNET')
+ 
+      const result = await payUSDC(
+        maticUSDCPaymentRequest.instructions[0].outputs[0].address,
+        maticUSDCPaymentRequest.instructions[0].outputs[0].amount,
+        "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+      );
+
+      console.log('payPolygonUSDCMetamask.result', result)
+
+    } catch(error) {
+
+      console.error('payPolygonUSDCMetamask.error', error)
+
+    }
+
+  }
+
+  async function getPaymentOption({ url, currency, chain }: {
+    url: string,
+    currency: string,
+    chain: string
+  }): Promise<any> {
+
+    const { data } = await axios.post(url, { chain, currency }, {
+
+      headers: {
+
+        'content-type': 'application/payment-request'
+
+      }
+
+    })
+
+    if (chain === 'MATIC' && currency === 'USDC') {
+
+      console.log(data, 'MATIC USDC Payment Request')
+
+      setMaticUSDCPaymentRequest(data)
+
+    }
 
   }
 
   useEffect(() => {
+
+    getPaymentOption({ 
+      url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
+      chain: 'MATIC',
+      currency: 'USDC'
+    })
+
     detectEthereumProvider().then(p => {
       
       setProvider(p)
@@ -406,7 +457,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     allowZeroExpanded={false}
     preExpanded={preExpanded}
   >
-    {maticOption && (
+    {maticOption && maticUSDCPaymentRequest && (
     <>
             
       <AccordionItem uuid="payment-usdc-polygon-metamask">
@@ -424,12 +475,12 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           <PaymentsOptionsItemBodyComponent>
             <div>
               <button onClick={payPolygonUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-              <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
             </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
 
+      {/*
       <AccordionItem uuid="payment-usdt-polygon-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -445,16 +496,16 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           <PaymentsOptionsItemBodyComponent>
             <div>
             <button onClick={payPolygonUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
             </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+      */}
 
     </>
     )}
 
-{(maticOption || solanaOption) && (
+{(false && solanaOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-solana-phantom">
@@ -496,7 +547,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{(maticOption || ethereumOption) && (
+{(ethereumOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-ethereum-metamask">
@@ -538,7 +589,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{(maticOption || avalancheOption) && (
+{(avalancheOption) && (
     <>
             
       <AccordionItem uuid="payment-usdc-avalanche-metamask">
@@ -556,7 +607,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           <PaymentsOptionsItemBodyComponent>
           <div>
               <button onClick={payAvalancheUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-              <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
             </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
@@ -577,7 +627,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           <PaymentsOptionsItemBodyComponent>
           <div>
               <button onClick={payAvalancheUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-              <button style={{padding:'1em', backgroundColor: '#388EF1', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Wallet Bot</button>          
             </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
@@ -590,7 +639,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       {/**
          * Relay
-         */}
         <AccordionItem uuid="payment-relay">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -614,10 +662,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+         */}
       
       {/**
-       * Relay
-       */}
+       * Money Button
       <AccordionItem uuid="payment-moneybutton">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -641,31 +689,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-
-
-    {/**
-     * HandCash
-     */}
-    <AccordionItem uuid="payment-handcash">
-      <AccordionItemHeading>
-        <AccordionItemButton>
-          <PaymentsOptionsItemHeaderComponent
-            title="HandCash & Simply Cash"
-            subtitle="Click to open wallet app"
-            active={accordionState.getActive() === 'payment-handcash'}
-          />
-        </AccordionItemButton>
-      </AccordionItemHeading>
-
-      <AccordionItemPanel>
-
-        <PaymentsOptionsItemBodyComponent>
-      {/* eslint-disable-next-line */}
-        <h3>< a target="_blank" rel="noreferrer" href="`pay:?r=https://api.anypayinc.com/r/${anypay.state.invoiceId}`">Scan QR to Pay</a></h3>
-        </PaymentsOptionsItemBodyComponent>
-
-      </AccordionItemPanel>
-    </AccordionItem>
 
     <AccordionItem uuid="payment-electrum">
       <AccordionItemHeading>
@@ -696,6 +719,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemButton>
       </AccordionItemHeading>
     </AccordionItem>
+       */}
       </>
     )}
 
