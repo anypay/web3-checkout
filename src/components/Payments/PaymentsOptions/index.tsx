@@ -305,15 +305,20 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
-  async function payUSDC(address: string, amount: any, token: string): Promise<any> {
+  async function payUSDC(address: string, amount: number, token: string): Promise<any> {
 
     let _web3 = new Web3(provider)
 
 
     let tokenAddress = token;
+
     let toAddress = address;
-    let fromAddress = metamaskAccount;// Use BigNumber
+
+    let fromAddress = metamaskAccount;
+
     let value = _web3.utils.toBN(amount);
+
+    console.log('PAY USDC', { amount, value })
 
     let minABI: any = [
       // transfer
@@ -342,7 +347,20 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     let contract = new _web3.eth.Contract(minABI, tokenAddress);// calculate ERC20 token amount
     return contract.methods.transfer(toAddress, value).send({from: fromAddress})
     .on('transactionHash', function(hash: string){
+
       console.log('transactionHash', hash);
+
+      submitPayment({
+
+        currency: 'USDC',
+
+        chain: 'MATIC',
+
+        txid: hash,
+
+        url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
+
+      })
 
       return hash
     })
@@ -419,12 +437,48 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
+  async function submitPayment({ url, txid, currency, chain }: {
+    url: string,
+    txid: string,
+    currency: string,
+    chain: string
+  }): Promise<any> {
+
+    const { data } = await axios.post(url, {
+
+      chain,
+
+      currency,
+
+      transactions: [{
+
+        tx: txid
+
+      }]
+
+    }, {
+
+      headers: {
+
+        'content-type': 'application/payment'
+
+      }
+
+    })
+
+    console.log(data, 'submitPayment.response')
+
+  }
+
   useEffect(() => {
 
     getPaymentOption({ 
       url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
       chain: 'MATIC',
       currency: 'USDC'
+    })
+    .catch(error => {
+      console.error('error', error)
     })
 
     detectEthereumProvider().then(p => {

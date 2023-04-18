@@ -180,6 +180,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
   const init = async () : Promise<void> => {
     try {
       const invoice = await api.invoiceGet({ invoiceId: config.invoiceId })
+      console.log(invoice, '--invoice--')
       const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
 
       console.log('invoiceReport', invoiceReport)
@@ -208,7 +209,12 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
         return nextState
       })
     } catch (error) {
+
+      console.log(error, '--error--')
+
       config.onAnypayLoadFailure && config.onAnypayLoadFailure({ error: error as string })
+
+
       fail({ error: error as string })
     }
   }

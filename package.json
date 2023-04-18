@@ -1,6 +1,6 @@
 {
-  "name": "anypay-checkout",
-  "version": "0.2.1",
+  "name": "web3-checkout",
+  "version": "0.2.2",
   "private": false,
   "dependencies": {
     "@babel/plugin-syntax-typescript": "^7.20.0",

@@ -62,6 +62,7 @@ console.log('POLL INVOICE', anypay.state)
 }
 
 export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
+  console.log('STATE--', anypay.state)
 
   console.log('OPTIONS', anypay.state.paymentOptions)
   return (

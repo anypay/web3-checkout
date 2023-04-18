@@ -31,8 +31,7 @@ function PaymentsHeaderComponent({ children }: IPaymentsHeaderComponent) {
     <WrapperStyled>
       <ComponentStyled>
       <HeaderLogo/>
-        <TitleStyled>Pay With Your Blockchain Wallet</TitleStyled>
-        
+        <TitleStyled>Pay With Your Web3 Wallet</TitleStyled>
       </ComponentStyled>
     </WrapperStyled>
   )
