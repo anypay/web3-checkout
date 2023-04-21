@@ -61,15 +61,17 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
 
+  const [currencies, setCurrencies] = useState(paymentOptions.map((o:any) => o.currency || o.chain))
+
   const [metamaskOption, setMetamaskOption] = useState(false)
-  const [bsvOption, setBsvOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'BSV')) // TODO: Fix USDC->MATIC for chain
+  const [bsvOption, setBsvOption] = useState<any>(paymentOptions.find((o:any) => o.chain === 'BSV'))
 
-  const [maticOption, setMaticOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'MATIC' || o.currency === 'USDC'))
+  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' || o.currency === 'USDC'))
   const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState<any>()
-  const [solanaOption, setSolanaOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'SOL')) // TODO: Fix USDC->MATIC for chain
+  const [solanaOption, setSolanaOption] = useState(paymentOptions.find((o:any) => o.chain === 'SOL')) // TODO: Fix USDC->MATIC for chain
 
-  const [ethereumOption, setEthereumOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'ETH')) // TODO: Fix USDC->MATIC for chain
-  const [avalancheOption, setAvalancheOption] = useState(!!paymentOptions.find((o:any) => o.chain === 'AVAX')) // TODO: Fix USDC->MATIC for chain
+  const [ethereumOption, setEthereumOption] = useState(paymentOptions.find((o:any) => o.chain === 'ETH')) // TODO: Fix USDC->MATIC for chain
+  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX')) // TODO: Fix USDC->MATIC for chain
   const [phantomOption, setPhantomOption] = useState(false)
 
   const [provider, setProvider] = useState<any>(null)
@@ -511,6 +513,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     allowZeroExpanded={false}
     preExpanded={preExpanded}
   >
+    <p>Coins Accepted:<br/><i>{currencies.join(', ')}</i></p>
     {maticOption && maticUSDCPaymentRequest && (
     <>
             
@@ -693,6 +696,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       {/**
          * Relay
+      */}
         <AccordionItem uuid="payment-relay">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -707,7 +711,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <PaymentRelayService
-              outputs={anypay.getPaymentInputForRelayX().outputs}
+              paymentOption={bsvOption}
 
               onLoad={anypay.onLoadCallbackForRelayX}
               onError={anypay.onErrorCallbackForRelayX}
@@ -716,10 +720,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-         */}
       
       {/**
        * Money Button
+      */}
       <AccordionItem uuid="payment-moneybutton">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -734,7 +738,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <PaymentMoneybuttonService
-              outputs={anypay.getPaymentInputForMoneybutton().outputs}
+              outputs={bsvOption.outputs}
 
               onLoad={anypay.onLoadCallbackForMoneybutton}
               onError={anypay.onErrorCallbackForMoneybutton}
@@ -757,23 +761,29 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       <AccordionItemPanel>
         <PaymentsOptionsItemBodyComponent>
-          <small>pay:?r=https://anypayx.com/r/${anypay.state.invoiceId}</small>
+          <small>pay:?r=https://anypayx.com/r/{anypay.state.invoiceId}</small>
         </PaymentsOptionsItemBodyComponent>
       </AccordionItemPanel>
     </AccordionItem>
 
-    <AccordionItem>
+    <AccordionItem uuid="payment-bsv-mobile">
       <AccordionItemHeading>
         <AccordionItemButton>
-        <PaymentsOptionsItemHeaderComponent
-            title="Electrum SV"
-            subtitle="Copy Payment Request URL"
-            active={accordionState.getActive() === 'payment-usdc-metamask'}
+          <PaymentsOptionsItemHeaderComponent
+            title="Handcash or Simply Cash"
+            subtitle="Click to Open Wallet on Mobile"
+            active={accordionState.getActive() === 'payment-bsv-mobile'}
           />
         </AccordionItemButton>
       </AccordionItemHeading>
+
+      <AccordionItemPanel>
+        <PaymentsOptionsItemBodyComponent>
+          <small><a target="_blank" rel="noreferrer" href={`pay:?r=https://anypayx.com/r/${anypay.state.invoiceId}`}>pay:?r=https://anypayx.com/r/{anypay.state.invoiceId}</a></small>
+        </PaymentsOptionsItemBodyComponent>
+      </AccordionItemPanel>
     </AccordionItem>
-       */}
+
       </>
     )}
 

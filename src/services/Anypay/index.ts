@@ -148,7 +148,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
       throw new Error('Invoice could not be polled as it wasn\'t initialized')
     }
 
-    const callback = (invoice: AnypayApiResponse.InvoiceGetResponse) => {
+    const callback = (invoice: any | AnypayApiResponse.InvoiceGetResponse) => {
       if (invoice.status === 'paid') {
         state.set({
           status: 'broadcasted',
@@ -179,7 +179,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
 
   const init = async () : Promise<void> => {
     try {
-      const invoice = await api.invoiceGet({ invoiceId: config.invoiceId })
+      const {invoice} = await api.invoiceGet({ invoiceId: config.invoiceId })
       console.log(invoice, '--invoice--')
       const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
 
@@ -192,14 +192,12 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           status: 'pending',
           invoiceId: config.invoiceId,
           invoiceReport,
-          paymentOptions: invoiceReport.paymentOptions,
+          paymentOptions: invoice.payment_options,
           invoice,
           modal: {
             isOpen: config?.modal?.isOpen || true,
           },
         } as IStateServiceState
-
-	console.log(nextState)
 
         config.onAnypayLoadSuccess && config.onAnypayLoadSuccess({
           state: nextState,
@@ -365,6 +363,27 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     onErrorCallbackForMoneybutton,
     onPaymentCallbackForMoneybutton,
   })
+}
+
+export interface IAnypayPaymentOption {
+  uid: string;
+  chain: string;
+  currency: string;
+  data: {
+    time: string;
+    expires: string;
+    memo: string,
+    paymentUrl: string;
+    paymentId: string;
+    chain: string;
+    network: string;
+    instructions: {
+      outputs: {
+        address: string;
+        amount: number;
+      }[]
+    }[]
+  }
 }
 
 export default AnypayService

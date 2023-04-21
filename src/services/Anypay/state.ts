@@ -12,7 +12,7 @@ export type IStateServiceState = {
   invoiceId?: string,
   invoiceReport?: AnypayApiResponse.InvoiceReportGetResponse
   paymentOptions?: any[]
-  invoice?: AnypayApiResponse.InvoiceGetResponse
+  invoice?: AnypayApiResponse.InvoiceGetResponse | any
   processed?: {
     provider: string
     payload: any

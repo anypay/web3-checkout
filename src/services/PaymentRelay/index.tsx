@@ -1,44 +1,103 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
+import axios from 'axios'
 import type {
   IAnypayServiceGetPaymentInputForRelayXResponse,
   IAnypayServiceOnLoadCallbackForRelayX,
   IAnypayServiceOnPaymentCallbackForRelayX,
   IAnypayServiceOnErrorCallbackForRelayX,
+  IAnypayPaymentOption
 } from 'services/Anypay'
 
-type IPaymentRelayXComponent = {
-  outputs: IAnypayServiceGetPaymentInputForRelayXResponse['outputs'];
 
+type IPaymentRelayXComponent = {
   onLoad: IAnypayServiceOnLoadCallbackForRelayX;
   onPayment: IAnypayServiceOnPaymentCallbackForRelayX;
   onError: IAnypayServiceOnErrorCallbackForRelayX;
+  paymentOption: IAnypayPaymentOption;
 }
+
 
 type IScriptInject = {
   scriptTags: any,
 }
+function PaymentRelayComponent({ paymentOption, onLoad, onPayment, onError }: IPaymentRelayXComponent) {
+  console.log('PaymentRelayComponent', {paymentOption})
 
-const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: IScriptInject) => {
-  if (scriptTags) {
-    const scriptTag = scriptTags[0]
-    scriptTag.onload = function() {
-      const div = document.querySelector('#relayx-button')
-      console.log(div)
+  const [option, setOption] = useState()
+  const [scriptLoaded, setScriptLoaded] = useState(false)
 
+  useEffect(() => {
+
+    axios.post(`https://api.next.anypayx.com/r/${paymentOption.uid}`, {
+      currency: 'BSV',
+      chain: 'BSV'
+    }, {
+      headers: {
+        'content-type': 'application/payment-request'
+      }
+    })
+    .then(({ data }) => {
+
+      console.log('bsv.payment-option-data', data)
+
+      setOption(data)
+
+    })
+
+  }, [])
+
+  useEffect(() => {
+
+    if (!scriptLoaded || !option) { return }
+   
+    //@ts-ignore
+    const outputs = option.data.instructions[0].outputs.map((output) => {
+
+      return {
+        to: output.address,
+        amount: output.amount * 100_000_000 // convert from satoshis to BSV for Relayx API
+      }
+
+    })
+
+    //@ts-ignore
+    window.relayone.render({
+      outputs,
+      devMode: true,
+      onPayment(payment: any) {
+        console.log('relayone.payment', payment)
+      },
+      onError(error: any) {
+        console.error('relayone.error', error)
+      },
+      onLoad(event: any) {
+        console.log('relayone.onLoad', event)
+      },
+    })
+
+
+  }, [scriptLoaded, option])
+
+  const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: IScriptInject) => {
+    if (scriptTags) {
+      const scriptTag = scriptTags[0]
+      scriptTag.onload = function() {
+        const div = document.querySelector('#relayx-button')
+
+        setScriptLoaded(true)
+      }
     }
   }
-}
 
-function PaymentRelayComponent({ outputs, onLoad, onPayment, onError }: IPaymentRelayXComponent) {
-  const scriptInject = useMemo(() => handleScriptInject({ outputs, onLoad, onPayment, onError }), [
-    outputs, onLoad, onPayment, onError
+
+  const scriptInject = useMemo(() => handleScriptInject({ paymentOption, onLoad, onPayment, onError }), [
+    paymentOption, onLoad, onPayment, onError
   ])
 
-  if (!outputs) {
+  if (!paymentOption) {
     return null
   }
-
   return (
     <>
       <Helmet
