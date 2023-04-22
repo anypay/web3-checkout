@@ -147,8 +147,12 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     if (!state.state.invoiceId) {
       throw new Error('Invoice could not be polled as it wasn\'t initialized')
     }
+    console.log('START POLL INVOICE')
 
-    const callback = (invoice: any | AnypayApiResponse.InvoiceGetResponse) => {
+    const callback = ({invoice}:{invoice: any | AnypayApiResponse.InvoiceGetResponse}) => {
+
+      console.log('invoiceGetPoll.result', invoice)
+
       if (invoice.status === 'paid') {
         state.set({
           status: 'broadcasted',
@@ -181,9 +185,6 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
     try {
       const {invoice} = await api.invoiceGet({ invoiceId: config.invoiceId })
       console.log(invoice, '--invoice--')
-      const invoiceReport = await api.invoiceReportGet({ invoiceId: config.invoiceId })
-
-      console.log('invoiceReport', invoiceReport)
 
       state.set((payload) => {
         const nextState = {
@@ -191,7 +192,7 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
           initialized: true,
           status: 'pending',
           invoiceId: config.invoiceId,
-          invoiceReport,
+          //invoiceReport,
           paymentOptions: invoice.payment_options,
           invoice,
           modal: {

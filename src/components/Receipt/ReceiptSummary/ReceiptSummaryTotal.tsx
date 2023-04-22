@@ -33,8 +33,7 @@ function ReceiptSummaryTotalContent() {
     <WrapperStyled>
       <ComponentStyled>
         <SubtitleStyled>
-          <PriceStyled>{anypay.state.invoice?.currency} {anypay.state.invoice?.invoice_amount}</PriceStyled>
-          <PriceStyled>{anypay.state.invoice?.denomination_currency} {anypay.state.invoice?.denomination_amount}</PriceStyled>
+          <PriceStyled>{anypay.state.invoice?.currency} {anypay.state.invoice?.amount}</PriceStyled>
         </SubtitleStyled>
       </ComponentStyled>
     </WrapperStyled>

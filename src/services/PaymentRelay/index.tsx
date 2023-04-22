@@ -22,37 +22,17 @@ type IScriptInject = {
   scriptTags: any,
 }
 function PaymentRelayComponent({ paymentOption, onLoad, onPayment, onError }: IPaymentRelayXComponent) {
+
   console.log('PaymentRelayComponent', {paymentOption})
 
-  const [option, setOption] = useState()
   const [scriptLoaded, setScriptLoaded] = useState(false)
 
   useEffect(() => {
 
-    axios.post(`https://api.next.anypayx.com/r/${paymentOption.uid}`, {
-      currency: 'BSV',
-      chain: 'BSV'
-    }, {
-      headers: {
-        'content-type': 'application/payment-request'
-      }
-    })
-    .then(({ data }) => {
-
-      console.log('bsv.payment-option-data', data)
-
-      setOption(data)
-
-    })
-
-  }, [])
-
-  useEffect(() => {
-
-    if (!scriptLoaded || !option) { return }
+    if (!scriptLoaded || !paymentOption) { return }
    
     //@ts-ignore
-    const outputs = option.data.instructions[0].outputs.map((output) => {
+    const outputs = paymentOption.instructions[0].outputs.map((output) => {
 
       return {
         to: output.address,
@@ -77,7 +57,7 @@ function PaymentRelayComponent({ paymentOption, onLoad, onPayment, onError }: IP
     })
 
 
-  }, [scriptLoaded, option])
+  }, [scriptLoaded, paymentOption])
 
   const handleScriptInject = (args: IPaymentRelayXComponent) => ({ scriptTags }: IScriptInject) => {
     if (scriptTags) {
