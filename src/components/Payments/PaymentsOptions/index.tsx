@@ -80,6 +80,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   const [web3, setWeb3] = useState()
 
+  console.log('ETHEREUM OPTION', ethereumOption)
+
   const networkMap: any = {
     POLYGON_MAINNET: {
       chainId: '0x89',//ethers.toBeHex(137), // '0x89'
@@ -170,6 +172,18 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   async function ensureChain(network: string) {
 
     await switchMetamaskChain(network)
+
+  }
+
+  async function payETHMetamask() {
+
+    let _web3 = new Web3(provider)
+
+    await ensureChain('ETHEREUM_MAINNET')
+
+    const { address, amount } = ethereumOption.instructions[0].outputs[0]
+
+    return payETH(address, amount)
 
   }
 
@@ -311,7 +325,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     let _web3 = new Web3(provider)
 
-
     let tokenAddress = token;
 
     let toAddress = address;
@@ -357,6 +370,59 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         currency: 'USDC',
 
         chain: 'MATIC',
+
+        txid: hash,
+
+        url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
+
+      })
+
+      return hash
+    })
+    .on('sending', (payload: any) => {
+      console.log('metamask.sending', payload)
+    })
+    .on('sent', (payload: any) => {
+      console.log('metamask.sent', payload)
+    })
+    .on('receipt', (payload: any) => {
+      console.log('metamask.receipt', payload)
+    })
+    .on('confirmation', (payload: any) => {
+      console.log('metamask.confirmation', payload)
+    })
+    .on('error', (payload: any) => {
+      console.log('metamask.error', payload)
+    })
+    .catch((error: Error) => {
+
+      console.error('metamask.send.error', error)
+    })
+  }
+
+  async function payETH(address: string, amount: number): Promise<any> {
+
+    let _web3 = new Web3(provider)
+
+    let toAddress = address;
+
+    let fromAddress = String(metamaskAccount);
+
+    let value = _web3.utils.toBN(amount);
+
+    console.log('PAY ETH', { amount, value })
+
+    var send = _web3.eth.sendTransaction({ from: fromAddress, to: toAddress, value });
+
+    send.on('transactionHash', function(hash: string){
+
+      console.log('transactionHash', hash);
+
+      submitPayment({
+
+        currency: 'ETH',
+
+        chain: 'ETH',
 
         txid: hash,
 
@@ -504,6 +570,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }, [provider])
 
+  console.log('BSV OPTION', bsvOption)
+
   return (
     <>
     {(bsvOption || maticOption || metamaskOption || phantomOption) && (
@@ -521,7 +589,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
-              title="USDC Polygon"
+              title="USDC on Polygon"
               subtitle="Pay USDC on Polygon Metamask"
               active={accordionState.getActive() === 'payment-usdc-polygon-metamask'}
             />
@@ -607,6 +675,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 {(ethereumOption) && (
     <>
             
+      {/*
       <AccordionItem uuid="payment-usdc-ethereum-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -624,7 +693,28 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+      */}
 
+      <AccordionItem uuid="payment-ethereum-metamask">
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="ETH on Ethereum"
+              subtitle="Pay ETH with Metamask"
+              active={accordionState.getActive() === 'payment-ethereum-metamask'}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+          <button onClick={payETHMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+          </PaymentsOptionsItemBodyComponent>
+        </AccordionItemPanel>
+      </AccordionItem>
+   
+
+      {/*
       <AccordionItem uuid="payment-usdt-ethereum-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -642,10 +732,12 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+      */}
       
     </>
     )}
 
+      {/*
 {(avalancheOption) && (
     <>
             
@@ -691,6 +783,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       
     </>
     )}
+      */}
     {bsvOption && (
       <>
 
