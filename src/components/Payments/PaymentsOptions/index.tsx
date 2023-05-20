@@ -373,7 +373,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         txid: hash,
 
-        url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
+        url: `https://anypayx.com/r/${anypay.state.invoiceId}`,
 
       })
 
@@ -426,7 +426,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         txid: hash,
 
-        url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
+        url: `https://anypayx.com/r/${anypay.state.invoiceId}`,
 
       })
 
@@ -541,7 +541,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   useEffect(() => {
 
     getPaymentOption({ 
-      url: `https://api.next.anypayx.com/i/${anypay.state.invoiceId}`,
+      url: `https://anypayx.com/r/${anypay.state.invoiceId}`,
       chain: 'MATIC',
       currency: 'USDC'
     })
