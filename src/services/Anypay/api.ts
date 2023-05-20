@@ -101,7 +101,7 @@ const ApiService = () => {
 
   // @ts-ignore
   const invoiceGet = async ({ invoiceId }: IApiServiceStatusGet) : IApiServiceStatusGetResponse => {
-    const request = await instance.get(`/invoices/${invoiceId}`)
+    const request = await instance.get(`/api/v1/invoices/${invoiceId}`)
     return request.data
   }
 
