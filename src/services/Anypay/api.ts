@@ -62,7 +62,7 @@ const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
 
 const ApiService = () => {
   const instance = axios.create({
-    baseURL: 'https://api.anypayx.com/'
+    baseURL: 'https://ionia.anypayx.com/'
   })
 
   // @ts-ignore

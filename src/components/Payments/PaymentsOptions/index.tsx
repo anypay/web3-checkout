@@ -66,13 +66,19 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const [metamaskOption, setMetamaskOption] = useState(false)
   const [bsvOption, setBsvOption] = useState<any>(paymentOptions.find((o:any) => o.chain === 'BSV'))
 
-  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' || o.currency === 'USDC'))
-  const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState<any>()
-  const [solanaOption, setSolanaOption] = useState(paymentOptions.find((o:any) => o.chain === 'SOL')) // TODO: Fix USDC->MATIC for chain
+  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
+  const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
+  const [maticUSDTPaymentRequest, setMaticUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDT'))
 
-  const [ethereumOption, setEthereumOption] = useState(paymentOptions.find((o:any) => o.chain === 'ETH')) // TODO: Fix USDC->MATIC for chain
-  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX')) // TODO: Fix USDC->MATIC for chain
-  const [phantomOption, setPhantomOption] = useState(false)
+  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' || o.currency === 'USDC'))
+  const [avalancheUSDCPaymentRequest, setAvalancheUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDC'))
+  const [avalancheUSDTPaymentRequest, setAvalancheUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDT'))
+
+  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' || o.currency === 'USDC'))
+  const [ethUSDCPaymentRequest, setEthUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDC'))
+  const [ethUSDTPaymentRequest, setEthUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDT'))
+
+  const [solanaOption, setSolanaOption] = useState(paymentOptions.find((o:any) => o.chain === 'SOL')) // TODO: Fix USDC->MATIC for chain
 
   const [provider, setProvider] = useState<any>(null)
   const [metamaskConnected, setMetamaskConnected] = useState<boolean>(false)
@@ -187,24 +193,13 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
-  async function payPolygonUSDTMetamask() {
-
-    await ensureChain('POLYGON_MAINNET')
-
-    const token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
-
-    const result = await payUSDC("0x78291d2aD33BB8577c53929961c38bc1Adc66Ee8", 1, token)
-
-    console.log('metamask.ethereum.usdt.send.result', result)
-  }
-
   async function payAvalancheUSDCMetamask() {
 
     await ensureChain('AVALANCHE_MAINNET')
 
     const token = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, 'AVAX')
 
     console.log('metamask.ethereum.usdt.send.result', result)
   }
@@ -215,7 +210,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     const token = "0xc7198437980c041c805A1EDcbA50c1Ce5db95118"
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, "AVAX")
 
     console.log('metamask.ethereum.usdt.send.result', result)
   }
@@ -228,7 +223,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     await ensureChain('ETHEREUM_MAINNET')
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, "ETH")
 
     console.log('pay ethereum usdc metamask')
 
@@ -241,7 +236,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     await ensureChain('ETHEREUM_MAINNET')
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token)
+    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, 'ETH')
 
     console.log('metamask.ethereum.usdt.send.result', result)
 
@@ -321,7 +316,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
-  async function payUSDC(address: string, amount: number, token: string): Promise<any> {
+  async function payUSDC(address: string, amount: number, token: string, chain: string, currency: string='USDC'): Promise<any> {
 
     let _web3 = new Web3(provider)
 
@@ -332,8 +327,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     let fromAddress = metamaskAccount;
 
     let value = _web3.utils.toBN(amount);
-
-    console.log('PAY USDC', { amount, value })
 
     let minABI: any = [
       // transfer
@@ -367,15 +360,17 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       submitPayment({
 
-        currency: 'USDC',
+        currency,
 
-        chain: 'MATIC',
+        chain,
 
         txid: hash,
 
-        url: `https://anypayx.com/r/${anypay.state.invoiceId}`,
+        url: anypay.state.invoice.uri.split("r=")[1]
 
       })
+      .then(result => console.log('submit payment result', result))
+      .catch(error => console.error('submit payment error', error))
 
       return hash
     })
@@ -426,7 +421,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         txid: hash,
 
-        url: `https://anypayx.com/r/${anypay.state.invoiceId}`,
+        url: anypay.state.invoice.uri.split("r=")[1]
 
       })
 
@@ -453,6 +448,37 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     })
   }
 
+  async function payPolygonUSDTMetamask() {
+
+    if (!maticUSDTPaymentRequest) { return }
+
+
+    try {
+
+    await ensureChain('POLYGON_MAINNET')
+
+    const token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
+
+    const result = await payUSDC(
+      maticUSDTPaymentRequest.instructions[0].outputs[0].address,
+      maticUSDTPaymentRequest.instructions[0].outputs[0].amount,
+      token,
+      "MATIC",
+      "USDT"
+    )
+
+      console.log('payPolygonUSDTMetamask.result', result)
+
+    } catch(error) {
+
+      console.error('payPolygonUSDTMetamask.error', error)
+
+    }
+
+  }
+
+
+
   async function payPolygonUSDCMetamask() {
 
     if (!maticUSDCPaymentRequest) { return }
@@ -466,7 +492,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       const result = await payUSDC(
         maticUSDCPaymentRequest.instructions[0].outputs[0].address,
         maticUSDCPaymentRequest.instructions[0].outputs[0].amount,
-        "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+        "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+        "MATIC"
       );
 
       console.log('payPolygonUSDCMetamask.result', result)
@@ -495,14 +522,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     })
 
-    if (chain === 'MATIC' && currency === 'USDC') {
-
-      console.log(data, 'MATIC USDC Payment Request')
-
-      setMaticUSDCPaymentRequest(data)
-
-    }
-
   }
 
   async function submitPayment({ url, txid, currency, chain }: {
@@ -511,6 +530,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     currency: string,
     chain: string
   }): Promise<any> {
+
+    console.log('--submit payment--', {url})
 
     const { data } = await axios.post(url, {
 
@@ -540,18 +561,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   useEffect(() => {
 
-    getPaymentOption({ 
-      url: `https://anypayx.com/r/${anypay.state.invoiceId}`,
-      chain: 'MATIC',
-      currency: 'USDC'
-    })
-    .catch(error => {
-      console.error('error', error)
-    })
-
     detectEthereumProvider().then(p => {
       
       setProvider(p)
+
     })
 
   }, [])
@@ -574,7 +587,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   return (
     <>
-    {(bsvOption || maticOption || metamaskOption || phantomOption) && (
+    {(bsvOption || maticOption || metamaskOption) && (
     <Accordion
     onChange={accordionState.setActive}
     allowMultipleExpanded={false}
@@ -605,7 +618,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemPanel>
       </AccordionItem>
 
-      {/*
       <AccordionItem uuid="payment-usdt-polygon-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -625,7 +637,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-      */}
 
     </>
     )}
@@ -854,7 +865,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       <AccordionItemPanel>
         <PaymentsOptionsItemBodyComponent>
-          <small>pay:?r=https://anypayx.com/r/{anypay.state.invoiceId}</small>
+          <small>{anypay.state.invoice.uri}</small>
         </PaymentsOptionsItemBodyComponent>
       </AccordionItemPanel>
     </AccordionItem>
@@ -872,7 +883,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       <AccordionItemPanel>
         <PaymentsOptionsItemBodyComponent>
-          <small><a target="_blank" rel="noreferrer" href={`pay:?r=https://anypayx.com/r/${anypay.state.invoiceId}`}>pay:?r=https://anypayx.com/r/{anypay.state.invoiceId}</a></small>
+          <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
         </PaymentsOptionsItemBodyComponent>
       </AccordionItemPanel>
     </AccordionItem>
