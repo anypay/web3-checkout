@@ -70,11 +70,11 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
   const [maticUSDTPaymentRequest, setMaticUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDT'))
 
-  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' || o.currency === 'USDC'))
+  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' || o.currency === 'AVAX'))
   const [avalancheUSDCPaymentRequest, setAvalancheUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDC'))
   const [avalancheUSDTPaymentRequest, setAvalancheUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDT'))
 
-  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' || o.currency === 'USDC'))
+  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' || o.currency === 'ETH'))
   const [ethUSDCPaymentRequest, setEthUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDC'))
   const [ethUSDTPaymentRequest, setEthUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDT'))
 
@@ -153,18 +153,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   async function switchMetamaskChain(network: string) {
 
-    /*provider.request({
-      method: 'wallet_addEthereumChain',
-      params: [networkMap[network]]
+    return provider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: networkMap[network].chainId }],
     })
-    .then(() => {*/
-
-      return provider.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: networkMap[network].chainId }],
-      })
-
-    //})
     .then((result: any) => {
 
       console.debug('switchMetamaskChain', result)
@@ -181,6 +173,32 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
+  async function payMATICMetamask() {
+
+    let _web3 = new Web3(provider)
+
+    await ensureChain('POLYGON_MAINNET')
+
+    const { address, amount } = maticOption.instructions[0].outputs[0]
+
+    return payETH({address, amount, chain: 'MATIC'})
+
+  }
+
+  async function payAVAXMetamask() {
+
+    let _web3 = new Web3(provider)
+
+    await ensureChain('AVALANCHE_MAINNET')
+
+    const { address, amount } = avalancheOption.instructions[0].outputs[0]
+
+    console.log("PAY AVAX", { address, amount })
+
+    return payETH({address, amount, chain: 'AVAX'})
+
+  }
+
   async function payETHMetamask() {
 
     let _web3 = new Web3(provider)
@@ -189,8 +207,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     const { address, amount } = ethereumOption.instructions[0].outputs[0]
 
-    return payETH(address, amount)
+    console.log("pay eth metamask", { address, amount })
 
+    return payETH({address, amount, chain: 'ETH'})
+ 
   }
 
   async function payAvalancheUSDCMetamask() {
@@ -199,9 +219,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     const token = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, 'AVAX')
+    const { address, amount } =  avalancheUSDCPaymentRequest.instructions[0].outputs[0]
 
-    console.log('metamask.ethereum.usdt.send.result', result)
+    return payUSDC(address, amount, token, 'AVAX', 'USDC')
   }
 
   async function payAvalancheUSDTMetamask() {
@@ -210,9 +230,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     const token = "0xc7198437980c041c805A1EDcbA50c1Ce5db95118"
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, "AVAX")
+    const { address, amount } =  avalancheUSDTPaymentRequest.instructions[0].outputs[0]
 
-    console.log('metamask.ethereum.usdt.send.result', result)
+    return payUSDC(address, amount, token, 'AVAX', 'USDT')
+
   }
 
   async function payEthereumUSDCMetamask() {
@@ -223,11 +244,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     await ensureChain('ETHEREUM_MAINNET')
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, "ETH")
+    const { address, amount } =  ethUSDCPaymentRequest.instructions[0].outputs[0]
 
-    console.log('pay ethereum usdc metamask')
-
-    console.log('metamask.ethereum.usdc.send.result', result)
+    return payUSDC(address, amount, token, 'ETH', 'USDC')
   }
 
   async function payEthereumUSDTMetamask() {
@@ -236,9 +255,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     await ensureChain('ETHEREUM_MAINNET')
 
-    const result = await payUSDC("0xA77547a3fB82a5Fa4DB408144870B69c70906989", 1, token, 'ETH')
+    const { address, amount } =  ethUSDTPaymentRequest.instructions[0].outputs[0]
 
-    console.log('metamask.ethereum.usdt.send.result', result)
+    return payUSDC(address, amount, token, 'ETH', 'USDT')
 
   }
 
@@ -395,7 +414,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     })
   }
 
-  async function payETH(address: string, amount: number): Promise<any> {
+  async function payETH({address, amount, chain}: {address: string, amount: number, chain: string}): Promise<any> {
 
     let _web3 = new Web3(provider)
 
@@ -405,19 +424,17 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     let value = _web3.utils.toBN(amount);
 
-    console.log('PAY ETH', { amount, value })
+    console.log(`pay ${chain}`, { amount, value })
 
     var send = _web3.eth.sendTransaction({ from: fromAddress, to: toAddress, value });
 
     send.on('transactionHash', function(hash: string){
 
-      console.log('transactionHash', hash);
-
       submitPayment({
 
-        currency: 'ETH',
+        currency: chain,
 
-        chain: 'ETH',
+        chain,
 
         txid: hash,
 
@@ -476,6 +493,36 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     }
 
   }
+
+  async function payMATIC() {
+
+    if (!maticOption) { return }
+
+    try {
+
+    await ensureChain('POLYGON_MAINNET')
+
+    const token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
+
+    const result = await payUSDC(
+      maticOption.instructions[0].outputs[0].address,
+      maticOption.instructions[0].outputs[0].amount,
+      token,
+      "MATIC",
+      "USDT"
+    )
+
+      console.log('payPolygonUSDTMetamask.result', result)
+
+    } catch(error) {
+
+      console.error('payPolygonUSDTMetamask.error', error)
+
+    }
+
+  }
+
+
 
 
 
@@ -595,7 +642,32 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     preExpanded={preExpanded}
   >
     <p>Coins Accepted:<br/><i>{currencies.join(', ')}</i></p>
-    {maticOption && maticUSDCPaymentRequest && (
+
+    {maticOption && (
+            
+      <AccordionItem uuid="payment-usdc-polygon-metamask">
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="MATIC on Polygon"
+              subtitle="Pay MATIC on Polygon Metamask"
+              active={accordionState.getActive() === 'payment-matic-polygon-metamask'}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <div>
+              <button onClick={payMATIC} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+            </div>
+          </PaymentsOptionsItemBodyComponent>
+        </AccordionItemPanel>
+      </AccordionItem>
+
+    )}
+
+    {maticUSDCPaymentRequest && (
     <>
             
       <AccordionItem uuid="payment-usdc-polygon-metamask">
@@ -686,7 +758,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 {(ethereumOption) && (
     <>
             
-      {/*
       <AccordionItem uuid="payment-usdc-ethereum-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -704,7 +775,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-      */}
 
       <AccordionItem uuid="payment-ethereum-metamask">
         <AccordionItemHeading>
@@ -725,7 +795,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       </AccordionItem>
    
 
-      {/*
       <AccordionItem uuid="payment-usdt-ethereum-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -743,14 +812,33 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-      */}
       
     </>
     )}
 
-      {/*
 {(avalancheOption) && (
     <>
+
+      <AccordionItem uuid="payment-avalanche-metamask">
+        <AccordionItemHeading>
+          <AccordionItemButton>
+            <PaymentsOptionsItemHeaderComponent
+              title="AVAX"
+              subtitle="Pay AVAX on Avalanche Metamask"
+              active={accordionState.getActive() === 'payment-avalanche-metamask'}
+            />
+          </AccordionItemButton>
+        </AccordionItemHeading>
+
+        <AccordionItemPanel>
+          <PaymentsOptionsItemBodyComponent>
+            <div>
+              <button onClick={payAVAXMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+            </div>
+          </PaymentsOptionsItemBodyComponent>
+        </AccordionItemPanel>
+      </AccordionItem>
+      
             
       <AccordionItem uuid="payment-usdc-avalanche-metamask">
         <AccordionItemHeading>
@@ -794,7 +882,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       
     </>
     )}
-      */}
+
     {bsvOption && (
       <>
 
