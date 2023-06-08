@@ -66,7 +66,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const [metamaskOption, setMetamaskOption] = useState(false)
   const [bsvOption, setBsvOption] = useState<any>(paymentOptions.find((o:any) => o.chain === 'BSV'))
 
-  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
+  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'MATIC'))
   const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
   const [maticUSDTPaymentRequest, setMaticUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDT'))
 
@@ -502,17 +502,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     await ensureChain('POLYGON_MAINNET')
 
-    const token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
-
-    const result = await payUSDC(
-      maticOption.instructions[0].outputs[0].address,
-      maticOption.instructions[0].outputs[0].amount,
-      token,
-      "MATIC",
-      "USDT"
-    )
-
-      console.log('payPolygonUSDTMetamask.result', result)
 
     } catch(error) {
 
@@ -645,7 +634,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     {maticOption && (
             
-      <AccordionItem uuid="payment-usdc-polygon-metamask">
+      <AccordionItem uuid="payment-matic-polygon-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
@@ -659,7 +648,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <div>
-              <button onClick={payMATIC} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+              <button onClick={payMATICMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
             </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
