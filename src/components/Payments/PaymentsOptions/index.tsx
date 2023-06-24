@@ -70,11 +70,11 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
   const [maticUSDTPaymentRequest, setMaticUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDT'))
 
-  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' || o.currency === 'AVAX'))
+  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'AVAX'))
   const [avalancheUSDCPaymentRequest, setAvalancheUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDC'))
   const [avalancheUSDTPaymentRequest, setAvalancheUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDT'))
 
-  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' || o.currency === 'ETH'))
+  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'ETH'))
   const [ethUSDCPaymentRequest, setEthUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDC'))
   const [ethUSDTPaymentRequest, setEthUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDT'))
 
@@ -500,8 +500,15 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     try {
 
-    await ensureChain('POLYGON_MAINNET')
+      await ensureChain('POLYGON_MAINNET')
 
+      const result = await payETH({
+        address: maticOption.instructions[0].outputs[0].address,
+        amount: maticOption.instructions[0].outputs[0].amount,
+        chain: "MATIC",
+      })
+
+      console.log('payPolygonUSDTMetamask.result', result)
 
     } catch(error) {
 
@@ -618,8 +625,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     provider.on('chainChanged', handleChainChanged)
 
   }, [provider])
-
-  console.log('BSV OPTION', bsvOption)
 
   return (
     <>
@@ -902,33 +907,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemPanel>
       </AccordionItem>
       
-      {/**
-       * Money Button
-      */}
-      <AccordionItem uuid="payment-moneybutton">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="MoneyButton"
-              subtitle="Swipe to pay using MoneyButton"
-              active={accordionState.getActive() === 'payment-moneybutton'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <PaymentMoneybuttonService
-              outputs={bsvOption.outputs}
-
-              onLoad={anypay.onLoadCallbackForMoneybutton}
-              onError={anypay.onErrorCallbackForMoneybutton}
-              onPayment={anypay.onPaymentCallbackForMoneybutton}
-            />
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-
     <AccordionItem uuid="payment-electrum">
       <AccordionItemHeading>
         <AccordionItemButton>
