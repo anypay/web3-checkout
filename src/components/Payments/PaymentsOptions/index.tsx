@@ -66,15 +66,15 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const [metamaskOption, setMetamaskOption] = useState(false)
   const [bsvOption, setBsvOption] = useState<any>(paymentOptions.find((o:any) => o.chain === 'BSV'))
 
-  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
+  const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'MATIC'))
   const [maticUSDCPaymentRequest, setMaticUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDC'))
   const [maticUSDTPaymentRequest, setMaticUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'USDT'))
 
-  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' || o.currency === 'AVAX'))
+  const [avalancheOption, setAvalancheOption] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'AVAX'))
   const [avalancheUSDCPaymentRequest, setAvalancheUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDC'))
   const [avalancheUSDTPaymentRequest, setAvalancheUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'AVAX' && o.currency === 'USDT'))
 
-  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' || o.currency === 'ETH'))
+  const [ethereumOption, setEthereum] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'ETH'))
   const [ethUSDCPaymentRequest, setEthUSDCPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDC'))
   const [ethUSDTPaymentRequest, setEthUSDTPaymentRequest] = useState(paymentOptions.find((o:any) => o.chain === 'ETH' && o.currency === 'USDT'))
 
@@ -500,17 +500,13 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     try {
 
-    await ensureChain('POLYGON_MAINNET')
+      await ensureChain('POLYGON_MAINNET')
 
-    const token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
-
-    const result = await payUSDC(
-      maticOption.instructions[0].outputs[0].address,
-      maticOption.instructions[0].outputs[0].amount,
-      token,
-      "MATIC",
-      "USDT"
-    )
+      const result = await payETH({
+        address: maticOption.instructions[0].outputs[0].address,
+        amount: maticOption.instructions[0].outputs[0].amount,
+        chain: "MATIC",
+      })
 
       console.log('payPolygonUSDTMetamask.result', result)
 
@@ -630,8 +626,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }, [provider])
 
-  console.log('BSV OPTION', bsvOption)
-
   return (
     <>
     {(bsvOption || maticOption || metamaskOption) && (
@@ -645,7 +639,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     {maticOption && (
             
-      <AccordionItem uuid="payment-usdc-polygon-metamask">
+      <AccordionItem uuid="payment-matic-polygon-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
@@ -913,33 +907,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemPanel>
       </AccordionItem>
       
-      {/**
-       * Money Button
-      */}
-      <AccordionItem uuid="payment-moneybutton">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="MoneyButton"
-              subtitle="Swipe to pay using MoneyButton"
-              active={accordionState.getActive() === 'payment-moneybutton'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <PaymentMoneybuttonService
-              outputs={bsvOption.outputs}
-
-              onLoad={anypay.onLoadCallbackForMoneybutton}
-              onError={anypay.onErrorCallbackForMoneybutton}
-              onPayment={anypay.onPaymentCallbackForMoneybutton}
-            />
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-
     <AccordionItem uuid="payment-electrum">
       <AccordionItemHeading>
         <AccordionItemButton>
