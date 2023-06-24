@@ -653,7 +653,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         <AccordionItemPanel>
           <PaymentsOptionsItemBodyComponent>
             <div>
-              <button onClick={payMATIC} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
+              <button onClick={payMATICMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
             </div>
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
