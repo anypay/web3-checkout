@@ -662,8 +662,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     )}
 
     {maticUSDCPaymentRequest && (
-    <>
-            
       <AccordionItem uuid="payment-usdc-polygon-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -683,6 +681,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+    )}
+    {maticUSDTPaymentRequest && (
 
       <AccordionItem uuid="payment-usdt-polygon-metamask">
         <AccordionItemHeading>
@@ -703,8 +703,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
-
-    </>
     )}
 
 {(false && solanaOption) && (
@@ -749,8 +747,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     </>
     )}
 
-{(ethereumOption) && (
-    <>
+    {(ethUSDCPaymentRequest) && (
             
       <AccordionItem uuid="payment-usdc-ethereum-metamask">
         <AccordionItemHeading>
@@ -769,6 +766,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+    )}
+
+    {(ethereumOption) && (
 
       <AccordionItem uuid="payment-ethereum-metamask">
         <AccordionItemHeading>
@@ -787,7 +787,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+    )}
    
+    {(ethUSDTPaymentRequest) && (
 
       <AccordionItem uuid="payment-usdt-ethereum-metamask">
         <AccordionItemHeading>
@@ -807,17 +809,15 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemPanel>
       </AccordionItem>
       
-    </>
     )}
 
-{(avalancheOption) && (
-    <>
+  {(avalancheOption) && (
 
       <AccordionItem uuid="payment-avalanche-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
             <PaymentsOptionsItemHeaderComponent
-              title="AVAX"
+              title="AVAX on Avalanche"
               subtitle="Pay AVAX on Avalanche Metamask"
               active={accordionState.getActive() === 'payment-avalanche-metamask'}
             />
@@ -832,7 +832,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
           </PaymentsOptionsItemBodyComponent>
         </AccordionItemPanel>
       </AccordionItem>
+    )}
       
+  {(avalancheUSDCPaymentRequest) && (
             
       <AccordionItem uuid="payment-usdc-avalanche-metamask">
         <AccordionItemHeading>
@@ -854,6 +856,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemPanel>
       </AccordionItem>
 
+    )}
+
+    {(avalancheUSDTPaymentRequest) && (
+
       <AccordionItem uuid="payment-usdt-avalanche-metamask">
         <AccordionItemHeading>
           <AccordionItemButton>
@@ -874,7 +880,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItemPanel>
       </AccordionItem>
       
-    </>
     )}
 
     {bsvOption && (
