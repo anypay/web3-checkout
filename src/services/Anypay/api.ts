@@ -60,9 +60,13 @@ export type IApiServiceStatusPollResponse = NodeJS.Timer
 
 const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
 
+const baseURL = 'https://develop.anypayx.com/'
+
+export { baseURL }
+
 const ApiService = () => {
   const instance = axios.create({
-    baseURL: 'https://ionia.anypayx.com/'
+    baseURL
   })
 
   // @ts-ignore

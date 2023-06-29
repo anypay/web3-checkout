@@ -1,6 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { PaymentsComponentContext } from 'components/Payments/context'
+
+import axios from 'axios'
+
+import { baseURL } from 'services/Anypay/api'
 
 const WrapperStyled = styled.div`
   ${props => props.theme.padding.default}
@@ -25,7 +29,16 @@ const LinkStyled = styled.span`
 function ReceiptSummaryInfoComponent() {
   const anypay = useContext(PaymentsComponentContext)
 
-  console.log('state', anypay.state)
+  const [payment, setPayment] = useState<any>(null)
+
+  useEffect(() => {
+    axios.get(`${baseURL}api/v1/invoices/${anypay.state.invoice?.uid}`).then(({data}) => {
+      setPayment(data.payment)
+    })
+
+  }, [])
+
+  if (!payment) { return <div></div> }
 
   return (
     <WrapperStyled>
@@ -33,7 +46,7 @@ function ReceiptSummaryInfoComponent() {
         <SubtitleStyled>
           Transaction ID:
           <LinkStyled>
-            <a href={`https://whatsonchain.com/tx/${anypay.state.invoice?.hash}`}>{anypay.state.invoice?.hash}</a>
+            <a href={payment.block_explorer_url}>{anypay.state.invoice?.hash}</a>
           </LinkStyled>
         </SubtitleStyled>
       </ComponentStyled>
