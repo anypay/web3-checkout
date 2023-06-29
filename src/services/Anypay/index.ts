@@ -153,6 +153,13 @@ const AnypayService = ({ config } : IAnypayService) : IAnypayServiceResponse => 
 
       console.log('invoiceGetPoll.result', invoice)
 
+      if (invoice.status === 'confirming') {
+        state.set({
+          status: 'published',
+          invoice,
+        })
+      }
+
       if (invoice.status === 'paid') {
         state.set({
           status: 'broadcasted',

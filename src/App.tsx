@@ -27,13 +27,13 @@ export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServ
   useEffect(() => {
     if (anypay.state.invoiceId) {
       if (anypay.state.invoice?.status === 'unpaid') {
-console.log('POLL INVOICE', anypay.state)
-	      const interval = anypay.pollInvoice()
-	      return () => clearInterval(interval)
-	}
+          console.log('POLL INVOICE', anypay.state)
+          const interval = anypay.pollInvoice()
+          return () => clearInterval(interval)
+      }
     }
   // eslint-disable-next-line
-  }, [anypay.state.initialized])
+  }, [anypay.state.initialized, anypay.state.invoice?.status])
 
   useEffect(() => {
     if (anypay.state.paymentOptions && anypay.state.paymentOptions.find(option => option.currency === 'BSV')) {
@@ -62,9 +62,7 @@ console.log('POLL INVOICE', anypay.state)
 }
 
 export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
-  console.log('STATE--', anypay.state)
 
-  console.log('OPTIONS', anypay.state.paymentOptions)
   return (
     <ThemeProvider theme={theme}>
       <Modal isOpen={anypay.state.modal?.isOpen || false} style={theme.modal}>

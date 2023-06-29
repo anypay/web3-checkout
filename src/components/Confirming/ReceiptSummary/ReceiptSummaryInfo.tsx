@@ -25,6 +25,8 @@ const LinkStyled = styled.span`
 function ReceiptSummaryInfoComponent() {
   const anypay = useContext(PaymentsComponentContext)
 
+  console.log('state', anypay.state)
+
   return (
     <WrapperStyled>
       <ComponentStyled>

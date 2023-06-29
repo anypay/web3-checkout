@@ -57,9 +57,10 @@ const ChainTokens = {
 
 function PaymentsOptionsComponent({ paymentOptions }: any) {
   const anypay = useContext(PaymentsComponentContext)
-  console.log(anypay.state, 'STATE')
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
+
+  const paymentURL = anypay.state.invoice.uri.split("r=")[1]
 
   const [currencies, setCurrencies] = useState(paymentOptions.map((o:any) => o.currency || o.chain))
 
@@ -343,7 +344,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     let toAddress = address;
 
-    let fromAddress = metamaskAccount;
+    let fromAddress = String(metamaskAccount);
 
     let value = _web3.utils.toBN(amount);
 
@@ -372,7 +373,32 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       }
     ];// Get ERC20 Token contract instance
     let contract = new _web3.eth.Contract(minABI, tokenAddress);// calculate ERC20 token amount
-    return contract.methods.transfer(toAddress, value).send({from: fromAddress})
+
+    const transfer = contract.methods.transfer(toAddress, value)
+
+    const transferResult = await transfer.call({ from: fromAddress })
+
+    const encoded = transfer.encodeABI()
+
+    console.log({ transferResult, transfer, encoded })
+
+    const txhex = await _web3.eth.signTransaction({
+      from: fromAddress,
+      to: tokenAddress,
+      data: encoded
+    }, provider)
+
+    console.log({ txhex })
+
+    const result = await submitPayment({
+      url: paymentURL,
+      chain,
+      currency,
+      txhex: txhex.toString()
+    })
+
+    /*
+    return transferResult.send({from: fromAddress})
     .on('transactionHash', function(hash: string){
 
       console.log('transactionHash', hash);
@@ -383,7 +409,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
         chain,
 
-        txid: hash,
+        txhex: hash,
 
         url: anypay.state.invoice.uri.split("r=")[1]
 
@@ -412,9 +438,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       console.error('metamask.send.error', error)
     })
+    */
   }
 
-  async function payETH({address, amount, chain}: {address: string, amount: number, chain: string}): Promise<any> {
+  async function payETH({address, amount, chain}: {address: string, amount: number, chain: string}): Promise<void> {
 
     let _web3 = new Web3(provider)
 
@@ -424,45 +451,30 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     let value = _web3.utils.toBN(amount);
 
-    console.log(`pay ${chain}`, { amount, value })
+    console.log(`pay ${chain}`, { amount, value, toAddress, fromAddress })
 
-    var send = _web3.eth.sendTransaction({ from: fromAddress, to: toAddress, value });
+    const txhex = await _web3.eth.signTransaction({
+      from: fromAddress,
+      to: toAddress,
+      value
+    }, provider)
 
-    send.on('transactionHash', function(hash: string){
+    console.log('eth.accounts.signTransaction.result', txhex)
 
-      submitPayment({
+    const result = await submitPayment({
 
-        currency: chain,
+      chain,
 
-        chain,
+      currency: chain,
 
-        txid: hash,
+      txhex: txhex.toString(),
 
-        url: anypay.state.invoice.uri.split("r=")[1]
+      url: `https://develop.anypayx.com/r/${anypay.state.invoiceId}`
 
-      })
-
-      return hash
     })
-    .on('sending', (payload: any) => {
-      console.log('metamask.sending', payload)
-    })
-    .on('sent', (payload: any) => {
-      console.log('metamask.sent', payload)
-    })
-    .on('receipt', (payload: any) => {
-      console.log('metamask.receipt', payload)
-    })
-    .on('confirmation', (payload: any) => {
-      console.log('metamask.confirmation', payload)
-    })
-    .on('error', (payload: any) => {
-      console.log('metamask.error', payload)
-    })
-    .catch((error: Error) => {
 
-      console.error('metamask.send.error', error)
-    })
+    console.log({ result })
+
   }
 
   async function payPolygonUSDTMetamask() {
@@ -567,9 +579,9 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
-  async function submitPayment({ url, txid, currency, chain }: {
+  async function submitPayment({ url, txhex, currency, chain }: {
     url: string,
-    txid: string,
+    txhex: string,
     currency: string,
     chain: string
   }): Promise<any> {
@@ -584,7 +596,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       transactions: [{
 
-        tx: txid
+        tx: txhex
 
       }]
 
