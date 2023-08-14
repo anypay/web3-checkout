@@ -6,6 +6,7 @@ type IModalTemplate = {
 }
 
 const WrapperStyled = styled.div`
+  max-height: calc(100vh - 60px);
 `
 
 const ComponentStyled = styled.div`
