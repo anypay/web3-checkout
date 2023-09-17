@@ -20,7 +20,10 @@ import {
   AccordionItemHeading,
   AccordionItemButton,
   AccordionItemPanel,
+  AccordionItemState,
 } from 'react-accessible-accordion'
+
+import Select from 'react-select';
 
 import detectEthereumProvider from '@metamask/detect-provider';
 
@@ -596,6 +599,206 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }, [provider])
 
+  const coinsList:any = {
+    'AVAX': { // Avalanche
+      wallets: ['BRAVE_WALLET'],
+      'isActive': false
+    },
+    'BCH' : { // Bitcoin Cash
+      wallets: ['BITCOINCOM_WALLET','EDGE_WALLET'],
+      'isActive': false
+    },
+    'BSV': { // Bitcoin SV
+      wallets: ['HAND_CASH', 'RELAYX', 'SENSILET_WALLET', 'TWETCH_WALLET', 'ELECTRUM_SV', 'SENTPE', 'SIMPLY_CASH']
+    },
+    'BTC': { // Bitcoin
+      wallets: ['EDGE', 'BITCOINCOM_WALLET', 'ELECTRUM', 'BREAD_WALLET'],
+      'isActive': false
+    },
+    'DASH': { // Dash
+      wallets: ['DASH_WALLET', 'DASH_ELECTRUM', 'DASH_CORE'],
+      'isActive': false
+    },
+    'ETH': { // Ethereum
+      wallets: ['BRAVE_WALLET'],
+      'isActive': false
+    },
+    'LTC': { // Litecoin
+      wallets: ['EDGE'],
+      'isActive': false
+    },
+    'MATIC': { // Polygon
+      wallets: ['BRAVE_WALLET'],
+      'isActive': false
+    },
+    'SOL': { // Solana
+      wallets: ['BRAVE_WALLET'],
+      'isActive': false
+    }
+  }
+
+  type PaymentWallet = {
+    'title': string;
+    'description': string;
+    'isActive': boolean;
+    'paymentBlock'?: any;
+  };
+
+  type PaymentWalletArray = {[key: string]: PaymentWallet;};
+
+  const walletsArry: PaymentWalletArray = {
+    'RELAYX': {
+      "title": "RELAYX", 
+      'description': 'Swipe to pay using Relay wallet',
+      'isActive': true,
+      'paymentBlock': <PaymentRelayService
+                        paymentOption={bsvOption}
+
+                        onLoad={anypay.onLoadCallbackForRelayX}
+                        onError={anypay.onErrorCallbackForRelayX}
+                        onPayment={anypay.onPaymentCallbackForRelayX}
+                      />
+    },
+    'HAND_CASH': {
+      "title": "HAND CASH", 
+      'description': 'Click to Open Wallet on Mobile',
+      'isActive': true,
+      'paymentBlock': <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
+    },
+    'SIMPLY_CASH': {
+      "title": "SIMPLY CASH", 
+      'description': 'Click to Open Wallet on Mobile',
+      'isActive': true,
+      'paymentBlock': <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
+    },
+    'ELECTRUM_SV': {
+      "title": "ELECTRUM SV", 
+      'description': 'Copy Payment Request URL',
+      'isActive': true,
+      'paymentBlock': <small>{anypay.state.invoice.uri}</small>
+    },
+    'BRAVE_WALLET': {
+      "title": "BRAVE WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'BITCOINCOM_WALLET': {
+      "title": "BITCOINCOM WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'EDGE_WALLET': {
+      "title": "EDGE WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'SENSILET_WALLET': {
+      "title": "SENSILET WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'TWETCH_WALLET': {
+      "title": "TWETCH WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'SENTPE': {
+      "title": "SENTPE", 
+      'description': '',
+      'isActive': false
+    },
+    'EDGE': {
+      "title": "EDGE", 
+      'description': '',
+      'isActive': false
+    },
+    'ELECTRUM': {
+      "title": "ELECTRUM", 
+      'description': '',
+      'isActive': false
+    },
+    'BREAD_WALLET': {
+      "title": "BREAD WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'DASH_WALLET': {
+      "title": "DASH WALLET", 
+      'description': '',
+      'isActive': false
+    },
+    'DASH_ELECTRUM': {
+      "title": "DASH ELECTRUM", 
+      'description': '',
+      'isActive': false
+    },
+    'DASH_CORE': {
+      "title": "DASH CORE", 
+      'description': '',
+      'isActive': false
+    }
+  };
+
+  const selectorOptions:any = [];
+
+  for (var coinTitle in coinsList) {
+    let isDisabled = true;
+
+    coinsList[coinTitle].wallets.forEach(function(walletId: string) {
+      if (walletsArry[walletId].isActive) {
+        isDisabled = false;
+        return false;
+      }
+    });
+
+    selectorOptions.push({value: coinTitle, label: coinTitle, isDisabled: isDisabled});
+  }
+
+  const [selectedCoin, setSelectedCoin] = useState("BSV");
+
+
+  function coinSelectorChangeHandler (selectedOption: any) {
+    setSelectedCoin(selectedOption.value);
+  }
+
+  coinsList[selectedCoin].wallets.sort(function(a:string, b:string) {
+    if (walletsArry[a].isActive && !walletsArry[b].isActive) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
+
+  const walletsList = coinsList[selectedCoin].wallets.map((walletId: string) => {
+      const paymentWallet: PaymentWallet = walletsArry[walletId];
+
+      return <>
+        <AccordionItem uuid={walletId} 
+          className="">
+          <AccordionItemHeading>
+            <AccordionItemButton>
+              <PaymentsOptionsItemHeaderComponent
+                title={paymentWallet.title}
+                subtitle={paymentWallet.description}
+                active={accordionState.getActive() === walletId && paymentWallet.isActive}
+                disabled= {paymentWallet.isActive}
+              />
+            </AccordionItemButton>
+          </AccordionItemHeading>
+
+          {paymentWallet.isActive && (
+            <AccordionItemPanel>
+            <PaymentsOptionsItemBodyComponent>
+                {paymentWallet.paymentBlock}
+            </PaymentsOptionsItemBodyComponent>
+            </AccordionItemPanel>
+          )}
+
+        </AccordionItem> 
+      </> 
+  });
+
+
   return (
     <>
     {(bsvOption || maticOption || metamaskOption) && (
@@ -606,6 +809,20 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     preExpanded={preExpanded}
   >
     <p>Coins Accepted:<br/><i>{currencies.join(', ')}</i></p>
+
+    <Select
+      defaultValue={selectorOptions[2]}
+      options={selectorOptions}
+      onChange={coinSelectorChangeHandler}
+    />
+      
+    <br/>
+
+    {walletsList}
+    
+    <div style={{display: 'none'}}>
+
+      {/* old list */}
 
     {maticOption && (
             
@@ -920,6 +1137,8 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
       </>
     )}
+
+  </div>
 
   </Accordion>
     )}
