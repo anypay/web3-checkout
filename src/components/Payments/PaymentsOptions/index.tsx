@@ -599,178 +599,159 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }, [provider])
 
-  const coinsList:any = {
+  type CoinInfo = {
+    'wallets': string[];
+  };
+  
+  type SupportedCoinsArray = {[key: string]: CoinInfo;};
+  
+  const supportedCoins:SupportedCoinsArray = {
     'AVAX': { // Avalanche
       wallets: ['BRAVE_WALLET'],
-      'isActive': false
     },
     'BCH' : { // Bitcoin Cash
       wallets: ['BITCOINCOM_WALLET','EDGE_WALLET'],
-      'isActive': false
     },
     'BSV': { // Bitcoin SV
-      wallets: ['HAND_CASH', 'RELAYX', 'SENSILET_WALLET', 'TWETCH_WALLET', 'ELECTRUM_SV', 'SENTPE', 'SIMPLY_CASH']
+      wallets: ['HAND_CASH', 'RELAYX', 'SENSILET_WALLET', 'TWETCH_WALLET', 'ELECTRUM_SV', 'SENTPE', 'SIMPLY_CASH'],
     },
     'BTC': { // Bitcoin
       wallets: ['EDGE', 'BITCOINCOM_WALLET', 'ELECTRUM', 'BREAD_WALLET'],
-      'isActive': false
     },
     'DASH': { // Dash
       wallets: ['DASH_WALLET', 'DASH_ELECTRUM', 'DASH_CORE'],
-      'isActive': false
     },
     'ETH': { // Ethereum
       wallets: ['BRAVE_WALLET'],
-      'isActive': false
     },
     'LTC': { // Litecoin
       wallets: ['EDGE'],
-      'isActive': false
     },
     'MATIC': { // Polygon
       wallets: ['BRAVE_WALLET'],
-      'isActive': false
     },
     'SOL': { // Solana
       wallets: ['BRAVE_WALLET'],
-      'isActive': false
     }
   }
 
   type PaymentWallet = {
     'title': string;
     'description': string;
-    'isActive': boolean;
-    'paymentBlock'?: any;
+    'enabled': boolean;
   };
 
   type PaymentWalletArray = {[key: string]: PaymentWallet;};
 
-  const walletsArry: PaymentWalletArray = {
+  const supportedWallets: PaymentWalletArray = {
     'RELAYX': {
       "title": "RELAYX", 
       'description': 'Swipe to pay using Relay wallet',
-      'isActive': true,
-      'paymentBlock': <PaymentRelayService
-                        paymentOption={bsvOption}
-
-                        onLoad={anypay.onLoadCallbackForRelayX}
-                        onError={anypay.onErrorCallbackForRelayX}
-                        onPayment={anypay.onPaymentCallbackForRelayX}
-                      />
+      'enabled': true
     },
     'HAND_CASH': {
       "title": "HAND CASH", 
       'description': 'Click to Open Wallet on Mobile',
-      'isActive': true,
-      'paymentBlock': <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
+      'enabled': true
     },
     'SIMPLY_CASH': {
       "title": "SIMPLY CASH", 
       'description': 'Click to Open Wallet on Mobile',
-      'isActive': true,
-      'paymentBlock': <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
+      'enabled': true
     },
     'ELECTRUM_SV': {
       "title": "ELECTRUM SV", 
       'description': 'Copy Payment Request URL',
-      'isActive': true,
-      'paymentBlock': <small>{anypay.state.invoice.uri}</small>
+      'enabled': true
     },
     'BRAVE_WALLET': {
       "title": "BRAVE WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'BITCOINCOM_WALLET': {
       "title": "BITCOINCOM WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'EDGE_WALLET': {
       "title": "EDGE WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'SENSILET_WALLET': {
       "title": "SENSILET WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'TWETCH_WALLET': {
       "title": "TWETCH WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'SENTPE': {
       "title": "SENTPE", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'EDGE': {
       "title": "EDGE", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'ELECTRUM': {
       "title": "ELECTRUM", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'BREAD_WALLET': {
       "title": "BREAD WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'DASH_WALLET': {
       "title": "DASH WALLET", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'DASH_ELECTRUM': {
       "title": "DASH ELECTRUM", 
       'description': '',
-      'isActive': false
+      'enabled': false
     },
     'DASH_CORE': {
       "title": "DASH CORE", 
       'description': '',
-      'isActive': false
+      'enabled': false
     }
   };
 
-  const selectorOptions:any = [];
+  type SelectorOption = {
+    'value': string;
+    'label': string;
+    'isDisabled': boolean;
+  };
 
-  for (var coinTitle in coinsList) {
-    let isDisabled = true;
-
-    coinsList[coinTitle].wallets.forEach(function(walletId: string) {
-      if (walletsArry[walletId].isActive) {
-        isDisabled = false;
-        return false;
-      }
-    });
-
-    selectorOptions.push({value: coinTitle, label: coinTitle, isDisabled: isDisabled});
-  }
+  const selectorOptions: SelectorOption[] = Object.keys(supportedCoins)
+    .map(coinTitle => ({
+        value: coinTitle,
+        label: coinTitle,
+        isDisabled: !supportedCoins[coinTitle].wallets
+          .some((wallet: string) => supportedWallets[wallet].enabled)
+      })
+    );
 
   const [selectedCoin, setSelectedCoin] = useState("BSV");
 
-
-  function coinSelectorChangeHandler (selectedOption: any) {
+  function onCoinSelectorChange (selectedOption: any) {
     setSelectedCoin(selectedOption.value);
   }
 
-  coinsList[selectedCoin].wallets.sort(function(a:string, b:string) {
-    if (walletsArry[a].isActive && !walletsArry[b].isActive) {
-      return -1;
-    } else {
-      return 1;
-    }
-  });
+  supportedCoins[selectedCoin].wallets
+    .sort((a:string, b:string) => supportedWallets[a].enabled && !supportedWallets[b].enabled ? -1 : 1);
 
-  const walletsList = coinsList[selectedCoin].wallets.map((walletId: string) => {
-      const paymentWallet: PaymentWallet = walletsArry[walletId];
+  const walletsList = supportedCoins[selectedCoin].wallets.map((walletId: string) => {
+      const paymentWallet: PaymentWallet = supportedWallets[walletId];
 
       return <>
         <AccordionItem uuid={walletId} 
@@ -780,16 +761,35 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
               <PaymentsOptionsItemHeaderComponent
                 title={paymentWallet.title}
                 subtitle={paymentWallet.description}
-                active={accordionState.getActive() === walletId && paymentWallet.isActive}
-                disabled= {paymentWallet.isActive}
+                active={accordionState.getActive() === walletId && paymentWallet.enabled}
+                disabled= {paymentWallet.enabled}
               />
             </AccordionItemButton>
           </AccordionItemHeading>
 
-          {paymentWallet.isActive && (
+          {paymentWallet.enabled && (
             <AccordionItemPanel>
             <PaymentsOptionsItemBodyComponent>
-                {paymentWallet.paymentBlock}
+              <>
+                {walletId === 'RELAYX' && 
+                  <PaymentRelayService
+                    paymentOption={bsvOption}
+
+                    onLoad={anypay.onLoadCallbackForRelayX}
+                    onError={anypay.onErrorCallbackForRelayX}
+                    onPayment={anypay.onPaymentCallbackForRelayX}
+                  />
+                }
+
+                {(walletId === 'HAND_CASH' ||
+                  walletId === 'SIMPLY_CASH') && 
+                  <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
+                }
+
+                {walletId === 'ELECTRUM_SV' && 
+                  <small>{anypay.state.invoice.uri}</small>
+                }
+              </>
             </PaymentsOptionsItemBodyComponent>
             </AccordionItemPanel>
           )}
@@ -797,7 +797,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
         </AccordionItem> 
       </> 
   });
-
 
   return (
     <>
@@ -813,7 +812,7 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     <Select
       defaultValue={selectorOptions[2]}
       options={selectorOptions}
-      onChange={coinSelectorChangeHandler}
+      onChange={onCoinSelectorChange}
     />
       
     <br/>
