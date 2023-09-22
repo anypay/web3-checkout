@@ -72,12 +72,6 @@ const ChainTokens = {
 }
 
 function PaymentsOptionsComponent({ paymentOptions }: any) {
-  console.log('>> paymentOptions:');
-  console.log(paymentOptions);
-
-  console.log('>> state:');
-  console.log(paymentOptions);
-
   const anypay = useContext(PaymentsComponentContext)
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
@@ -86,7 +80,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   const [currencies, setCurrencies] = useState(paymentOptions.map((o:any) => o.currency || o.chain))
 
-  const [metamaskOption, setMetamaskOption] = useState(false)
   const [bsvOption, setBsvOption] = useState<any>(paymentOptions.find((o:any) => o.chain === 'BSV'))
 
   const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'MATIC'))
