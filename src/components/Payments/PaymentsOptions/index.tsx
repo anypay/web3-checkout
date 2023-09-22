@@ -685,149 +685,149 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   }, [provider])
 
   type CoinInfo = {
-    'wallets': string[];
+    wallets: string[];
   };
   
   type SupportedCoinsArray = {[key: string]: CoinInfo;};
   
   const supportedCoins:SupportedCoinsArray = {
-    'AVAX': { // Avalanche
+    AVAX: { // Avalanche
       wallets: ['BRAVE_WALLET'],
     },
-    'BCH' : { // Bitcoin Cash
+    BCH : { // Bitcoin Cash
       wallets: ['BITCOINCOM_WALLET','EDGE_WALLET'],
     },
-    'BSV': { // Bitcoin SV
+    BSV: { // Bitcoin SV
       wallets: ['HAND_CASH', 'RELAYX', 'SENSILET_WALLET', 'TWETCH_WALLET', 'ELECTRUM_SV', 'SENTPE', 'SIMPLY_CASH'],
     },
-    'BTC': { // Bitcoin
+    BTC: { // Bitcoin
       wallets: ['EDGE', 'BITCOINCOM_WALLET', 'ELECTRUM', 'BREAD_WALLET'],
     },
-    'DASH': { // Dash
+    DASH: { // Dash
       wallets: ['DASH_WALLET', 'DASH_ELECTRUM', 'DASH_CORE'],
     },
-    'ETH': { // Ethereum
+    ETH: { // Ethereum
       wallets: ['BRAVE_WALLET'],
     },
-    'LTC': { // Litecoin
+    LTC: { // Litecoin
       wallets: ['EDGE'],
     },
-    'MATIC': { // Polygon
+    MATIC: { // Polygon
       wallets: ['BRAVE_WALLET'],
     },
-    // 'SOL': { // Solana
+    // SOL: { // Solana
     //   wallets: ['BRAVE_WALLET'],
     // },
-    'USDC': { // USDC
+    USDC: { // USDC
       wallets: ['BRAVE_WALLET'],
     },
-    'USDT': { // USDT
+    USDT: { // USDT
       wallets: ['BRAVE_WALLET']
     },
   }
 
   type PaymentWallet = {
-    'title': string;
-    'description': string;
-    'enabled': boolean;
-    'handler' ?: Function;
+    title: string;
+    description: string;
+    enabled: boolean;
+    handler ?: Function;
   };
 
   type PaymentWalletArray = {[key: string]: PaymentWallet;};
 
   const supportedWallets: PaymentWalletArray = {
-    'RELAYX': {
-      "title": "RELAYX", 
-      'description': 'Swipe to pay using Relay wallet',
-      'enabled': false
+    RELAYX: {
+      title: "RELAYX", 
+      description: 'Swipe to pay using Relay wallet',
+      enabled: false
     },
-    'HAND_CASH': {
-      "title": "HAND CASH", 
-      'description': 'Click to Open Wallet on Mobile',
-      'enabled': true,
-      'handler': payWithLink
+    HAND_CASH: {
+      title: "HAND CASH", 
+      description: 'Click to Open Wallet on Mobile',
+      enabled: true,
+      handler: payWithLink
     },
-    'SIMPLY_CASH': {
-      "title": "SIMPLY CASH", 
-      'description': 'Click to Open Wallet on Mobile',
-      'enabled': true,
-      'handler': payWithLink
+    SIMPLY_CASH: {
+      title: "SIMPLY CASH", 
+      description: 'Click to Open Wallet on Mobile',
+      enabled: true,
+      handler: payWithLink
     },
-    'ELECTRUM_SV': {
-      "title": "ELECTRUM SV", 
-      'description': 'Copy Payment Request URL',
-      'enabled': true,
-      'handler': payWithLink
+    ELECTRUM_SV: {
+      title: "ELECTRUM SV", 
+      description: 'Copy Payment Request URL',
+      enabled: true,
+      handler: payWithLink
     },
-    'BRAVE_WALLET': {
-      "title": "BRAVE WALLET", 
-      'description': '',
-      'enabled': true
+    BRAVE_WALLET: {
+      title: "BRAVE WALLET", 
+      description: '',
+      enabled: true
     },
-    'BITCOINCOM_WALLET': {
-      "title": "BITCOINCOM WALLET", 
-      'description': '',
-      'enabled': false
+    BITCOINCOM_WALLET: {
+      title: "BITCOINCOM WALLET", 
+      description: '',
+      enabled: false
     },
-    'EDGE_WALLET': {
-      "title": "EDGE WALLET", 
-      'description': '',
-      'enabled': false
+    EDGE_WALLET: {
+      title: "EDGE WALLET", 
+      description: '',
+      enabled: false
     },
-    'SENSILET_WALLET': {
-      "title": "SENSILET WALLET", 
-      'description': '',
-      'enabled': false
+    SENSILET_WALLET: {
+      title: "SENSILET WALLET", 
+      description: '',
+      enabled: false
     },
-    'TWETCH_WALLET': {
-      "title": "TWETCH WALLET", 
-      'description': '',
-      'enabled': false
+    TWETCH_WALLET: {
+      title: "TWETCH WALLET", 
+      description: '',
+      enabled: false
     },
-    'SENTPE': {
-      "title": "SENTPE", 
-      'description': '',
-      'enabled': false
+    SENTPE: {
+      title: "SENTPE", 
+      description: '',
+      enabled: false
     },
-    'EDGE': {
-      "title": "EDGE", 
-      'description': '',
-      'enabled': false
+    EDGE: {
+      title: "EDGE", 
+      description: '',
+      enabled: false
     },
-    'ELECTRUM': {
-      "title": "ELECTRUM", 
-      'description': '',
-      'enabled': false
+    ELECTRUM: {
+      title: "ELECTRUM", 
+      description: '',
+      enabled: false
     },
-    'BREAD_WALLET': {
-      "title": "BREAD WALLET", 
-      'description': '',
-      'enabled': false
+    BREAD_WALLET: {
+      title: "BREAD WALLET", 
+      description: '',
+      enabled: false
     },
-    'DASH_WALLET': {
-      "title": "DASH WALLET", 
-      'description': '',
-      'enabled': true,
-      'handler': payDashWallet
+    DASH_WALLET: {
+      title: "DASH WALLET", 
+      description: '',
+      enabled: true,
+      handler: payDashWallet
     },
-    'DASH_ELECTRUM': {
-      "title": "DASH ELECTRUM", 
-      'description': '',
-      'enabled': true,
-      'handler': payDashElectrum
+    DASH_ELECTRUM: {
+      title: "DASH ELECTRUM", 
+      description: '',
+      enabled: true,
+      handler: payDashElectrum
     },
-    'DASH_CORE': {
-      "title": "DASH CORE", 
-      'description': '',
-      'enabled': true,
-      'handler': payDashCore
+    DASH_CORE: {
+      title: "DASH CORE", 
+      description: '',
+      enabled: true,
+      handler: payDashCore
     }
   };
 
   type SelectorOption = {
-    'value': string;
-    'label': string;
-    'isDisabled': boolean;
+    value: string;
+    label: string;
+    isDisabled: boolean;
   };
 
   const selectorOptions: SelectorOption[] = Object.keys(supportedCoins)
