@@ -16,6 +16,8 @@ const WrapperStyled = styled.div`
 `
 
 const ComponentStyled = styled.div<IComponentStyled>`
+  ${props => props.theme.border.defaultGlow}
+  
   ${props => props.disabled && props.theme.font.colorLight}
 
   ${props => props.theme.background.default}
