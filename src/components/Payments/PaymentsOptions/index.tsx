@@ -4,6 +4,7 @@ import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
 import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
+import PaymentsOptionsItemButton from './PaymentsOptionsItemButton'
 import { useAccordionState } from './service'
 import './index.css'
 
@@ -61,6 +62,12 @@ const ChainTokens = {
 }
 
 function PaymentsOptionsComponent({ paymentOptions }: any) {
+  console.log('>> paymentOptions:');
+  console.log(paymentOptions);
+
+  console.log('>> state:');
+  console.log(paymentOptions);
+
   const anypay = useContext(PaymentsComponentContext)
   const preExpanded = ['payment-relay']
   const accordionState = useAccordionState({ preExpanded })
@@ -522,6 +529,84 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
+  async function payHandCash() {
+    window.open(anypay.state.invoice.uri);
+  }
+
+  async function payWithLink() {
+    window.open(anypay.state.invoice.uri);
+  }
+
+  async function payDashWallet() {
+    // example link:
+    // dash:XmhZcmxTKEfpXYdWEZ5Binc9Aab7LmGK1m?amount=10&currency=USD&local=262.67
+
+    const paymentInfo = anypay.state.invoice.payment_options
+      .find((element:any) => element.currency === 'DASH');
+
+    const transactionInfo = paymentInfo.instructions
+      .find((element:any) => element.type === 'transaction');
+
+    const address = transactionInfo.outputs[0].address;
+    const amount = transactionInfo.outputs[0].amount / Math.pow(10, 8);
+    const localAmount = anypay.state.invoice.amount;
+    const localCurrency = anypay.state.invoice.currency;
+   
+    const link = 'dash:' + 
+                 address + 
+                 '?amount=' + 
+                 amount + // currency
+                 '&currency=' + 
+                 localCurrency + 
+                 '&local=' + 
+                 localAmount; // usd
+
+    window.open(link);
+  }
+
+
+  async function payDashElectrum() { // need to edit link
+    // example link:
+    // dash:XuK44Usr44eQ391zeGA1MqsRA4BTYn7xDW?amount=12 
+
+    const paymentInfo = anypay.state.invoice.payment_options
+      .find((element:any) => element.currency === 'DASH');
+
+    const transactionInfo = paymentInfo.instructions
+      .find((element:any) => element.type === 'transaction');
+
+    const address = transactionInfo.outputs[0].address;
+    const amount = transactionInfo.outputs[0].amount / Math.pow(10, 8);
+   
+    const link = 'dash:' + 
+                 address + 
+                 '?amount=' + 
+                 amount;
+
+    window.open(link);
+  }
+
+  async function payDashCore() {
+    // example link:
+    // dash:XuK44Usr44eQ391zeGA1MqsRA4BTYn7xDW?amount=12 
+
+    const paymentInfo = anypay.state.invoice.payment_options
+      .find((element:any) => element.currency === 'DASH');
+
+    const transactionInfo = paymentInfo.instructions
+      .find((element:any) => element.type === 'transaction');
+
+    const address = transactionInfo.outputs[0].address;
+    const amount = transactionInfo.outputs[0].amount / Math.pow(10, 8);
+   
+    const link = 'dash:' + 
+                 address + 
+                 '?amount=' + 
+                 amount;
+
+    window.open(link);
+  }
+
   async function getPaymentOption({ url, currency, chain }: {
     url: string,
     currency: string,
@@ -630,15 +715,22 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     'MATIC': { // Polygon
       wallets: ['BRAVE_WALLET'],
     },
-    'SOL': { // Solana
+    // 'SOL': { // Solana
+    //   wallets: ['BRAVE_WALLET'],
+    // },
+    'USDC': { // USDC
       wallets: ['BRAVE_WALLET'],
-    }
+    },
+    'USDT': { // USDT
+      wallets: ['BRAVE_WALLET']
+    },
   }
 
   type PaymentWallet = {
     'title': string;
     'description': string;
     'enabled': boolean;
+    'handler' ?: Function;
   };
 
   type PaymentWalletArray = {[key: string]: PaymentWallet;};
@@ -647,27 +739,30 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     'RELAYX': {
       "title": "RELAYX", 
       'description': 'Swipe to pay using Relay wallet',
-      'enabled': true
+      'enabled': false
     },
     'HAND_CASH': {
       "title": "HAND CASH", 
       'description': 'Click to Open Wallet on Mobile',
-      'enabled': true
+      'enabled': true,
+      'handler': payWithLink
     },
     'SIMPLY_CASH': {
       "title": "SIMPLY CASH", 
       'description': 'Click to Open Wallet on Mobile',
-      'enabled': true
+      'enabled': true,
+      'handler': payWithLink
     },
     'ELECTRUM_SV': {
       "title": "ELECTRUM SV", 
       'description': 'Copy Payment Request URL',
-      'enabled': true
+      'enabled': true,
+      'handler': payWithLink
     },
     'BRAVE_WALLET': {
       "title": "BRAVE WALLET", 
       'description': '',
-      'enabled': false
+      'enabled': true
     },
     'BITCOINCOM_WALLET': {
       "title": "BITCOINCOM WALLET", 
@@ -712,17 +807,20 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     'DASH_WALLET': {
       "title": "DASH WALLET", 
       'description': '',
-      'enabled': false
+      'enabled': true,
+      'handler': payDashWallet
     },
     'DASH_ELECTRUM': {
       "title": "DASH ELECTRUM", 
       'description': '',
-      'enabled': false
+      'enabled': true,
+      'handler': payDashElectrum
     },
     'DASH_CORE': {
       "title": "DASH CORE", 
       'description': '',
-      'enabled': false
+      'enabled': true,
+      'handler': payDashCore
     }
   };
 
@@ -733,15 +831,20 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   };
 
   const selectorOptions: SelectorOption[] = Object.keys(supportedCoins)
+    .filter((coinTitle: string) => {
+      return supportedCoins[coinTitle].wallets
+        .some((wallet: string) => supportedWallets[wallet].enabled) && 
+        paymentOptions.find((o:any) => o.currency === coinTitle); 
+    })
     .map(coinTitle => ({
-        value: coinTitle,
-        label: coinTitle,
-        isDisabled: !supportedCoins[coinTitle].wallets
-          .some((wallet: string) => supportedWallets[wallet].enabled)
-      })
-    );
+      value: coinTitle,
+      label: coinTitle,
+      isDisabled: !supportedCoins[coinTitle].wallets
+        .some((wallet: string) => supportedWallets[wallet].enabled)
+    })
+);
 
-  const [selectedCoin, setSelectedCoin] = useState("BSV");
+  const [selectedCoin, setSelectedCoin] = useState(selectorOptions[0].value);
 
   function onCoinSelectorChange (selectedOption: any) {
     setSelectedCoin(selectedOption.value);
@@ -753,75 +856,155 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
   const walletsList = supportedCoins[selectedCoin].wallets.map((walletId: string) => {
       const paymentWallet: PaymentWallet = supportedWallets[walletId];
 
-      return <>
-        <AccordionItem uuid={walletId} 
-          className="">
-          <AccordionItemHeading>
-            <AccordionItemButton>
-              <PaymentsOptionsItemHeaderComponent
-                title={paymentWallet.title}
-                subtitle={paymentWallet.description}
-                active={accordionState.getActive() === walletId && paymentWallet.enabled}
-                disabled= {paymentWallet.enabled}
+      if (walletId === 'BRAVE_WALLET') {
+        if (selectedCoin === 'USDC') {
+          return <>
+            {(maticUSDCPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDC on Polygon with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payPolygonUSDCMetamask}
               />
-            </AccordionItemButton>
-          </AccordionItemHeading>
+            )}
+            
+            {(ethUSDCPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDC on Ethereum with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payEthereumUSDCMetamask}
+              />
+            )}
 
-          {paymentWallet.enabled && (
-            <AccordionItemPanel>
-            <PaymentsOptionsItemBodyComponent>
-              <>
-                {walletId === 'RELAYX' && 
-                  <PaymentRelayService
-                    paymentOption={bsvOption}
+            {(avalancheUSDCPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDC on Avalanche with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payAvalancheUSDCMetamask}
+              />
+            )}
+          </>
+        }
 
-                    onLoad={anypay.onLoadCallbackForRelayX}
-                    onError={anypay.onErrorCallbackForRelayX}
-                    onPayment={anypay.onPaymentCallbackForRelayX}
-                  />
-                }
+        if (selectedCoin === 'USDT') {
+          return <>
+            {(maticUSDTPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDT on Polygon with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payPolygonUSDTMetamask}
+              />
+            )}
 
-                {(walletId === 'HAND_CASH' ||
-                  walletId === 'SIMPLY_CASH') && 
-                  <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
-                }
+            {(ethUSDTPaymentRequest &&
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDT on ETH with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payEthereumUSDTMetamask}
+              />
+            )}
 
-                {walletId === 'ELECTRUM_SV' && 
-                  <small>{anypay.state.invoice.uri}</small>
-                }
-              </>
-            </PaymentsOptionsItemBodyComponent>
-            </AccordionItemPanel>
-          )}
+            {(avalancheUSDTPaymentRequest &&
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDT on Avalanche with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payAvalancheUSDTMetamask}
+              />
+            )}
+          </>
+        }
 
-        </AccordionItem> 
-      </> 
+        if (selectedCoin === 'ETH') {
+          return <>
+            {(ethereumOption &&            
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay ETH with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payETHMetamask}
+              />
+            )}
+          </>
+        }
+
+        if (selectedCoin === 'AVAX') {
+          return <>
+            {(avalancheOption && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay AVAX with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payAVAXMetamask}
+              />
+            )}
+          </>
+        }
+
+        if (selectedCoin === 'MATIC') {
+          return <>
+            {(maticOption && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay MATIC with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payMATICMetamask}
+              />
+            )}
+          </>
+        }
+
+        return <></>
+      }
+
+      let onClick = paymentWallet.handler;
+
+      return <>
+        <PaymentsOptionsItemButton
+          title = {paymentWallet.title}
+          subtitle = {paymentWallet.description}
+          disabled = {!paymentWallet.enabled}
+          handler={onClick}
+        />
+      </>
   });
 
   return (
     <>
     {(bsvOption || maticOption || metamaskOption) && (
-    <Accordion
-    onChange={accordionState.setActive}
-    allowMultipleExpanded={false}
-    allowZeroExpanded={false}
-    preExpanded={preExpanded}
-  >
-    <p>Coins Accepted:<br/><i>{currencies.join(', ')}</i></p>
+    <>   
+    
+    <p>Coins Accepted:<br/><i>{currencies.filter((coinTitle:string, pos: number) => {
+      return supportedCoins[coinTitle].wallets
+      .some((walletTitle: string) => supportedWallets[walletTitle].enabled) &&
+      currencies.indexOf(coinTitle) === pos;
+    }).join(', ')}</i></p>
 
     <Select
-      defaultValue={selectorOptions[2]}
+      defaultValue={selectorOptions[0]}
       options={selectorOptions}
       onChange={onCoinSelectorChange}
     />
-      
+    
     <br/>
 
     {walletsList}
     
+    
     <div style={{display: 'none'}}>
 
-      {/* old list */}
+    {/* old list */}
+    
+    <Accordion
+      onChange={accordionState.setActive}
+      allowMultipleExpanded={false}
+      allowZeroExpanded={false}
+      preExpanded={preExpanded}
+    >
 
     {maticOption && (
             
@@ -1137,9 +1320,10 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
       </>
     )}
 
-  </div>
+  
 
-  </Accordion>
+  </Accordion></div>
+  </>
     )}
 
     </>

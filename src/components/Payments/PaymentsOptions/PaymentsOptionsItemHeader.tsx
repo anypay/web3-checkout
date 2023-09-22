@@ -23,7 +23,7 @@ const ComponentStyled = styled.div<IComponentStyled>`
   ${props => props.active && props.theme.border.activeGlow}
   ${props => !props.active && props.theme.border.defaultGlow}
 
-  ${props => !props.disabled && props.theme.font.colorLight}
+  ${props => props.disabled && props.theme.font.colorLight}
 
   ${props => props.theme.background.default}
   ${props => props.theme.padding.defaultHorizontal}
