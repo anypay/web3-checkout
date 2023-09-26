@@ -839,9 +839,9 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
       if (walletId === 'BRAVE_WALLET') {
         if (selectedCoin === 'USDC') {
-          return <>
+          return <div key={walletId + 'USDC'}>
             {(maticUSDCPaymentRequest && 
-              <PaymentsOptionsItemButton
+              <PaymentsOptionsItemButton 
                 title = {paymentWallet.title}
                 subtitle = {'Pay USDC on Polygon with Brave Wallet'}
                 disabled = {!paymentWallet.enabled}
@@ -866,11 +866,11 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
                 handler={payAvalancheUSDCMetamask}
               />
             )}
-          </>
+          </div>
         }
 
         if (selectedCoin === 'USDT') {
-          return <>
+          return <div key={walletId + 'USDT'}>
             {(maticUSDTPaymentRequest && 
               <PaymentsOptionsItemButton
                 title = {paymentWallet.title}
@@ -897,11 +897,11 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
                 handler={payAvalancheUSDTMetamask}
               />
             )}
-          </>
+          </div>
         }
 
         if (selectedCoin === 'ETH') {
-          return <>
+          return <div key={walletId + 'ETH'}>
             {(ethereumOption &&            
               <PaymentsOptionsItemButton
                 title = {paymentWallet.title}
@@ -910,11 +910,11 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
                 handler={payETHMetamask}
               />
             )}
-          </>
+          </div>
         }
 
         if (selectedCoin === 'AVAX') {
-          return <>
+          return <div key={walletId + 'AVAX'}>
             {(avalancheOption && 
               <PaymentsOptionsItemButton
                 title = {paymentWallet.title}
@@ -923,11 +923,11 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
                 handler={payAVAXMetamask}
               />
             )}
-          </>
+          </div>
         }
 
         if (selectedCoin === 'MATIC') {
-          return <>
+          return <div key={walletId + 'MATIC'}>
             {(maticOption && 
               <PaymentsOptionsItemButton
                 title = {paymentWallet.title}
@@ -936,20 +936,20 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
                 handler={payMATICMetamask}
               />
             )}
-          </>
+          </div>
         }
 
         return <></>
       }
 
-      return <>
+      return <div key={walletId}>
         <PaymentsOptionsItemButton
           title = {paymentWallet.title}
           subtitle = {paymentWallet.description}
           disabled = {!paymentWallet.enabled}
           handler={paymentWallet.handler}
         />
-      </>
+      </div>
   });
 
   return (
