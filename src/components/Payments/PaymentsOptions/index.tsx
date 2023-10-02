@@ -955,7 +955,7 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
   return (
   <>   
     <p>Coins Accepted:<br/><i>{currencies.filter((coinTitle:string, pos: number) => {
-      return supportedCoins[coinTitle].wallets
+      return supportedCoins[coinTitle] === undefined ? false : supportedCoins[coinTitle].wallets
       .some((walletTitle: string) => supportedWallets[walletTitle].enabled) &&
       currencies.indexOf(coinTitle) === pos;
     }).join(', ')}</i></p>
