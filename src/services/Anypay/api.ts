@@ -1,8 +1,6 @@
 import axios from 'axios'
 import { AnypayApiResponse } from 'types/api'
 import 'dotenv/config'
-console.log('api process.env:')
-console.log(process.env)
 
 export type IApiService = {
 }
@@ -63,7 +61,7 @@ export type IApiServiceStatusPollResponse = NodeJS.Timer
 
 const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
 
-const baseURL = 'https://api.anypayx.com/'
+const baseURL = process.env.REACT_APP_BASEURL
 
 export { baseURL }
 
