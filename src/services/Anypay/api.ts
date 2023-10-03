@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { AnypayApiResponse } from 'types/api'
-import 'dotenv/config'
 
 export type IApiService = {
 }
