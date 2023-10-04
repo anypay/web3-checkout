@@ -2,8 +2,7 @@
 import axios from 'axios'
 
 import React, { useContext, useEffect, useState } from 'react'
-import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
-import PaymentsOptionsItemBodyComponent from './PaymentsOptionsItemBody'
+import PaymentsOptionsItemButton from './PaymentsOptionsItemButton'
 import { useAccordionState } from './service'
 import './index.css'
 
@@ -14,13 +13,7 @@ import PaymentMoneybuttonService from 'services/PaymentMoneybutton'
 import { PaymentsComponentContext } from 'components/Payments/context'
 //import QRCode from 'react-qr-code'
 
-import {
-  Accordion,
-  AccordionItem,
-  AccordionItemHeading,
-  AccordionItemButton,
-  AccordionItemPanel,
-} from 'react-accessible-accordion'
+import Select from 'react-select';
 
 import detectEthereumProvider from '@metamask/detect-provider';
 
@@ -29,6 +22,27 @@ import Web3 from 'web3'
 import SolanaWeb3 from '@solana/web3.js'
 
 import { PublicKey, SystemProgram  } from '@solana/web3.js'
+
+type CoinInfo = {
+  wallets: string[];
+};
+
+type SupportedCoinsArray = {[key: string]: CoinInfo;};
+
+type PaymentWallet = {
+  title: string;
+  description: string;
+  enabled: boolean;
+  handler ?: Function;
+};
+
+type PaymentWalletArray = {[key: string]: PaymentWallet;};
+
+type SelectorOption = {
+  value: string;
+  label: string;
+  isDisabled: boolean;
+};
 
 const ChainIDs = {
 
@@ -66,7 +80,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   const [currencies, setCurrencies] = useState(paymentOptions.map((o:any) => o.currency || o.chain))
 
-  const [metamaskOption, setMetamaskOption] = useState(false)
   const [bsvOption, setBsvOption] = useState<any>(paymentOptions.find((o:any) => o.chain === 'BSV'))
 
   const [maticOption, setMaticOption] = useState(paymentOptions.find((o:any) => o.chain === 'MATIC' && o.currency === 'MATIC'))
@@ -126,6 +139,149 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
     'USDC': 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     'USDT': 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'
   }  
+
+  const supportedCoins:SupportedCoinsArray = {
+    AVAX: { // Avalanche
+      wallets: ['BRAVE_WALLET'],
+    },
+    BCH : { // Bitcoin Cash
+      wallets: ['BITCOINCOM_WALLET','EDGE_WALLET'],
+    },
+    BSV: { // Bitcoin SV
+      wallets: ['HAND_CASH', 'RELAYX', 'SENSILET_WALLET', 'TWETCH_WALLET', 'ELECTRUM_SV', 'SENTPE', 'SIMPLY_CASH'],
+    },
+    BTC: { // Bitcoin
+      wallets: ['EDGE', 'BITCOINCOM_WALLET', 'ELECTRUM', 'BREAD_WALLET'],
+    },
+    DASH: { // Dash
+      wallets: ['DASH_WALLET', 'DASH_ELECTRUM', 'DASH_CORE'],
+    },
+    ETH: { // Ethereum
+      wallets: ['BRAVE_WALLET'],
+    },
+    LTC: { // Litecoin
+      wallets: ['EDGE'],
+    },
+    MATIC: { // Polygon
+      wallets: ['BRAVE_WALLET'],
+    },
+    // SOL: { // Solana
+    //   wallets: ['BRAVE_WALLET'],
+    // },
+    USDC: { // USDC
+      wallets: ['BRAVE_WALLET'],
+    },
+    USDT: { // USDT
+      wallets: ['BRAVE_WALLET']
+    },
+  }
+
+  const supportedWallets: PaymentWalletArray = {
+    RELAYX: {
+      title: "RELAYX", 
+      description: 'Swipe to pay using Relay wallet',
+      enabled: false
+    },
+    HAND_CASH: {
+      title: "HAND CASH", 
+      description: 'Click to Open Wallet on Mobile',
+      enabled: true,
+      handler: payWithLink
+    },
+    SIMPLY_CASH: {
+      title: "SIMPLY CASH", 
+      description: 'Click to Open Wallet on Mobile',
+      enabled: true,
+      handler: payWithLink
+    },
+    ELECTRUM_SV: {
+      title: "ELECTRUM SV", 
+      description: 'Copy Payment Request URL',
+      enabled: true,
+      handler: payWithLink
+    },
+    BRAVE_WALLET: {
+      title: "BRAVE WALLET", 
+      description: '',
+      enabled: true
+    },
+    BITCOINCOM_WALLET: {
+      title: "BITCOINCOM WALLET", 
+      description: '',
+      enabled: false
+    },
+    EDGE_WALLET: {
+      title: "EDGE WALLET", 
+      description: '',
+      enabled: false
+    },
+    SENSILET_WALLET: {
+      title: "SENSILET WALLET", 
+      description: '',
+      enabled: false
+    },
+    TWETCH_WALLET: {
+      title: "TWETCH WALLET", 
+      description: '',
+      enabled: false
+    },
+    SENTPE: {
+      title: "SENTPE", 
+      description: '',
+      enabled: false
+    },
+    EDGE: {
+      title: "EDGE", 
+      description: '',
+      enabled: false
+    },
+    ELECTRUM: {
+      title: "ELECTRUM", 
+      description: '',
+      enabled: false
+    },
+    BREAD_WALLET: {
+      title: "BREAD WALLET", 
+      description: '',
+      enabled: false
+    },
+    DASH_WALLET: {
+      title: "DASH WALLET", 
+      description: '',
+      enabled: true,
+      handler: payDashWallet
+    },
+    DASH_ELECTRUM: {
+      title: "DASH ELECTRUM", 
+      description: '',
+      enabled: true,
+      handler: payDashElectrum
+    },
+    DASH_CORE: {
+      title: "DASH CORE", 
+      description: '',
+      enabled: true,
+      handler: payDashCore
+    }
+  };
+
+  const selectorOptions: SelectorOption[] = Object.keys(supportedCoins)
+  .filter((coinTitle: string) => {
+    return supportedCoins[coinTitle].wallets
+      .some((wallet: string) => supportedWallets[wallet].enabled) && 
+      paymentOptions.find((o:any) => o.currency === coinTitle); 
+  })
+  .map(coinTitle => ({
+    value: coinTitle,
+    label: coinTitle,
+    isDisabled: !supportedCoins[coinTitle].wallets
+      .some((wallet: string) => supportedWallets[wallet].enabled)
+  })
+);
+
+const [defaultSelectorOption] = selectorOptions;
+
+const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
   useEffect(() => {
 
@@ -488,10 +644,6 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }
 
-
-
-
-
   async function payPolygonUSDCMetamask() {
 
     if (!maticUSDCPaymentRequest) { return }
@@ -517,6 +669,84 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
     }
 
+  }
+
+  async function payHandCash() {
+    window.open(anypay.state.invoice.uri);
+  }
+
+  async function payWithLink() {
+    window.open(anypay.state.invoice.uri);
+  }
+
+  async function payDashWallet() {
+    // example link:
+    // dash:XmhZcmxTKEfpXYdWEZ5Binc9Aab7LmGK1m?amount=10&currency=USD&local=262.67
+
+    const paymentInfo = anypay.state.invoice.payment_options
+      .find((element:any) => element.currency === 'DASH');
+
+    const transactionInfo = paymentInfo.instructions
+      .find((element:any) => element.type === 'transaction');
+
+    const address = transactionInfo.outputs[0].address;
+    const amount = transactionInfo.outputs[0].amount / Math.pow(10, 8);
+    const localAmount = anypay.state.invoice.amount;
+    const localCurrency = anypay.state.invoice.currency;
+   
+    const link = 'dash:' + 
+                 address + 
+                 '?amount=' + 
+                 amount + // currency
+                 '&currency=' + 
+                 localCurrency + 
+                 '&local=' + 
+                 localAmount; // usd
+
+    window.open(link);
+  }
+
+
+  async function payDashElectrum() { // need to edit link
+    // example link:
+    // dash:XuK44Usr44eQ391zeGA1MqsRA4BTYn7xDW?amount=12 
+
+    const paymentInfo = anypay.state.invoice.payment_options
+      .find((element:any) => element.currency === 'DASH');
+
+    const transactionInfo = paymentInfo.instructions
+      .find((element:any) => element.type === 'transaction');
+
+    const address = transactionInfo.outputs[0].address;
+    const amount = transactionInfo.outputs[0].amount / Math.pow(10, 8);
+   
+    const link = 'dash:' + 
+                 address + 
+                 '?amount=' + 
+                 amount;
+
+    window.open(link);
+  }
+
+  async function payDashCore() {
+    // example link:
+    // dash:XuK44Usr44eQ391zeGA1MqsRA4BTYn7xDW?amount=12 
+
+    const paymentInfo = anypay.state.invoice.payment_options
+      .find((element:any) => element.currency === 'DASH');
+
+    const transactionInfo = paymentInfo.instructions
+      .find((element:any) => element.type === 'transaction');
+
+    const address = transactionInfo.outputs[0].address;
+    const amount = transactionInfo.outputs[0].amount / Math.pow(10, 8);
+   
+    const link = 'dash:' + 
+                 address + 
+                 '?amount=' + 
+                 amount;
+
+    window.open(link);
   }
 
   async function getPaymentOption({ url, currency, chain }: {
@@ -596,335 +826,151 @@ function PaymentsOptionsComponent({ paymentOptions }: any) {
 
   }, [provider])
 
+
+  function onCoinSelectorChange (selectedOption: any) {
+    setSelectedCoin(selectedOption.value);
+  }
+
+  supportedCoins[selectedCoin].wallets
+    .sort((a:string, b:string) => supportedWallets[a].enabled && !supportedWallets[b].enabled ? -1 : 1);
+
+  const walletsList = supportedCoins[selectedCoin].wallets.map((walletId: string) => {
+      const paymentWallet: PaymentWallet = supportedWallets[walletId];
+
+      if (walletId === 'BRAVE_WALLET') {
+        if (selectedCoin === 'USDC') {
+          return <div key={walletId + 'USDC'}>
+            {(maticUSDCPaymentRequest && 
+              <PaymentsOptionsItemButton 
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDC on Polygon with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payPolygonUSDCMetamask}
+              />
+            )}
+            
+            {(ethUSDCPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDC on Ethereum with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payEthereumUSDCMetamask}
+              />
+            )}
+
+            {(avalancheUSDCPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDC on Avalanche with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payAvalancheUSDCMetamask}
+              />
+            )}
+          </div>
+        }
+
+        if (selectedCoin === 'USDT') {
+          return <div key={walletId + 'USDT'}>
+            {(maticUSDTPaymentRequest && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDT on Polygon with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payPolygonUSDTMetamask}
+              />
+            )}
+
+            {(ethUSDTPaymentRequest &&
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDT on ETH with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payEthereumUSDTMetamask}
+              />
+            )}
+
+            {(avalancheUSDTPaymentRequest &&
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay USDT on Avalanche with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payAvalancheUSDTMetamask}
+              />
+            )}
+          </div>
+        }
+
+        if (selectedCoin === 'ETH') {
+          return <div key={walletId + 'ETH'}>
+            {(ethereumOption &&            
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay ETH with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payETHMetamask}
+              />
+            )}
+          </div>
+        }
+
+        if (selectedCoin === 'AVAX') {
+          return <div key={walletId + 'AVAX'}>
+            {(avalancheOption && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay AVAX with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payAVAXMetamask}
+              />
+            )}
+          </div>
+        }
+
+        if (selectedCoin === 'MATIC') {
+          return <div key={walletId + 'MATIC'}>
+            {(maticOption && 
+              <PaymentsOptionsItemButton
+                title = {paymentWallet.title}
+                subtitle = {'Pay MATIC with Brave Wallet'}
+                disabled = {!paymentWallet.enabled}
+                handler={payMATICMetamask}
+              />
+            )}
+          </div>
+        }
+
+        return <></>
+      }
+
+      return <div key={walletId}>
+        <PaymentsOptionsItemButton
+          title = {paymentWallet.title}
+          subtitle = {paymentWallet.description}
+          disabled = {!paymentWallet.enabled}
+          handler={paymentWallet.handler}
+        />
+      </div>
+  });
+
   return (
-    <>
-    {(bsvOption || maticOption || metamaskOption) && (
-    <Accordion
-    onChange={accordionState.setActive}
-    allowMultipleExpanded={false}
-    allowZeroExpanded={false}
-    preExpanded={preExpanded}
-  >
-    <p>Coins Accepted:<br/><i>{currencies.join(', ')}</i></p>
+  <>   
+    <p>Coins Accepted:<br/><i>{currencies.filter((coinTitle:string, pos: number) => {
+      return supportedCoins[coinTitle] === undefined ? false : supportedCoins[coinTitle].wallets
+      .some((walletTitle: string) => supportedWallets[walletTitle].enabled) &&
+      currencies.indexOf(coinTitle) === pos;
+    }).join(', ')}</i></p>
 
-    {maticOption && (
-            
-      <AccordionItem uuid="payment-matic-polygon-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="MATIC on Polygon"
-              subtitle="Pay MATIC on Polygon Metamask"
-              active={accordionState.getActive() === 'payment-matic-polygon-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
+    <Select
+      defaultValue={selectorOptions[0]}
+      options={selectorOptions}
+      onChange={onCoinSelectorChange}
+    />
+    
+    <br/>
 
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <div>
-              <button onClick={payMATICMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            </div>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-
-    )}
-
-    {maticUSDCPaymentRequest && (
-      <AccordionItem uuid="payment-usdc-polygon-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDC on Polygon"
-              subtitle="Pay USDC on Polygon Metamask"
-              active={accordionState.getActive() === 'payment-usdc-polygon-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <div>
-              <button onClick={payPolygonUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            </div>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-    )}
-    {maticUSDTPaymentRequest && (
-
-      <AccordionItem uuid="payment-usdt-polygon-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDT Polygon"
-              subtitle="Pay USDT on Polygon Metamask"
-              active={accordionState.getActive() === 'payment-usdt-polygon-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <div>
-            <button onClick={payPolygonUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            </div>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-    )}
-
-{(false && solanaOption) && (
-    <>
-            
-      <AccordionItem uuid="payment-usdc-solana-phantom">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDC Solana"
-              subtitle="Pay USDC on Solana with Phantom Wallet"
-              active={accordionState.getActive() === 'payment-usdc-solana-phantom'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-          <button onClick={phantomSolanaPayUSDC} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Phantom</button>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-
-      <AccordionItem uuid="payment-usdt-solana-phantom">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDT Solana"
-              subtitle="Pay USDT on Solana with Phantom Wallet"
-              active={accordionState.getActive() === 'payment-usdt-solana-phantom'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <button onClick={phantomSolanaPayUSDT} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Phantom</button>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-      
-    </>
-    )}
-
-    {(ethUSDCPaymentRequest) && (
-            
-      <AccordionItem uuid="payment-usdc-ethereum-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDC Ethereum"
-              subtitle="Pay USDC ERC20 on Ethereum Metamask"
-              active={accordionState.getActive() === 'payment-usdc-ethereum-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>          
-            <button onClick={payEthereumUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-    )}
-
-    {(ethereumOption) && (
-
-      <AccordionItem uuid="payment-ethereum-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="ETH on Ethereum"
-              subtitle="Pay ETH with Metamask"
-              active={accordionState.getActive() === 'payment-ethereum-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-          <button onClick={payETHMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-    )}
-   
-    {(ethUSDTPaymentRequest) && (
-
-      <AccordionItem uuid="payment-usdt-ethereum-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDT Ethereum"
-              subtitle="Pay USDT ERC20 on Ethereum Metamask"
-              active={accordionState.getActive() === 'payment-usdt-ethereum-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-          <button onClick={payEthereumUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-      
-    )}
-
-  {(avalancheOption) && (
-
-      <AccordionItem uuid="payment-avalanche-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="AVAX on Avalanche"
-              subtitle="Pay AVAX on Avalanche Metamask"
-              active={accordionState.getActive() === 'payment-avalanche-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <div>
-              <button onClick={payAVAXMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            </div>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-    )}
-      
-  {(avalancheUSDCPaymentRequest) && (
-            
-      <AccordionItem uuid="payment-usdc-avalanche-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDC Avalanche"
-              subtitle="Pay USDC ERC20 on Avalanche Metamask"
-              active={accordionState.getActive() === 'payment-usdc-avalanche-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-          <div>
-              <button onClick={payAvalancheUSDCMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            </div>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-
-    )}
-
-    {(avalancheUSDTPaymentRequest) && (
-
-      <AccordionItem uuid="payment-usdt-avalanche-metamask">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="USDT Avalanche"
-              subtitle="Pay USDT ERC20 on Avalanche Metamask"
-              active={accordionState.getActive() === 'payment-usdt-avalanche-metamask'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-          <div>
-              <button onClick={payAvalancheUSDTMetamask} style={{padding:'1em', backgroundColor: '#832E9B', color: 'white', fontWeight: 'bold', borderRadius: '1em', border: '0px' }}>Metamask</button>
-            </div>
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-      
-    )}
-
-    {bsvOption && (
-      <>
-
-      {/**
-         * Relay
-      */}
-        <AccordionItem uuid="payment-relay">
-        <AccordionItemHeading>
-          <AccordionItemButton>
-            <PaymentsOptionsItemHeaderComponent
-              title="Relay"
-              subtitle="Swipe to pay using Relay wallet"
-              active={accordionState.getActive() === 'payment-relay'}
-            />
-          </AccordionItemButton>
-        </AccordionItemHeading>
-
-        <AccordionItemPanel>
-          <PaymentsOptionsItemBodyComponent>
-            <PaymentRelayService
-              paymentOption={bsvOption}
-
-              onLoad={anypay.onLoadCallbackForRelayX}
-              onError={anypay.onErrorCallbackForRelayX}
-              onPayment={anypay.onPaymentCallbackForRelayX}
-            />
-          </PaymentsOptionsItemBodyComponent>
-        </AccordionItemPanel>
-      </AccordionItem>
-      
-    <AccordionItem uuid="payment-electrum">
-      <AccordionItemHeading>
-        <AccordionItemButton>
-          <PaymentsOptionsItemHeaderComponent
-            title="Electrum SV"
-            subtitle="Copy Payment Request URL"
-            active={accordionState.getActive() === 'payment-electrum'}
-          />
-        </AccordionItemButton>
-      </AccordionItemHeading>
-
-      <AccordionItemPanel>
-        <PaymentsOptionsItemBodyComponent>
-          <small>{anypay.state.invoice.uri}</small>
-        </PaymentsOptionsItemBodyComponent>
-      </AccordionItemPanel>
-    </AccordionItem>
-
-    <AccordionItem uuid="payment-bsv-mobile">
-      <AccordionItemHeading>
-        <AccordionItemButton>
-          <PaymentsOptionsItemHeaderComponent
-            title="Handcash or Simply Cash"
-            subtitle="Click to Open Wallet on Mobile"
-            active={accordionState.getActive() === 'payment-bsv-mobile'}
-          />
-        </AccordionItemButton>
-      </AccordionItemHeading>
-
-      <AccordionItemPanel>
-        <PaymentsOptionsItemBodyComponent>
-          <small><a target="_blank" rel="noreferrer" href={anypay.state.invoice.uri}>{anypay.state.invoice.uri}</a></small>
-        </PaymentsOptionsItemBodyComponent>
-      </AccordionItemPanel>
-    </AccordionItem>
-
-      </>
-    )}
-
-  </Accordion>
-    )}
-
-    </>
+    {walletsList}
+    
+  </>
   )
 }
 

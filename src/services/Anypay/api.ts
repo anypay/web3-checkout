@@ -60,7 +60,7 @@ export type IApiServiceStatusPollResponse = NodeJS.Timer
 
 const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
 
-const baseURL = 'https://develop.anypayx.com/'
+const baseURL = process.env.REACT_APP_BASEURL
 
 export { baseURL }
 
