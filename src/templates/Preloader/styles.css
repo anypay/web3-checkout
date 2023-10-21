@@ -252,7 +252,7 @@
   
     60% {
         transform: rotate(200deg) scale(0.38);
-        filter: blur(1px);
+        filter: blur(1.3px);
     }
 
     100% {
