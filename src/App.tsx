@@ -67,7 +67,7 @@ export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
   return (
     <ThemeProvider theme={theme}>
       <PreloaderTemplate active={!anypay.state.modal?.isOpen }/>
-      <Modal isOpen={anypay.state.modal?.isOpen || false} style={theme.modal}>
+      <Modal isOpen={anypay.state.modal?.isOpen || false} style={theme.modal} ariaHideApp={false}>
         <ModalTemplate>
           <PaymentsComponentContext.Provider value={anypay}>
             {!anypay.state.initialized ?

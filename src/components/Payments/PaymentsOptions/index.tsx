@@ -14,14 +14,11 @@ import { PaymentsComponentContext } from 'components/Payments/context'
 //import QRCode from 'react-qr-code'
 
 import Select from 'react-select';
-
 import detectEthereumProvider from '@metamask/detect-provider';
-
-import Web3 from 'web3'
-
 import SolanaWeb3 from '@solana/web3.js'
-
 import { PublicKey, SystemProgram  } from '@solana/web3.js'
+
+const Web3 = require('web3');
 
 type CoinInfo = {
   wallets: string[];
@@ -294,7 +291,7 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
         setMetamaskAccount(account)
 
-      })
+      }).catch(()=>{})
 
       
     }

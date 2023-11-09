@@ -1,8 +1,9 @@
-import * as bsv from 'bsv'
 import ApiService from './api'
 import StateService from './state'
 import type { IStateServiceGetResponse, IStateServiceState } from './state'
 import { AnypayApiResponse } from 'types/api'
+
+const bsv = require('bsv2');
 
 /**
  * Anypay payment service
