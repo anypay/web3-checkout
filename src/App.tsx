@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { ThemeProvider } from 'styled-components'
 import ModalTemplate from 'templates/Modal'
+import PreloaderTemplate from 'templates/Preloader'
 import PaymentsComponent from 'components/Payments'
 import PaymentsLoadingComponent from 'components/Payments/PaymentsLoading'
 import PaymentsErrorComponent from 'components/Payments/PaymentsError'
@@ -65,6 +66,7 @@ export function AppComponent({ anypay } : { anypay: IAnypayServiceResponse }) {
 
   return (
     <ThemeProvider theme={theme}>
+      <PreloaderTemplate active={!anypay.state.modal?.isOpen }/>
       <Modal isOpen={anypay.state.modal?.isOpen || false} style={theme.modal}>
         <ModalTemplate>
           <PaymentsComponentContext.Provider value={anypay}>
