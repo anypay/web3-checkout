@@ -57,7 +57,7 @@ export function AppComponentWrapper({ anypay, children } : { anypay: IAnypayServ
 
     }
   // eslint-disable-next-line
-  }, [anypay.state.status])
+  }, [anypay.state.status, bsvOption])
 
   return children({ anypay })
 }

@@ -1,5 +1,5 @@
 import { AppComponentWrapper } from 'App'
-import { render } from '@testing-library/react'
+import TestRenderer from 'react-test-renderer'
 
 const anypay = {
   init: jest.fn(),
@@ -12,9 +12,12 @@ const anypay = {
   state: {
     initialized: false,
     status: 'pending',
-    invoiceId: 'zMjwpQ7kk',
+    invoiceId: 'RWQZ8GKnI',
     invoiceReport: {},
-    invoice: {},
+    invoice: {
+      status: ''
+    },
+    paymentOptions: [{currency: 'BSV'}],
     processed: {
       provider: '',
       payload: {},
@@ -34,14 +37,18 @@ const anypay = {
   getCurrencyFromNetwork: jest.fn(),
 }
 
-const renderAppComponentWrapper = ({ children, anypay }: any) => render(
-  <AppComponentWrapper anypay={anypay}>
-    {() => {
-      children()
-      return null
-    }}
-  </AppComponentWrapper>
-)
+const renderAppComponentWrapper = ({ children, anypay }: any) => {
+  TestRenderer.act(()=>{
+    TestRenderer.create(
+      <AppComponentWrapper anypay={anypay} >
+        {() => {
+          children()
+          return null
+        }}
+      </AppComponentWrapper>
+    ) 
+  })
+}
 
 describe('AppComponentWrapper', () => {
   test('render#init', () => {
@@ -63,7 +70,8 @@ describe('AppComponentWrapper', () => {
 
   test('render#poll', () => {
     const children = jest.fn()
-    anypay.state.invoiceId = 'zMjwpQ7kk'
+    anypay.state.invoiceId = 'RWQZ8GKnI'
+    anypay.state.invoice.status = 'unpaid'
     renderAppComponentWrapper({ children, anypay })
     expect(anypay.pollInvoice).toHaveBeenCalled()
   })
