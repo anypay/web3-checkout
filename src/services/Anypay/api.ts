@@ -56,7 +56,7 @@ export type IApiServiceStatusPoll = {
   callback: (payload: any) => void
 }
 
-export type IApiServiceStatusPollResponse = NodeJS.Timer
+export type IApiServiceStatusPollResponse = NodeJS.Timeout
 
 const MERCHANT_API_KEY = '43b5f322-4eb7-487d-b8ba-3a0fbfe3235b'
 

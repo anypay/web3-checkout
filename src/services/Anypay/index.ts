@@ -33,7 +33,7 @@ export type IAnypayService = {
 export type IAnypayServiceResponse = {
   init: () => void
   fail: (state: IAnypayServiceFail) => void
-  pollInvoice: () => NodeJS.Timer
+  pollInvoice: () => NodeJS.Timeout
   setModalState: (visibility: boolean) => void
 
   getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse
