@@ -4,7 +4,7 @@ import ReceiptSummaryComponent from './index'
 
 export default {
   component: ReceiptSummaryComponent,
-  title: 'Components/ReceiptSummary',
+  title: 'Components/CunfirmingReceiptSummary',
 } as Meta
 
 export const Default: React.VFC<{}> = () => (

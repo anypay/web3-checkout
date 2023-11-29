@@ -1,7 +1,6 @@
 import { Meta } from '@storybook/react'
 
 import PaymentsOptionsItemHeaderComponent from './PaymentsOptionsItemHeader'
-import PaymentsOptionsIconComponent from './PaymentsOptionsIcon'
 
 export default {
   component: PaymentsOptionsItemHeaderComponent,
