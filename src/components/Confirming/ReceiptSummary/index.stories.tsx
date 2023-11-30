@@ -4,7 +4,7 @@ import ReceiptSummaryComponent from './index'
 
 export default {
   component: ReceiptSummaryComponent,
-  title: 'Components/CunfirmingReceiptSummary',
+  title: 'Components/ConfirmingReceiptSummary',
 } as Meta
 
 export const Default = () => (

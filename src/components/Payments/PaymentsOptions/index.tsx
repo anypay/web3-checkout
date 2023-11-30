@@ -291,7 +291,7 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
         setMetamaskAccount(account)
 
-      }).catch(()=>{})
+      })
 
       
     }
