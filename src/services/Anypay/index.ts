@@ -3,7 +3,8 @@ import StateService from './state'
 import type { IStateServiceGetResponse, IStateServiceState } from './state'
 import { AnypayApiResponse } from 'types/api'
 
-const bsv = require('bsv2');
+// @ts-ignore
+import bsv from 'bsv2'
 
 /**
  * Anypay payment service

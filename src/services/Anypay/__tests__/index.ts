@@ -111,6 +111,7 @@ describe('AnypayService', () => {
     })
   })
 
+  // TODO RelayX currently not supported
   test.skip('AnypayService#getPaymentInputForRelayX/success', async () => {
     mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
     mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
@@ -144,6 +145,7 @@ describe('AnypayService', () => {
     })   
   })
 
+  // TODO Moneybutton currently not supported
   test.skip('AnypayService#getPaymentInputForMoneybutton/success', async () => {
     mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
     mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
