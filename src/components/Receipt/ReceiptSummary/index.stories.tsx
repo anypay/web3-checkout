@@ -7,6 +7,6 @@ export default {
   title: 'Components/ReceiptSummary',
 } as Meta
 
-export const Default: React.VFC<{}> = () => (
+export const Default = () => (
   <ReceiptSummaryComponent />
 )

@@ -7,14 +7,14 @@ export default {
   title: 'Components/PaymentsOptionsItemHeader',
 } as Meta
 
-export const Default: React.VFC<{}> = () => (
+export const Default = () => (
   <PaymentsOptionsItemHeaderComponent
     title="Payment option"
     subtitle="Payment option description, could be long as well"
   />
 )
 
-export const WithIcon: React.VFC<{}> = () => (
+export const WithIcon = () => (
   <PaymentsOptionsItemHeaderComponent
     title="Payment option"
     subtitle="Payment option description, could be long as well"
