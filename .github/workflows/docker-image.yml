@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag anypay/web3-checkout:${GITHUB_REF#refs/heads/}
+      run: docker build . --file Dockerfile --tag anypay/web3-checkout:${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.head_ref }}
