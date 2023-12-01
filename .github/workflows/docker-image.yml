@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "*" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag anypay/web3-checkout:${GITHUB_REF#refs/heads/}
+
+      - name: Push Docker Image
+        if: github.event_name == 'push' && github.event_name != 'pull_request'
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          docker push anypay/web3-checkout:${GITHUB_REF#refs/heads/}
+
