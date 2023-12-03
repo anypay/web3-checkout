@@ -35,7 +35,7 @@ function ReceiptSummaryInfoComponent() {
       setPayment(data.payment)
     })
 
-  }, [])
+  }, [anypay.state.invoice?.uid])
 
   if (!payment) { return <div></div> }
 
