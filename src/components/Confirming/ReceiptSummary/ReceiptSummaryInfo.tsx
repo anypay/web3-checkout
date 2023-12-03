@@ -30,17 +30,12 @@ function ReceiptSummaryInfoComponent() {
 
   const [payment, setPayment] = useState<any>(null)
 
-  const invoiceUid = anypay.state.invoice?.uid
-
   useEffect(() => {
-
-    if (!invoiceUid) { return }
-
-    axios.get(`${baseURL}api/v1/invoices/${invoiceUid}`).then(({data}) => {
+    axios.get(`${baseURL}api/v1/invoices/${anypay.state.invoice?.uid}`).then(({data}) => {
       setPayment(data.payment)
     })
 
-  }, [invoiceUid])
+  }, [anypay.state.invoice?.uid])
 
   if (!payment) { return <div></div> }
 
