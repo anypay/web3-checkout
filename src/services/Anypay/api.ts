@@ -91,12 +91,6 @@ const ApiService = () => {
   }
 
   // @ts-ignore
-  const paymentOptionsGet = async ({ invoiceId }: IApiServicePaymentOptionsGet) : IApiServicePaymentOptionsGetResponse => {
-    const request = await instance.get(`/r/${invoiceId}`)
-    return request.data
-  }
-
-  // @ts-ignore
   const invoiceReportPost = async ({ invoiceId }: IApiServiceInvoicePost, payload) : IApiServiceInvoicePostResponse => {
     const request = await instance.post(`/r/${invoiceId}/pay/BSV/bip270`, payload)
     return request.data
