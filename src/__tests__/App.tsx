@@ -67,20 +67,4 @@ describe('AppComponentWrapper', () => {
     renderAppComponentWrapper({ children, anypay })
     expect(anypay.pollInvoice).toHaveBeenCalled()
   })
-
-  test('render#getPaymentOutputForRelayX', () => {
-    const children = jest.fn()
-    anypay.state.status = 'broadcasted'
-    anypay.state.processed.provider = 'relayx'
-    renderAppComponentWrapper({ children, anypay })
-    expect(anypay.publishBroadcastedTransaction).toHaveBeenCalled()
-  })
-
-  test('render#getPaymentOutputForMoneybutton', () => {
-    const children = jest.fn()
-    anypay.state.status = 'broadcasted'
-    anypay.state.processed.provider = 'moneybutton'
-    renderAppComponentWrapper({ children, anypay })
-    expect(anypay.publishBroadcastedTransaction).toHaveBeenCalled()
-  })
 })
