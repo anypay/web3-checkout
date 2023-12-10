@@ -13,7 +13,8 @@ import Select from 'react-select';
 
 import detectEthereumProvider from '@metamask/detect-provider';
 
-import Web3 from 'web3'
+import { Web3 } from 'web3';
+
 
 type CoinInfo = {
   wallets: string[];
@@ -241,7 +242,7 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
         setMetamaskAccount(account)
 
-      })
+      }).catch(console.error)
 
       
     }
@@ -357,17 +358,17 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
   async function payUSDC(address: string, amount: number, token: string, chain: string, currency: string='USDC'): Promise<any> {
 
-    let _web3 = new Web3(provider)
+    const _web3 = new Web3(provider)
 
-    let tokenAddress = token;
+    const tokenAddress = token;
 
-    let toAddress = address;
+    const toAddress = address;
 
-    let fromAddress = String(metamaskAccount);
+    const fromAddress = String(metamaskAccount);
 
-    let value = _web3.utils.toBN(amount);
+    const value = _web3.utils.toNumber(amount);
 
-    let minABI: any = [
+    const minABI: any = [
       // transfer
       {
         "constant": false,
@@ -391,9 +392,9 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
         "type": "function"
       }
     ];// Get ERC20 Token contract instance
-    let contract = new _web3.eth.Contract(minABI, tokenAddress);// calculate ERC20 token amount
+    const contract = new _web3.eth.Contract(minABI, tokenAddress);// calculate ERC20 token amount
 
-    const transfer = contract.methods.transfer(toAddress, value)
+    const transfer = (contract.methods.transfer as any)(toAddress, value)
 
     await transfer.call({ from: fromAddress })
 
@@ -418,13 +419,13 @@ const [selectedCoin, setSelectedCoin] = useState(defaultSelectorOption.value);
 
   async function payETH({address, amount, chain}: {address: string, amount: number, chain: string}): Promise<void> {
 
-    let _web3 = new Web3(provider)
+    const _web3 = new Web3(provider)
 
-    let toAddress = address;
+    const toAddress = address;
 
-    let fromAddress = String(metamaskAccount);
+    const fromAddress = String(metamaskAccount);
 
-    let value = _web3.utils.toBN(amount);
+    const value = _web3.utils.toNumber(amount);
 
     console.log(`pay ${chain}`, { amount, value, toAddress, fromAddress })
 

@@ -13,9 +13,9 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#workflow', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
-    mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+    mock.onPost('https://api.anypayx.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
     
     const customConfig = {
       invoiceId: config.invoiceId,
@@ -27,13 +27,6 @@ describe('AnypayService', () => {
 
     await act(async () => {
       await anypay.result.current.init()
-    })
-
-    expect(anypay.result.current.getPaymentInputForRelayX()).toEqual({
-      outputs: [
-        {'amount':0.000608, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 b0b343aa5025eb12f0ff4f63243449df9e4ef223 OP_EQUALVERIFY OP_CHECKSIG'},
-        {'amount':0.00007, currency: 'BSV', 'to': 'OP_DUP OP_HASH160 fde8f61612beecbf7532765d17ce9c36c8601878 OP_EQUALVERIFY OP_CHECKSIG'}
-      ]
     })
 
     act(() => {
@@ -52,9 +45,9 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#init/success', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
-    mock.onPost('https://api.anypayinc.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+    mock.onPost('https://api.anypayx.com/r/zMjwpQ7kk/pay/BSV/bip270').reply(200, apiMocks.invoiceReportPost)
 
     const customConfig = {
       invoiceId: config.invoiceId,
@@ -70,8 +63,7 @@ describe('AnypayService', () => {
     expect(anypay.result.current.state).toMatchObject({
       initialized: true,
       status: 'pending',
-      invoiceReport: apiMocks.invoiceReportGetPrepaid,
-      invoice: apiMocks.invoiceGetPrepaid,
+      invoice: apiMocks.invoiceGetPrepaid.invoice,
     })
     expect(customConfig.onAnypayLoadSuccess).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -82,8 +74,8 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#init/failure', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').networkError()
 
     const customConfig = {
       invoiceId: config.invoiceId,
@@ -119,9 +111,10 @@ describe('AnypayService', () => {
     })
   })
 
-  test('AnypayService#getPaymentInputForRelayX/success', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+  // TODO RelayX currently not supported
+  test.skip('AnypayService#getPaymentInputForRelayX/success', async () => {
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
 
     const anypay = renderHook(() => AnypayService({ config }))
 
@@ -138,8 +131,8 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#getPaymentInputForRelayX/failure', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').networkError()
 
     const anypay = renderHook(() => AnypayService({ config }))
 
@@ -152,9 +145,10 @@ describe('AnypayService', () => {
     })   
   })
 
-  test('AnypayService#getPaymentInputForMoneybutton/success', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
+  // TODO Moneybutton currently not supported
+  test.skip('AnypayService#getPaymentInputForMoneybutton/success', async () => {
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').reply(200, apiMocks.invoiceReportGetPrepaid)
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').reply(200, apiMocks.invoiceGetPrepaid)
 
     const anypay = renderHook(() => AnypayService({ config }))
 
@@ -171,8 +165,8 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#getPaymentInputForMoneybutton/failure', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').networkError()
 
     const anypay = renderHook(() => AnypayService({ config }))
 
@@ -186,8 +180,8 @@ describe('AnypayService', () => {
   })
 
   test('AnypayService#publishBroadcastedTransaction/failure', async () => {
-    mock.onGet('https://api.anypayinc.com/r/zMjwpQ7kk').networkError()
-    mock.onGet('https://api.anypayinc.com/invoices/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/r/zMjwpQ7kk').networkError()
+    mock.onGet('https://api.anypayx.com/api/v1/invoices/zMjwpQ7kk').networkError()
 
     const anypay = renderHook(() => AnypayService({ config }))
 

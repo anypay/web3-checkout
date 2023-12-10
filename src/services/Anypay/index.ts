@@ -1,8 +1,10 @@
-import * as bsv from 'bsv'
 import ApiService from './api'
 import StateService from './state'
 import type { IStateServiceGetResponse, IStateServiceState } from './state'
 import { AnypayApiResponse } from 'types/api'
+
+// @ts-ignore
+import bsv from 'bsv2'
 
 /**
  * Anypay payment service
@@ -32,7 +34,7 @@ export type IAnypayService = {
 export type IAnypayServiceResponse = {
   init: () => void
   fail: (state: IAnypayServiceFail) => void
-  pollInvoice: () => NodeJS.Timer
+  pollInvoice: () => NodeJS.Timeout
   setModalState: (visibility: boolean) => void
 
   getPaymentInputForRelayX: () => IAnypayServiceGetPaymentInputForRelayXResponse

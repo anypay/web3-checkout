@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
   webpack: {
     configure: {
@@ -12,7 +14,19 @@ module.exports = {
           },
         },
       },
-    },
+      resolve: {
+          fallback: { 
+            crypto: false,
+            buffer: require.resolve('buffer/')
+        },
+      },
+      plugins: [
+        new webpack.ProvidePlugin({
+            process: 'process/browser',
+            Buffer: ['buffer', 'Buffer']
+        })
+      ]
+    }
   },
   plugins: [
     {
@@ -24,5 +38,5 @@ module.exports = {
       },
       options: {}
     }
-  ],
+  ]
 }
